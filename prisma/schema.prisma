@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Feature {
+  id        String   @id @default(uuid())
+  name      String   @unique   // e.g., "Create Bot", "Copy Trade", "Sell on Marketplace"
+  website   Website
+  createdAt DateTime @default(now())
+
+  roles RoleFeature[]
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique   // admin, seller, affiliate, trader, copyTrader
+  website   Website
+  createdAt DateTime @default(now())
+
+  usersCrypto CryptoUser[]
+  usersStocks StocksUser[]
+  features RoleFeature[]
+}
+
+model RoleFeature {
+  id        String   @id @default(uuid())
+  roleId    String
+  featureId String
+
+  role    Role    @relation(fields: [roleId], references: [id])
+  feature Feature @relation(fields: [featureId], references: [id])
+
+  @@unique([roleId, featureId])
+}
+
+model CryptoUser {
+  id            String   @id @default(uuid()) 
+  email         String   @unique
+  name          String?
+  phone         String?
+  password      String
+  roleId        String
+  membership    String?  // Free / Starter / Professional / Ultimate
+  isVerified    Boolean  @default(false)
+  twoFASecret   String?
+  twoFAEnabled  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  role          Role     @relation(fields: [roleId], references: [id])
+  credentials   CryptoCredentials[] 
+  kyc           CryptoKYC[]
+}
+
+model StocksUser {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  phone         String?
+  password      String
+  roleId        String
+  membership    String?
+  isVerified    Boolean  @default(false)
+  twoFASecret   String?
+  twoFAEnabled  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  role          Role     @relation(fields: [roleId], references: [id])
+  credentials   StocksCredentials[]
+  kyc           StocksKYC[] 
+}
+
+enum Website {
+  CRYPTO
+  STOCKS
+}
+
+model CryptoCredentials {
+  id             String     @id @default(uuid())
+  userId         String
+  exchange       CryptoExchange
+  apiKey         String
+  apiSecret      String
+  apiPassphrase  String?
+  apiKeyVersion  String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  user           CryptoUser @relation(fields: [userId], references: [id])
+
+  @@unique([userId, exchange])
+}
+
+model StocksCredentials {
+  id             String     @id @default(uuid())
+  userId         String
+  exchange       String
+  apiKey         String
+  apiSecret      String
+  apiPassphrase  String?
+  apiKeyVersion  String?
+  expiresAt      DateTime
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  user           StocksUser @relation(fields: [userId], references: [id])
+
+  @@unique([userId, exchange])
+}
+
+model CryptoKYC {
+  id         String    @id @default(uuid())
+  userId     String
+  document   String
+  status     KYCStatus @default(PENDING)
+  rejectionReason String?
+  adminNote       String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user CryptoUser @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+
+model StocksKYC {
+  id         String   @id @default(uuid())
+  userId     String   
+  document   String
+  status     KYCStatus @default(PENDING)
+  rejectionReason String?
+  adminNote       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user StocksUser @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+
+ 
+enum KYCStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+
+enum CryptoExchange {
+  BINANCE
+  COINDCX
+  KUCOIN
+}
+
+enum StocksExchange {
+  ZERODHA
+}
+enum CryptoTradeType {
+  SPOT
+  FUTURES
+}
+
+enum TradeSide {
+  BUY
+  SELL
+}
