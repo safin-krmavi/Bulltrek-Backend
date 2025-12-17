@@ -462,3 +462,99 @@ export const getCoinDCXFuturesActivePositions = async (
 
   return filteredPositions;
 };
+
+export const getFuturesPositionsByFilters = async (
+  apiKey: string,
+  apiSecret: string,
+  {
+    pairs,
+    positionIds,
+    marginCurrency = ["USDT"],
+    page = 1,
+    size = 50,
+  }: {
+    pairs?: string[];
+    positionIds?: string[];
+    marginCurrency?: string[];
+    page?: number;
+    size?: number;
+  }
+) => {
+  if (
+    (!pairs || pairs.length === 0) &&
+    (!positionIds || positionIds.length === 0)
+  ) {
+    throw new Error("Either 'pairs' or 'positionIds' must be provided.");
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const body: Record<string, any> = {
+    timestamp,
+    page: String(page),
+    size: String(size),
+    margin_currency_short_name: [marginCurrency],
+  };
+
+  if (pairs && pairs.length > 0) {
+    body["pairs"] = pairs.join(","); // e.g., "B-BTC_USDT,B-ETH_USDT"
+  }
+  if (positionIds && positionIds.length > 0) {
+    body["position_ids"] = positionIds.join(",");
+  }
+
+  const signature = generateSignatureCoinDCX(body, apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_FUTURE_LIST_POSITIONS_ENDPOINT}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    const positions = response?.data || [];
+
+    // Step 2: Fetch latest mark prices (real-time)
+    let markPriceMap: Record<string, any> = {};
+    try {
+      const { data } = await axios.get(
+        `${COINDCX_GET_FUTURES_CURRENT_PRICES_REALTIME_URL}`
+      );
+      markPriceMap = data?.prices || {};
+    } catch (err) {
+      console.log("ERROR_FETCHING_REALTIME_PRICES_COINDCX", {
+        error: err,
+      });
+    }
+
+    // Step 3: Add `mark_price` and `unrealized_pnl`
+    const updatedPositions = positions.map((pos: any) => {
+      const priceInfo = markPriceMap[pos.pair];
+      const mark_price = priceInfo?.mp ?? pos.mark_price ?? 0;
+      const unrealized_pnl = (mark_price - pos.avg_price) * pos.active_pos;
+
+      return {
+        id: pos.id,
+        pair: pos.pair,
+        active_pos: pos.active_pos,
+        avg_price: pos.avg_price,
+        liquidation_price: pos.liquidation_price,
+        leverage: pos.leverage,
+        mark_price,
+        margin_type: (pos.margin_type ?? "isolated").toUpperCase(),
+        unrealized_pnl,
+        created_at: pos?.updated_at || Date.now(),
+      };
+    });
+
+    return updatedPositions;
+  } catch (error: any) {
+    console.log("ERROR_FETCHING_FILTERED_POSITIONS_COINDCX", { error });
+    throw new Error(error);
+  }
+};

@@ -109,6 +109,23 @@ export async function getCryptoUser(userId: string) {
   if (!user) throw new Error("User not found");
   return user;
 }
+export async function getCryptoUsers() {
+  const users = await prisma.cryptoUser.findMany({
+    include: {
+      credentials: true,
+    },
+  });
+
+  return users.map((client) => ({
+    id: client.id,
+    name: client.name,
+    email: client.email,
+    phone: client.phone, // use 'phone', not 'phoneNumber'
+    membership: client.membership || null, // optional
+    createdAt: client.createdAt,
+    exchanges: client.credentials.map((cred) => cred.exchange),
+  }));
+}
 
 export async function deleteCryptoUser(userId: string) {
   await prisma.cryptoUser.delete({

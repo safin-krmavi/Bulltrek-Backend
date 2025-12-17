@@ -16,6 +16,7 @@ import { getKucoinAllData } from "../../../services/crypto/exchange/kucoinServic
 import { getCoinDCXAllData } from "../../../services/crypto/exchange/coindcxService";
 import fs from "fs/promises";
 import { FILE_PATH, DATA_DIR } from "../../../constants/crypto";
+import { getAngelOneInstruments } from "../../../services/stocks/exchange/angeloneService";
 // import { promises as fs } from "fs";
 
 export const fetchSymbolPairsController = async (
@@ -37,15 +38,18 @@ export const updateSymbolPairsController = async (
   res: Response
 ) => {
   try {
-    const [binanceData, kucoinData, coinDCXData] = await Promise.all([
-      getBinanceUSDTData(),
-      getKucoinAllData(),
-      getCoinDCXAllData(),
-    ]);
+    const [binanceData, kucoinData, coinDCXData, angelData] = await Promise.all(
+      [
+        getBinanceUSDTData(),
+        getKucoinAllData(),
+        getCoinDCXAllData(),
+        getAngelOneInstruments(),
+      ]
+    );
 
     const formattedData = [
       {
-        type: "SPOT",
+        type: "CRYPTO_SPOT",
         data: [
           {
             exchange: "BINANCE",
@@ -63,7 +67,7 @@ export const updateSymbolPairsController = async (
         ],
       },
       {
-        type: "FUTURES",
+        type: "CRYPTO_FUTURES",
         data: [
           {
             exchange: "BINANCE",
@@ -77,6 +81,35 @@ export const updateSymbolPairsController = async (
           {
             exchange: "COINDCX",
             data: coinDCXData.futureSymbols,
+          },
+        ],
+      },
+
+      // ---------------- STOCKS ----------------
+      {
+        type: "STOCK_CASH",
+        data: [
+          {
+            exchange: "ANGELONE",
+            data: angelData.equitySymbols,
+          },
+        ],
+      },
+      {
+        type: "STOCK_FUTURES",
+        data: [
+          {
+            exchange: "ANGELONE",
+            data: angelData.futuresSymbols,
+          },
+        ],
+      },
+      {
+        type: "STOCK_OPTIONS",
+        data: [
+          {
+            exchange: "ANGELONE",
+            data: angelData.optionsSymbols,
           },
         ],
       },

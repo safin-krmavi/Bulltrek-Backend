@@ -53,6 +53,7 @@ model CryptoUser {
   role          Role     @relation(fields: [roleId], references: [id])
   credentials   CryptoCredentials[] 
   kyc           CryptoKYC[]
+  cryptoTrades  CryptoTrades[]
 }
 
 model StocksUser {
@@ -95,18 +96,23 @@ model CryptoCredentials {
 }
 
 model StocksCredentials {
-  id             String     @id @default(uuid())
-  userId         String
-  exchange       String
-  apiKey         String
-  apiSecret      String
-  apiPassphrase  String?
-  apiKeyVersion  String?
-  expiresAt      DateTime
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  id            String   @id @default(uuid())
+  userId        String
+  exchange      String   // "ANGELONE" | "ZERODHA"
 
-  user           StocksUser @relation(fields: [userId], references: [id])
+  apiKey        String
+  clientCode    String?  // Angel: clientCode | Zerodha: user_id
+
+  accessToken   String?
+  refreshToken  String?  // Angel One only
+  feedToken     String?  // Angel One only
+
+  expiresAt     DateTime
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          StocksUser @relation(fields: [userId], references: [id])
 
   @@unique([userId, exchange])
 }
@@ -143,6 +149,92 @@ model StocksKYC {
 }
 
 
+
+
+
+model CryptoTrades {
+  id           String      @id @default(uuid())
+  userId       String        
+  exchange     CryptoExchange
+  type         CryptoTradeType
+  orderType    String  // "LIMIT" or "MARKET"
+  symbol       String
+  side         TradeSide
+  orderId      String       
+  quantity     Float
+  price        Float
+  triggerPrice Float?
+  status       TradeStatus
+  fee          Float       @default(0)
+  leverage     Float?
+  
+  realizedPnl   Float           @default(0) // REQUIRED
+  executedAt    DateTime        @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         CryptoUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order        CryptoOrder? @relation(fields: [orderId], references: [id])
+
+}
+
+
+model FuturesPosition {
+  id             String   @id @default(uuid())
+  userId         String
+  exchange       CryptoExchange
+  symbol         String
+
+  qty            Float    // +long, -short
+  avgEntryPrice  Float
+  realizedPnl    Float    @default(0)
+
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, exchange, symbol])
+}
+
+model SpotBalance {
+  id            String   @id @default(uuid())
+  userId        String
+  exchange      CryptoExchange
+  asset         String
+
+  qty           Float
+  avgPrice      Float
+  realizedPnl   Float    @default(0)
+
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, exchange, asset])
+}
+
+model CryptoOrder {
+  id               String   @id @default(uuid())
+  userId           String
+  exchange         CryptoExchange
+  type             CryptoTradeType   // SPOT | FUTURES
+  symbol           String
+  side             TradeSide          // BUY | SELL
+
+  exchangeOrderId  String?
+  clientOrderId    String?
+
+  requestedQty     Float
+  requestedPrice   Float?
+  leverage         Float?
+  orderType        String             // MARKET / LIMIT
+
+  status           TradeStatus         // NEW / PARTIALLY_FILLED / FILLED / CANCELLED
+  filledQty        Float               @default(0)
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  trades           CryptoTrades[]
+
+  @@unique([exchangeOrderId])
+}
+
  
 enum KYCStatus {
   PENDING
@@ -159,6 +251,7 @@ enum CryptoExchange {
 
 enum StocksExchange {
   ZERODHA
+  ANGELONE
 }
 enum CryptoTradeType {
   SPOT
@@ -169,3 +262,14 @@ enum TradeSide {
   BUY
   SELL
 }
+
+enum TradeStatus {
+  EXECUTED
+  PENDING 
+  FAILED
+  TIMEOUTED
+  OPEN
+  CANCELLED
+  PARTIALLY_FILLED
+}
+ 

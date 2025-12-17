@@ -1,6 +1,7 @@
+import Decimal from "decimal.js";
 import path from "path";
 import fs from "fs";
-import { TradeSide } from "@prisma/client";
+import { TradeSide, TradeStatus } from "@prisma/client";
 import { generateHeadersKucoin } from "../../../utils/crypto/exchange/kucoinUtils";
 import axios from "axios";
 import { fetchSymbolPairs } from "../../../services/crypto/exchange/exchangeService";
@@ -331,4 +332,128 @@ export async function getSymbolData(
   }
 
   return null;
+}
+
+export async function calcQty(orderData: any, isForStatusUpdate: boolean) {
+  if (!orderData) {
+    throw new Error("Order data is undefined or null");
+  }
+
+  // Destructure size and remaining properties
+  const { size, ...remaining } = orderData;
+
+  let price = 0;
+  let type = isForStatusUpdate ? orderData.orderType : orderData.type;
+  if (isForStatusUpdate) {
+    price = orderData.price ? new Decimal(orderData.price).toNumber() : 0;
+  } else {
+    if (type && type === "market") {
+      price = orderData.avgDealPrice
+        ? new Decimal(orderData.avgDealPrice).toNumber()
+        : 0;
+    } else {
+      price = orderData.price ? new Decimal(orderData.price).toNumber() : 0;
+    }
+  }
+
+  // const value = orderData.value ? new Decimal(orderData.value).toNumber() : 0;
+
+  const symbol = orderData.symbol;
+  if (!symbol) {
+    console.log("NO_SYMBOL_FOUND_IN_ORDER_DATA", {
+      clientId: orderData.clientId,
+      exchange: orderData.exchange,
+    });
+  }
+
+  // Fetch symbol data to get the multiplier
+  let multiplier = 1; // Default multiplier
+  if (symbol) {
+    try {
+      const symbolData = await getSymbolData(symbol);
+      if (symbolData && symbolData.multiplier) {
+        multiplier = symbolData.multiplier;
+        console.log("SYMBOL_MULTIPLIER_FOUND", {
+          symbol: symbol,
+          multiplier: multiplier,
+          clientId: orderData.clientId,
+          exchange: orderData.exchange,
+        });
+      } else {
+        console.log("NO_MULTIPLIER_FOUND_USING_DEFAULT", {
+          symbol: symbol,
+          defaultMultiplier: 1,
+          clientId: orderData.clientId,
+          exchange: orderData.exchange,
+        });
+      }
+    } catch (error: any) {
+      console.log("ERROR_FETCHING_SYMBOL_DATA", {
+        error: error?.data || error?.response?.data || error.message,
+        symbol: symbol,
+        clientId: orderData.clientId,
+        exchange: orderData.exchange,
+      });
+      console.log("USING_DEFAULT_MULTIPLIER", {
+        defaultMultiplier: 1,
+        clientId: orderData.clientId,
+        exchange: orderData.exchange,
+      });
+    }
+  }
+
+  let qty = 0;
+  if (price > 0) {
+    // // Use Decimal.js for precise division to calculate base qty
+    // const baseQty = new Decimal(value).dividedBy(new Decimal(price)).toNumber();
+
+    // Apply multiplier to size
+    qty = new Decimal(size).times(new Decimal(multiplier)).toNumber();
+    console.log("FINAL_QTY_WITH_MULTIPLIER", {
+      qty: qty,
+      clientId: orderData.clientId,
+      exchange: orderData.exchange,
+    });
+  } else {
+    console.log("QTY_ZERO_INVALID_PRICE", {
+      clientId: orderData.clientId,
+      exchange: orderData.exchange,
+    });
+  }
+  return {
+    ...remaining,
+    size,
+    qty: qty, // This is calculated as value/price
+  };
+}
+
+export const mapKucoinSpotOrderSocketStatus = (orderData: any) => {
+  const status = orderData?.status.toLowerCase();
+  const type = orderData?.type.toLowerCase();
+
+  if (type === "filled" && status === "done") {
+    return TradeStatus.EXECUTED;
+  } else if (type === "open" && status === "open") {
+    return TradeStatus.OPEN;
+  } else if (type === "canceled" && status === "done") {
+    return TradeStatus.CANCELLED;
+  } else if (type === "") return TradeStatus.OPEN;
+
+  // const type;
+};
+
+export function mapKuCoinFuturesOrderStatus(orderData: any): TradeStatus {
+  const { status, type, filledSize } = orderData;
+
+  if (status === "done" && type === "filled" && parseFloat(filledSize) > 0) {
+    return TradeStatus.EXECUTED; // Fully executed order
+  }
+
+  if (status === "done" && type === "canceled") {
+    return TradeStatus.CANCELLED; // Cancelled order
+  }
+  //  parseFloat(order.filledSize) > 0 &&
+  //       parseFloat(order.filledSize) < parseFloat(order.size)
+  // Fallback to OPEN unless explicitly failed
+  return TradeStatus.OPEN;
 }

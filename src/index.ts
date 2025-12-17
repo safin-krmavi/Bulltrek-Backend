@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import rootrouter from "./routes/index";
+import { registerSocketManager } from "./sockets/bootstrap";
 dotenv.config();
 
 const app = express();
@@ -10,6 +11,9 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// Register SocketManager first
+// registerSocketManager(app);
 
 app.use("/api/v1/", rootrouter);
 

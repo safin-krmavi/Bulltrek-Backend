@@ -10,6 +10,17 @@ function sign(data: string, secret: string): string {
   return crypto.createHmac("sha256", secret).update(data).digest("base64");
 }
 
+// Generate signature for KuCoin requests
+export function generateSignatureKucoin(
+  apiSecret: string,
+  timestamp: string,
+  method: string,
+  endpoint: string
+): string {
+  const hmac = crypto.createHmac("sha256", apiSecret);
+  return hmac.update(timestamp + method + endpoint).digest("base64");
+}
+
 export async function generateKucoinServerTime(): Promise<string> {
   const res = await axios.get(
     `${KUCOIN_FUTURES_BASE_URL}${KUCOIN_GET_SERVER_TIME_ENDPOINT}`

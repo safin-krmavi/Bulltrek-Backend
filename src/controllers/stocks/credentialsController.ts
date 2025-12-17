@@ -12,18 +12,23 @@ export async function addOrUpdateCredentialsController(
       userId,
       exchange,
       apiKey,
-      apiSecret,
-      apiPassphrase,
-      apiKeyVersion,
+      clientCode,
+      accessToken,
+      refreshToken,
+      feedToken,
+      expiresAt,
     } = req.body;
     const creds = await credentialsService.addOrUpdateStocksCredentials({
       userId,
       exchange,
       apiKey,
-      apiSecret,
-      apiPassphrase,
-      apiKeyVersion,
+      clientCode,
+      accessToken,
+      refreshToken,
+      feedToken,
+      expiresAt: new Date(expiresAt),
     });
+
     return sendCreated(res, "Credentials saved successfully", creds);
   } catch (err: any) {
     return sendBadRequest(res, err.message);

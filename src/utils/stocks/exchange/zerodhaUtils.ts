@@ -1,3 +1,6 @@
+import { TradeSide } from "@prisma/client";
+import { CommonOrderPayload } from "./tradeUtils";
+
 export const handleZerodhaError = (error: any) => {
   const exchangeMessage =
     error.response?.data?.msg ||
@@ -25,3 +28,43 @@ export const handleZerodhaError = (error: any) => {
     message: exchangeMessage,
   };
 };
+
+export function endOfDay() {
+  const d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+export type ZerodhaOrderPayload = {
+  variety?: "regular" | "amo" | "co" | "iceberg" | "auction";
+  tradingsymbol: string;
+  exchange: "NSE" | "BSE" | "NFO" | "MCX" | "CDS" | "BCD";
+  transaction_type: TradeSide;
+  order_type: "MARKET" | "LIMIT" | "SL" | "SL-M";
+  quantity: number;
+  product: "CNC" | "MIS" | "NRML" | "MTF";
+  price?: number;
+  trigger_price?: number;
+  validity?: "DAY" | "IOC" | "TTL";
+};
+
+export function mapToZerodhaOrder(
+  payload: CommonOrderPayload
+): ZerodhaOrderPayload {
+  return {
+    variety: "regular",
+    tradingsymbol: payload.symbol,
+    exchange: payload.exchange,
+    transaction_type: payload.side,
+    order_type: payload.orderType,
+    quantity: payload.quantity,
+    product:
+      payload.product === "DELIVERY"
+        ? "CNC"
+        : payload.product === "INTRADAY"
+        ? "MIS"
+        : "NRML",
+    price: payload.price,
+    trigger_price: payload.triggerPrice,
+    validity: payload.validity ?? "DAY",
+  };
+}

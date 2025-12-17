@@ -17,6 +17,7 @@ import { getActiveFuturesPositions } from "../../../services/crypto/exchange/tra
 
 export const createTradeController = async (req: any, res: Response) => {
   const { exchange, type, payload } = req.body;
+  const userId = req.user.userId;
 
   if (!exchange || !type || !payload) {
     return sendBadRequest(res, "exchange, type and payload are required");
@@ -39,8 +40,8 @@ export const createTradeController = async (req: any, res: Response) => {
 
     const result =
       type === CryptoTradeType.SPOT
-        ? await createSpotTrade(exchange, credentials, payload)
-        : await createFuturesTrade(exchange, credentials, payload);
+        ? await createSpotTrade(userId, exchange, credentials, payload)
+        : await createFuturesTrade(userId, exchange, credentials, payload);
     return sendSuccess(res, "Trade placed successfully", result);
   } catch (error: any) {
     switch (error.code) {

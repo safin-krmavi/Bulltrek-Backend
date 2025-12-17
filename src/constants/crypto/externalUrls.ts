@@ -10,6 +10,7 @@ export const BINANCE_FUTURES_URL =
 export const BINANCE_FUTURES_BASE_URL = "https://fapi.binance.com";
 export const BINANCE_FUTURES_BALANCE_ENDPOINT = "/fapi/v3/balance";
 export const BINANCE_FUTURES_POSITIONS_ENDPOINT = "/fapi/v2/positionRisk";
+export const BINANCE_CREATE_ORDER_ENDPOINT = "/fapi/v1/order";
 
 // -------------------------KUCOIN------------------------------------
 export const KUCOIN_SPOT_BASE_URL = "https://api.kucoin.com";
@@ -46,7 +47,8 @@ export const COINDCX_FUTURES_URL =
 export const COINDCX_FUTURES_TICKER_URL =
   "https://api.coindcx.com/exchange/ticker";
 export const COINDCX_USER_INFO_ENDPOINT = "/users/info";
-export const COINDCX_GET_FUTURES_CURRENT_PRICES_REALTIME_URL =  "https://public.coindcx.com/market_data/v3/current_prices/futures/rt"
+export const COINDCX_GET_FUTURES_CURRENT_PRICES_REALTIME_URL =
+  "https://public.coindcx.com/market_data/v3/current_prices/futures/rt";
 // SPOT
 export const COINDCX_ORDER_CREATE_ENDPOINT = "/orders/create";
 export const COINDCX_ORDER_CANCEL_ENDPOINT = "/orders/cancel";

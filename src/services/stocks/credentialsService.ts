@@ -5,25 +5,16 @@ import {
   encodeCredentials,
 } from "../../utils/credentialUtils";
 
-// Add or update credentials
 export async function addOrUpdateStocksCredentials(data: {
   userId: string;
   exchange: StocksExchange;
   apiKey: string;
-  apiSecret: string;
-  apiPassphrase?: string;
-  apiKeyVersion?: string;
+  clientCode?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  feedToken?: string;
+  expiresAt: Date;
 }) {
-  const encryptedData = {
-    ...data,
-    ...encodeCredentials(
-      data.apiKey,
-      data.apiSecret,
-      data.apiPassphrase,
-      data.apiKeyVersion
-    ),
-  };
-
   const existing = await prisma.stocksCredentials.findUnique({
     where: {
       userId_exchange: { userId: data.userId, exchange: data.exchange },
@@ -35,10 +26,11 @@ export async function addOrUpdateStocksCredentials(data: {
       where: {
         userId_exchange: { userId: data.userId, exchange: data.exchange },
       },
-      data: encryptedData,
+      data,
     });
   }
-  return prisma.stocksCredentials.create({ data: encryptedData });
+
+  return prisma.stocksCredentials.create({ data });
 }
 
 export async function getStocksCredentials(
@@ -46,94 +38,28 @@ export async function getStocksCredentials(
   exchange?: StocksExchange
 ) {
   if (exchange) {
-    const cred = await prisma.stocksCredentials.findUnique({
+    return prisma.stocksCredentials.findUnique({
       where: { userId_exchange: { userId, exchange } },
     });
-    if (!cred) return null;
-    return {
-      ...cred,
-      ...decodeCredentials(
-        cred.apiKey,
-        cred.apiSecret,
-        cred.apiPassphrase,
-        cred.apiKeyVersion
-      ),
-    };
   } else {
-    const creds = await prisma.stocksCredentials.findMany({
-      where: { userId },
-    });
-    return creds.map((c) => ({
-      ...c,
-      ...decodeCredentials(
-        c.apiKey,
-        c.apiSecret,
-        c.apiPassphrase,
-        c.apiKeyVersion
-      ),
-    }));
+    return prisma.stocksCredentials.findMany({ where: { userId } });
   }
 }
-// Update specific credentials by ID
+
 export async function updateStocksCredentials(
   id: string,
   data: Partial<{
-    exchange: StocksExchange;
     apiKey: string;
-    apiSecret: string;
-    apiPassphrase?: string;
-    apiKeyVersion?: string;
+    clientCode: string;
+    accessToken: string;
+    refreshToken: string;
+    feedToken: string;
+    expiresAt: Date;
   }>
 ) {
-  const existing = await prisma.stocksCredentials.findUnique({ where: { id } });
-  if (!existing) throw new Error("Credential not found");
-  const decodedExisting = decodeCredentials(
-    existing.apiKey,
-    existing.apiSecret,
-    existing.apiPassphrase,
-    existing.apiKeyVersion
-  );
-
-  const encodedData: any = {};
-  if (data.exchange && data.exchange !== existing.exchange) {
-    // Delete conflicting credential if it exists
-    await prisma.stocksCredentials.deleteMany({
-      where: {
-        userId: existing.userId,
-        exchange: data.exchange,
-        NOT: { id },
-      },
-    });
-
-    encodedData.exchange = data.exchange;
-  }
-  if (data.apiKey || data.apiSecret || data.apiPassphrase) {
-    const encoded = encodeCredentials(
-      data.apiKey ?? decodedExisting.apiKey,
-      data.apiSecret ?? decodedExisting.apiSecret,
-      data.apiPassphrase ?? decodedExisting.apiPassphrase,
-      data.apiKeyVersion ?? existing.apiKeyVersion
-    );
-
-    Object.assign(encodedData, encoded);
-  }
-  const updated = await prisma.stocksCredentials.update({
-    where: { id },
-    data: encodedData,
-  });
-
-  return {
-    ...updated,
-    ...decodeCredentials(
-      updated.apiKey,
-      updated.apiSecret,
-      updated.apiPassphrase,
-      updated.apiKeyVersion
-    ),
-  };
+  return prisma.stocksCredentials.update({ where: { id }, data });
 }
 
-// Delete credentials by ID
 export async function deleteStocksCredentials(id: string) {
   return prisma.stocksCredentials.delete({ where: { id } });
 }

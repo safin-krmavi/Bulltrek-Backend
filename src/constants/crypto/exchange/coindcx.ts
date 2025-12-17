@@ -1,4 +1,4 @@
-import { TradeSide } from "@prisma/client";
+import { TradeSide, TradeStatus } from "@prisma/client";
 
 export enum CoinDCXSpotOrderType {
   MARKET = "market_order",
@@ -39,3 +39,42 @@ export function safeISO(date: any) {
   if (isNaN(d.getTime())) return null;
   return d.toISOString();
 }
+
+export const mapStatus = (status: string): TradeStatus => {
+  const s = status.toLowerCase();
+  switch (s) {
+    case "initial":
+    case "open":
+    case "partially_filled":
+      return TradeStatus.OPEN;
+
+    case "filled":
+      return TradeStatus.EXECUTED;
+
+    case "partially_cancelled":
+    case "cancelled":
+      return TradeStatus.CANCELLED;
+
+    case "rejected":
+      return TradeStatus.FAILED;
+
+    case "untriggered":
+      return TradeStatus.OPEN;
+
+    case "failed":
+      return TradeStatus.FAILED;
+
+    default:
+      return TradeStatus.OPEN;
+  }
+};
+
+export const resolveOrderTypeKey = (value: string): string => {
+  for (const [key, val] of Object.entries(CoinDCXSpotOrderType)) {
+    if (val === value) return key;
+  }
+  for (const [key, val] of Object.entries(CoinDCXFuturesOrderType)) {
+    if (val === value) return key;
+  }
+  throw new Error(`Unknown order type value: ${value}`);
+};

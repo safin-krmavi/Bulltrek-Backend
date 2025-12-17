@@ -211,41 +211,46 @@ export async function ensureKucoinMarginMode(
   symbol: string,
   desiredMode: string
 ) {
-  const endpoint = `/api/v1/positions?symbol=${symbol}`;
-  const headers = await generateHeadersKucoin(
-    config,
-    "GET",
-    endpoint,
-    "",
-    "futures"
-  );
-
-  const { data } = await axios.get(`${KUCOIN_FUTURES_BASE_URL}${endpoint}`, {
-    headers,
-  });
-  const currentMode = data.data.crossMode ? "CROSS" : "ISOLATED";
-
-  if (currentMode !== desiredMode) {
-    // logger.info("SWITCHING_KUCOIN_MARGIN_MODE", {
-    //   symbol,
-    //   from: currentMode,
-    //   to: desiredMode,
-    // });
-    const changeEndpoint = "/api/v1/position/margin/mode/change";
-    const body = JSON.stringify({ symbol, marginMode: desiredMode });
-    const changeHeaders = await generateHeadersKucoin(
+  try {
+    const endpoint = `/api/v1/positions?symbol=${symbol}`;
+    const headers = await generateHeadersKucoin(
       config,
-      "POST",
-      changeEndpoint,
-      body,
+      "GET",
+      endpoint,
+      "",
       "futures"
     );
 
-    await axios.post(
-      `${KUCOIN_FUTURES_BASE_URL}${changeEndpoint}`,
-      { symbol, marginMode: desiredMode },
-      { headers: changeHeaders }
-    );
+    const { data } = await axios.get(`${KUCOIN_FUTURES_BASE_URL}${endpoint}`, {
+      headers,
+    });
+    const currentMode = data.data.crossMode ? "CROSS" : "ISOLATED";
+
+    if (currentMode !== desiredMode) {
+      // logger.info("SWITCHING_KUCOIN_MARGIN_MODE", {
+      //   symbol,
+      //   from: currentMode,
+      //   to: desiredMode,
+      // });
+      const changeEndpoint = "/api/v1/position/margin/mode/change";
+      const body = JSON.stringify({ symbol, marginMode: desiredMode });
+      const changeHeaders = await generateHeadersKucoin(
+        config,
+        "POST",
+        changeEndpoint,
+        body,
+        "futures"
+      );
+
+      await axios.post(
+        `${KUCOIN_FUTURES_BASE_URL}${changeEndpoint}`,
+        { symbol, marginMode: desiredMode },
+        { headers: changeHeaders }
+      );
+    }
+  } catch (error) {
+    console.log("ERROR", error?.response?.data);
+    handleKucoinError(error);
   }
 }
 
@@ -298,6 +303,11 @@ export async function createKucoinFutureTrade(
     // logger.error("ERROR_CREATING_KUCOIN_FUTURES_ORDER", {
     //   error: error?.response?.data.msg || error?.message,
     // });
+
+    console.log("ERROR_CREATING_KUCOIN_FUTURES_ORDER", {
+      error: error?.response?.data.msg || error?.message,
+    });
+
     handleKucoinError(error);
   }
 }

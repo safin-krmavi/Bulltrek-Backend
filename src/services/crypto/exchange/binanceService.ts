@@ -7,6 +7,7 @@ import {
   BINANCE_FUTURES_POSITIONS_ENDPOINT,
   BINANCE_SPOT_URL,
   BINANCE_FUTURES_URL,
+  BINANCE_CREATE_ORDER_ENDPOINT,
 } from "../../../constants/crypto/externalUrls";
 import {
   createQueryString,
@@ -55,7 +56,7 @@ export async function getBinanceUSDTData() {
       futureSymbols,
     };
   } catch (error) {
-    // logger.error("ERROR_FETCHING_BINANCE_DATA", {
+    // console.log("ERROR_FETCHING_BINANCE_DATA", {
     //   error: (error as any)?.response?.data || (error as any)?.message || error,
     // });
     handleBinanceError(error);
@@ -190,7 +191,7 @@ export async function createBinanceSpotTrade(
 
     return response.data;
   } catch (error: any) {
-    // logger.error("ERROR_CREATING_BINANCE_SPOT_ORDER", {
+    // console.log("ERROR_CREATING_BINANCE_SPOT_ORDER", {
     //   error: (error as any)?.response?.data || (error as any)?.message || error,
     // });
     handleBinanceError(error);
@@ -233,7 +234,7 @@ export async function createBinanceFutureTrade(
   params: BinanceFuturesOrderParams
 ) {
   try {
-    const endpoint = "/fapi/v1/order";
+    const endpoint = BINANCE_CREATE_ORDER_ENDPOINT;
     const timestamp = Date.now();
 
     // Create params object with required parameters
@@ -302,7 +303,7 @@ export async function createBinanceFutureTrade(
     });
     return response.data;
   } catch (error: any) {
-    // logger.error("ERROR_PLACING_BINANCE_FUTURES_ORDER", {
+    // console.log("ERROR_PLACING_BINANCE_FUTURES_ORDER", {
     //   error: (error as any)?.response?.data || (error as any)?.message || error,
     // });
     handleBinanceError(error);
@@ -361,9 +362,63 @@ export async function getBinanceFuturesActivePositions(
 
     return activePositions;
   } catch (error: any) {
-    // logger.error("ERROR_GETTING_BINANCE_ACTIVE_FUTURES_POSITIONS", {
+    // console.log("ERROR_GETTING_BINANCE_ACTIVE_FUTURES_POSITIONS", {
     //   error: (error as any)?.response?.data || (error as any)?.message || error,
     // });
     handleBinanceError(error);
+  }
+}
+
+export async function getActiveFuturesPositionsBySymbol(
+  apiKey: string,
+  apiSecret: string,
+  symbol: string
+) {
+  try {
+    const endpoint = BINANCE_FUTURES_POSITIONS_ENDPOINT;
+    const timestamp = Date.now();
+
+    const requestParams: Record<string, any> = { timestamp };
+    if (symbol) requestParams.symbol = symbol;
+
+    const queryString = createQueryString(requestParams);
+    const signature = generateSignatureBinance(queryString, apiSecret);
+
+    const url = `${BINANCE_FUTURES_BASE_URL}${endpoint}?${queryString}&signature=${signature}`;
+
+    const response = await axios.get(url, {
+      headers: { "X-MBX-APIKEY": apiKey },
+    });
+
+    const positions = response.data;
+
+    const activePositions = positions.map((position: any, index: number) => {
+      return {
+        id: `${position.symbol}_${index}`, // You can also use UUID or timestamp
+        pair: position.symbol || "",
+        active_pos: position.positionAmt,
+        avg_price: parseFloat(position.entryPrice || "0"),
+        liquidation_price: parseFloat(position.liquidationPrice || "0"),
+        leverage: parseFloat(position.leverage || "0"),
+        mark_price: parseFloat(position.markPrice || "0"),
+        margin_type:
+          position.marginType?.toUpperCase() === "CROSS"
+            ? "CROSSED"
+            : "ISOLATED",
+        unrealized_pnl: parseFloat(position.unRealizedProfit || "0"),
+        positionSide: position.positionSide,
+      };
+    });
+
+    return activePositions;
+  } catch (error: any) {
+    console.log("ERROR_GETTING_BINANCE_ACTIVE_FUTURES_POSITIONS", {
+      error: (error as any)?.response?.data || (error as any)?.message || error,
+    });
+    throw new Error(
+      (error as any)?.response?.data?.msg ||
+        (error as any)?.message ||
+        "Failed to get active futures positions"
+    );
   }
 }
