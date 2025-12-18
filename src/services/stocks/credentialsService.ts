@@ -1,65 +1,87 @@
-import { StocksExchange } from "@prisma/client";
-import prisma from "../../config/db.config";
-import {
-  decodeCredentials,
-  encodeCredentials,
-} from "../../utils/credentialUtils";
+// controllers/crypto/credentialsController.ts
+import { Request, Response } from "express";
+import * as credentialsService from "../../services/crypto/credentialsService";
+import { sendCreated, sendSuccess, sendBadRequest } from "../../utils/response";
+import { CryptoExchange } from "@prisma/client";
 
-export async function addOrUpdateStocksCredentials(data: {
-  userId: string;
-  exchange: StocksExchange;
-  apiKey: string;
-  clientCode?: string;
-  accessToken?: string;
-  refreshToken?: string;
-  feedToken?: string;
-  expiresAt: Date;
-}) {
-  const existing = await prisma.stocksCredentials.findUnique({
-    where: {
-      userId_exchange: { userId: data.userId, exchange: data.exchange },
-    },
-  });
-
-  if (existing) {
-    return prisma.stocksCredentials.update({
-      where: {
-        userId_exchange: { userId: data.userId, exchange: data.exchange },
-      },
-      data,
-    });
-  }
-
-  return prisma.stocksCredentials.create({ data });
-}
-
-export async function getStocksCredentials(
-  userId: string,
-  exchange?: StocksExchange
+export async function addOrUpdateCredentialsController(
+  req: Request,
+  res: Response
 ) {
-  if (exchange) {
-    return prisma.stocksCredentials.findUnique({
-      where: { userId_exchange: { userId, exchange } },
+  try {
+    const {
+      userId,
+      exchange,
+      apiKey,
+      apiSecret,
+      apiPassphrase,
+      apiKeyVersion,
+    } = req.body;
+
+    if (!userId) {
+      return sendBadRequest(res, "userId is required");
+    }
+
+    if (!exchange) {
+      return sendBadRequest(res, "exchange is required");
+    }
+    if (!apiKey || !apiSecret) {
+      return sendBadRequest(res, "apiKey and apiSecret are required");
+    }
+    if (exchange === CryptoExchange.KUCOIN) {
+      if (!apiPassphrase || !apiKeyVersion) {
+        return sendBadRequest(
+          res,
+          "KuCoin requires apiPassphrase and apiKeyVersion"
+        );
+      }
+    }
+
+    const creds = await credentialsService.addOrUpdateCryptoCredentials({
+      userId,
+      exchange,
+      apiKey,
+      apiSecret,
+      apiPassphrase,
+      apiKeyVersion,
     });
-  } else {
-    return prisma.stocksCredentials.findMany({ where: { userId } });
+    return sendCreated(res, "Credentials saved successfully", creds);
+  } catch (err: any) {
+    return sendBadRequest(res, err.message);
   }
 }
 
-export async function updateStocksCredentials(
-  id: string,
-  data: Partial<{
-    apiKey: string;
-    clientCode: string;
-    accessToken: string;
-    refreshToken: string;
-    feedToken: string;
-    expiresAt: Date;
-  }>
-) {
-  return prisma.stocksCredentials.update({ where: { id }, data });
+export async function getCredentialsController(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
+    const { exchange } = req.query;
+    const creds = await credentialsService.getCryptoCredentials(
+      userId,
+      exchange as CryptoExchange | undefined
+    );
+    return sendSuccess(res, "Credentials fetched successfully", creds);
+  } catch (err: any) {
+    return sendBadRequest(res, err.message);
+  }
 }
 
-export async function deleteStocksCredentials(id: string) {
-  return prisma.stocksCredentials.delete({ where: { id } });
+export async function updateCredentialsController(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    const updated = await credentialsService.updateCryptoCredentials(id, data);
+    return sendSuccess(res, "Credentials updated successfully", updated);
+  } catch (err: any) {
+    return sendBadRequest(res, err.message);
+  }
+}
+
+export async function deleteCredentialsController(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    await credentialsService.deleteCryptoCredentials(id);
+    return sendSuccess(res, "Credentials deleted successfully");
+  } catch (err: any) {
+    return sendBadRequest(res, err.message);
+  }
 }
