@@ -78,3 +78,4 @@ export function mapBinanceStatusToTradeStatus(status: string): TradeStatus {
       return TradeStatus.OPEN;
   }
 }
+

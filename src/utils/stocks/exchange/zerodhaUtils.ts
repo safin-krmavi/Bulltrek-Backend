@@ -7,7 +7,7 @@ export const handleZerodhaError = (error: any) => {
     error.response?.data?.message ||
     error.message ||
     "Unknown exchange error";
-  // console.log(error);
+  console.log(error);
 
   if (error.response?.status === 401 || error.response?.status === 403) {
     throw {
@@ -50,21 +50,27 @@ export type ZerodhaOrderPayload = {
 export function mapToZerodhaOrder(
   payload: CommonOrderPayload
 ): ZerodhaOrderPayload {
-  return {
+  const order: any = {
     variety: "regular",
     tradingsymbol: payload.symbol,
     exchange: payload.exchange,
     transaction_type: payload.side,
     order_type: payload.orderType,
-    quantity: payload.quantity,
+    quantity: Number(payload.quantity),
     product:
       payload.product === "DELIVERY"
         ? "CNC"
         : payload.product === "INTRADAY"
         ? "MIS"
         : "NRML",
-    price: payload.price,
-    trigger_price: payload.triggerPrice,
     validity: payload.validity ?? "DAY",
   };
+
+  // Only include price for orders that need it
+  if (payload.orderType !== "MARKET") {
+    order.price = payload.price;
+    order.trigger_price = payload.triggerPrice;
+  }
+
+  return order;
 }

@@ -15,6 +15,15 @@ exchangeRouter.put(
   verifyCryptoAdmin,
   cryptoExchangeController.updateSymbolPairsController
 );
+exchangeRouter.get(
+  "/symbol-precision",
+  cryptoExchangeController.getExchangePrecisionController
+);
+
+exchangeRouter.put(
+  "/symbol-precision",
+  cryptoExchangeController.refreshSymbolMetaController
+);
 
 // Verify exchange creds
 exchangeRouter.post(

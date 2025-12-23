@@ -235,7 +235,28 @@ model CryptoOrder {
   @@unique([exchangeOrderId])
 }
 
- 
+model Strategy {
+  id           String   @id @default(cuid())
+  userId       String
+
+  name         String   // "Growth DCA BTC"
+  assetType    String   // CRYPTO | STOCK
+  type         String   // GROWTH_DCA
+  exchange     String   // BINANCE | KUCOIN | COINDCX | NSE
+  segment      String   // SPOT | FUTURES | DELIVERY | CASH
+  symbol       String   // BTCUSDT, B-BTC_USDT, RELIANCE
+
+  config       Json     // ALL strategy logic lives here
+
+  status       String   @default("ACTIVE") // ACTIVE | PAUSED | STOPPED
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([exchange, segment, symbol])
+}
+
 enum KYCStatus {
   PENDING
   APPROVED

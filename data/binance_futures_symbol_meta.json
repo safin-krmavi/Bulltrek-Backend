@@ -1,0 +1,2158 @@
+{
+  "BTCUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.10"
+  },
+  "ETHUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "BCHUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "XRPUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "LTCUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "TRXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "ETCUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001"
+  },
+  "LINKUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001"
+  },
+  "XLMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "ADAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00010"
+  },
+  "XMRUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "DASHUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "ZECUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "XTZUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "BNBUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.010"
+  },
+  "ATOMUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001"
+  },
+  "ONTUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "IOTAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "BATUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "VETUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "NEOUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001"
+  },
+  "QTUMUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "IOSTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "THETAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "ALGOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "ZILUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "KNCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00010"
+  },
+  "ZRXUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "COMPUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "DOGEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000010"
+  },
+  "KAVAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "BANDUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "RLCUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "SNXUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "DOTUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "YFIUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "1"
+  },
+  "CRVUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "TRBUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "RUNEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "SUSHIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "EGLDUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "SOLUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.0100"
+  },
+  "ICXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "STORJUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "UNIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0010"
+  },
+  "AVAXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0010"
+  },
+  "ENJUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "KSMUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "NEARUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0010"
+  },
+  "AAVEUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.010"
+  },
+  "FILUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "RSRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "LRCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "BELUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00010"
+  },
+  "AXSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00100"
+  },
+  "ZENUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "SKLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "GRTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "1INCHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "CHZUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "SANDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "ANKRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "RVNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "SFPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "COTIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "CHRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "MANAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "ALICEUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "HBARUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "ONEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "DENTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "CELRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "HOTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "MTLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "OGNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "NKNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "1000SHIBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "GTCUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "BTCDOMUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.1"
+  },
+  "IOTXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "C98USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "MASKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "ATAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "DYDXUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "1000XECUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "GALAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "CELOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "ARUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "ARPAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "CTSIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "LPTUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "ENSUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "PEOPLEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "ROSEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "DUSKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "FLOWUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001"
+  },
+  "IMXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "API3USDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001"
+  },
+  "GMTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "APEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001"
+  },
+  "WOOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00001"
+  },
+  "JASMYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000001"
+  },
+  "OPUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "INJUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "STGUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SPELLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "1000LUNCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LUNA2USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LDOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "ICPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.001000"
+  },
+  "APTUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.00010"
+  },
+  "QNTUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.010000"
+  },
+  "FETUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "FXSUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "HOOKUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000010"
+  },
+  "MAGICUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "TUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HIGHUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "MINAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ASTRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "PHBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "GMXUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "CFXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "STXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ACHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "SSVUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "CKBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "TRUUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LQTYUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "USDCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "IDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ARBUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "JOEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TLMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "RDNTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HFTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "XVSUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "BLURUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "EDUUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SUIUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "1000PEPEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "1000FLOKIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "UMAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "NMRUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "MAVUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "XVGUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "WLDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "PENDLEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ARKMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "AGLDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "YGGUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "DODOXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BNTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "OXTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SEIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "CYBERUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "ARKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "BICOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BIGTIMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "WAXPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BSVUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.01000"
+  },
+  "RIFUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "POLYXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GASUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "POWRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TIAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "CAKEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "MEMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "TWTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "ORDIUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "STEEMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000010"
+  },
+  "ILVUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.00100"
+  },
+  "NTRNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000010"
+  },
+  "KASUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BEAMXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "1000BONKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "PYTHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SUPERUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "USTCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "ONGUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ETHWUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "JTOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "1000SATSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "AUCTIONUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "1000RATSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ACEUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.000100"
+  },
+  "MOVRUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "NFPUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "AIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000010"
+  },
+  "XAIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "WIFUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "MANTAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "ONDOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "LSKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "ALTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "JUPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ZETAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000010"
+  },
+  "RONINUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "DYMUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000010"
+  },
+  "OMUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "PIXELUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "STRKUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "GLMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PORTALUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "TONUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "AXLUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "METISUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.0010"
+  },
+  "AEVOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "VANRYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BOMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "ETHFIUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "ENAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "WUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "TNSRUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "SAGAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "TAOUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "REZUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "NOTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "TURBOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "IOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "ZKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MEWUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "LISTAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ZROUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "RENDERUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0010000"
+  },
+  "BANANAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0010000"
+  },
+  "RAREUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "SYNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SYSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BRETTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "POPCATUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SUNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "DOGSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "MBOXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CHESSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FLUXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "RPLUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0010000"
+  },
+  "POLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "1MBABYDOGEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "NEIROUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.00000010"
+  },
+  "FIDAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FIOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CATIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GHSTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "HMSTRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "COSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "EIGENUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "DIAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "1000CATUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "SCRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GOATUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MOODENGUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SAFEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SANTOSUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0010000"
+  },
+  "COWUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "CETUSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "1000000MOGUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "GRASSUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "DRIFTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ACTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PNUTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HIPPOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "DEGENUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BANUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AKTUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "SCRTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "1000CHEEMSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "1000WHYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "THEUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "MORPHOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "CHILLGUYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "KAIAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AEROUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "ACXUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "ORCAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0010000"
+  },
+  "MOVEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "RAYSOLUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "KOMAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "VIRTUALUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "SPXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "MEUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "AVAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "DEGOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "VELODROMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MOCAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "VANAUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "PENGUUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "LUMIAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "USUALUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AIXBTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FARTCOINUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0001000"
+  },
+  "KMNOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CGPTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HIVEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "DEXEUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "PHAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "DFUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GRIFFAINUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ZEREBROUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BIOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "COOKIEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ALCHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SWARMSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SONICUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0000100"
+  },
+  "DUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PROMUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.0010000"
+  },
+  "SUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SOLVUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ARCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AVAAIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TRUMPUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "MELANIAUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.000100"
+  },
+  "VTHOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "ANIMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "VINEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PIPPINUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "VVVUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.001000"
+  },
+  "BERAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "TSTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LAYERUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "HEIUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "B3USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "IPUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "GPSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "SHELLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "KAITOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "REDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "VICUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "EPICUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "BMTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MUBARAKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FORMUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "BIDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TUTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BROCCOLI714USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BROCCOLIF3BUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "SIRENUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BANANAS31USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PLUMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "NILUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000010"
+  },
+  "PARTIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "JELLYJELLYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MAVIAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PAXGUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.0100"
+  },
+  "WALUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "FUNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "MLNUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.00100"
+  },
+  "GUNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ATHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BABYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FORTHUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "PROMPTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "STOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FHEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "KERNELUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "WCTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "INITUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "AERGOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BANKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "EPTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "DEEPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HYPERUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "JSTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "SIGNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PUNDIXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "CTKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "AIOTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "DOLOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HAEDALUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SXTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ASRUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "ALPINEUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "B2USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SYRUPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "DOODUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "OGUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "ZKJUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000010"
+  },
+  "SKYAIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "NXPCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "CVCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AGTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "AWEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SOONUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "HUMAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "AUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SOPHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "MERLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HYPEUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.00100"
+  },
+  "BDXNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PUFFERUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "1000000BOBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "HOMEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "RESOLVUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TAIKOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SQDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PUMPBTCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SPKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MYXUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0010000"
+  },
+  "FUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "NEWTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "DMCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "HUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "OLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SAHARAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BTCUSDT_251226": {
+    "quantityStep": "0.001",
+    "priceTick": "0.1"
+  },
+  "ETHUSDT_251226": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "ICNTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "BULLAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "IDOLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "TANSSIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PUMPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "CROSSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AINUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "VELVETUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TACUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "ERAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "TAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CVXUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "SLPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "ZORAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TAGUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "ZRCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "ESPORTSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TREEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "A2ZUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "PLAYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "NAORISUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TOWNSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "PROVEUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "ALLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.000100"
+  },
+  "INUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "YALAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CARVUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "AIOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "XNYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "USELESSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "DAMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CUDISUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "SAPIENUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "XPLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "WLFIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SOMIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "BASUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "BTRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MITOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "HEMIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LINEAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "QUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "ARIAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "TAKEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "PTBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "OPENUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "FLOCKUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SKYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "AVNTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "HOLOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "XPINUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "UBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ZKCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "TOSHIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "STBLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "0GUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "BARDUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ASTERUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "TRADOORUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0010000"
+  },
+  "BLESSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FLUIDUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "COAIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "BTCUSDT_260327": {
+    "quantityStep": "0.001",
+    "priceTick": "0.1"
+  },
+  "ETHUSDT_260327": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "HANAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MIRAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "AKEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000001"
+  },
+  "ORDERUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "LIGHTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "XANUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "FFUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "VFYUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "EDENUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "NOMUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "TRUTHUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "2ZUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "EVAAUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "LYNUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "KGENUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "4USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GIGGLEUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.01000"
+  },
+  "MONUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "YBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "METUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "EULUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "ENSOUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.000100"
+  },
+  "CLOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "RECALLUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "ZBTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "LABUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "RIVERUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "RVVUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "币安人生USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BLUAIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "TURTLEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "APRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ONUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "42USDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "COMMONUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "KITEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ATUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CCUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "MMTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "TRUSTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "UAIUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "FOLKSUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "STABLEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "JCTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "ALLOUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "CLANKERUSDT": {
+    "quantityStep": "0.01",
+    "priceTick": "0.01000"
+  },
+  "BEATUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "PIEVERSEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "SENTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "BOBUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "IRYSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "RLSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000010"
+  },
+  "POWERUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "WETUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "NIGHTUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "XAUUSDT": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
+  },
+  "USUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "CYSUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0001000"
+  },
+  "RAVEUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "ZKPUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "GUAUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  },
+  "IRUSDT": {
+    "quantityStep": "1",
+    "priceTick": "0.0000100"
+  }
+}

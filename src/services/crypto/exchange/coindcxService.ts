@@ -154,6 +154,7 @@ export const createCoinDCXSpotTrade = async (
 
   const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
   console.log(body);
+  console.log(`${COINDCX_BASE_URL}${COINDCX_ORDER_CREATE_ENDPOINT}`)
   try {
     const response = await axios.post(
       `${COINDCX_BASE_URL}${COINDCX_ORDER_CREATE_ENDPOINT}`,
@@ -558,3 +559,11 @@ export const getFuturesPositionsByFilters = async (
     throw new Error(error);
   }
 };
+
+export async function getCoindcxFuturesSymbols(
+  margin: "USDT" | "INR" = "USDT"
+) {
+  const url = `https://api.coindcx.com/exchange/v1/derivatives/futures/data/active_instruments?margin_currency_short_name[]=${margin}`;
+  const res = await axios.get(url);
+  return res.data; // e.g., ["B-BTC_USDT", "B-ETH_USDT", ...]
+}

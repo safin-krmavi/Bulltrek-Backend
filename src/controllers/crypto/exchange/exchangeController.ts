@@ -7,7 +7,9 @@ import {
 } from "../../../utils/response";
 import { CryptoExchange, CryptoTradeType } from "@prisma/client";
 import {
+  fetchSymbolPairs,
   getExchangeBalances,
+  refreshSymbolMeta,
   verifyExchangeCredentials,
 } from "../../../services/crypto/exchange/exchangeService";
 import { getCryptoCredentials } from "../../../services/crypto/credentialsService";
@@ -17,6 +19,7 @@ import { getCoinDCXAllData } from "../../../services/crypto/exchange/coindcxServ
 import fs from "fs/promises";
 import { FILE_PATH, DATA_DIR } from "../../../constants/crypto";
 import { getAngelOneInstruments } from "../../../services/stocks/exchange/angeloneService";
+import { getSymbolPrecision } from "../../../utils/crypto/exchange/precisionResolver";
 // import { promises as fs } from "fs";
 
 export const fetchSymbolPairsController = async (
@@ -139,6 +142,58 @@ export const updateSymbolPairsController = async (
           error?.message || "Failed to update symbol pairs"
         );
     }
+  }
+};
+
+export async function getExchangePrecisionController(
+  req: Request,
+  res: Response
+) {
+  const { exchange, tradeType, symbol } = req.query;
+
+  // if (!exchange || !tradeType ) {
+  //   return res.status(400).json({
+  //     message: "exchange and tradeType are required",
+  //   });
+  // }
+
+  const precision = await getSymbolPrecision({
+    exchange: exchange as string,
+    tradeType: tradeType as "SPOT" | "FUTURES",
+    symbol: symbol as string,
+  });
+
+  if (!precision) {
+    return res.status(404).json({
+      message: "Precision data not found",
+    });
+  }
+
+  return res.json(precision);
+}
+export const refreshSymbolMetaController = async (
+  _: Request,
+  res: Response
+) => {
+  try {
+    // 🔹 Fetch all symbol pairs from your source
+    const formattedData = await fetchSymbolPairs();
+    // 🔹 Log a sample to verify input
+
+    // 🔹 Refresh spot/futures meta based on fetched symbol pairs
+    await refreshSymbolMeta(formattedData);
+
+    return res.status(200).json({
+      success: true,
+      message: "Symbol meta refreshed successfully",
+    });
+  } catch (error: any) {
+    console.error("[META_REFRESH_ERROR]", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error?.message || "Failed to refresh symbol meta",
+    });
   }
 };
 

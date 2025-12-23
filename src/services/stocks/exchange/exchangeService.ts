@@ -10,33 +10,25 @@ import {
 import {
   createAngelOneOrder,
   getAngelOneBalances,
+  getAngelOneLoginUrl,
   getAngelOnePositions,
-  loginAngelOne,
+  handleAngelOneCallback,
 } from "./angeloneService";
 import { CommonOrderPayload } from "../../../utils/stocks/exchange/tradeUtils";
 import { mapToZerodhaOrder } from "../../../utils/stocks/exchange/zerodhaUtils";
 import { mapToAngelOneOrder } from "../../../utils/stocks/exchange/angeloneUtils";
-type CredentialsInput = {
-  apiKey: string;
-  apiSecret?: string;
-  requestToken?: string;
-  clientCode?: string; // optional for Angel/Zerodha
-  password?: string; // Angel One
-  totp?: string; // Angel One
-};
 
 /**
  * STEP 1: Get Login URL (only for Zerodha)
  */
-export function getStockLoginUrl(exchange: StocksExchange, apiKey: string) {
+export function getStockLoginUrl(exchange: StocksExchange, userId: string) {
   switch (exchange) {
     case StocksExchange.ZERODHA:
-      return { loginUrl: getZerodhaLoginUrl(apiKey) };
+      return { loginUrl: getZerodhaLoginUrl() };
 
     case StocksExchange.ANGELONE:
-      throw {
-        code: "NOT_REQUIRED",
-        message: "Angel One does not require a login URL",
+      return {
+        loginUrl: getAngelOneLoginUrl(userId),
       };
 
     default:
@@ -54,6 +46,8 @@ export function handleStockAuthCallback(exchange: StocksExchange, req: any) {
   switch (exchange) {
     case StocksExchange.ZERODHA:
       return handleZerodhaAuthCallback(req);
+    case StocksExchange.ANGELONE:
+      return handleAngelOneCallback(req);
 
     default:
       throw {
@@ -75,7 +69,34 @@ export async function loginStockExchange(
       return loginZerodha(params);
 
     case StocksExchange.ANGELONE:
-      return loginAngelOne(params);
+      throw {
+        code: "NOT_REQUIRED",
+        message: "Unsupported broker",
+      };
+    default:
+      throw {
+        code: "UNSUPPORTED_BROKER",
+        message: "Unsupported broker",
+      };
+  }
+}
+
+/**
+ * Verify API keys by making a lightweight authenticated call
+ */
+export async function verifyStockCredentials(
+  exchange: StocksExchange,
+  credentials: any
+) {
+  switch (exchange) {
+    case StocksExchange.ZERODHA:
+      // balances is the safest validation
+      await getZerodhaBalances(credentials);
+      return { verified: true };
+
+    case StocksExchange.ANGELONE:
+      await getAngelOneBalances(credentials);
+      return { verified: true };
 
     default:
       throw {

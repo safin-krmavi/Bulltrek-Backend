@@ -17,7 +17,8 @@ import { addOrUpdateStocksCredentials } from "../credentialsService";
 /**
  * STEP 1: Generate Zerodha Login URL
  */
-export function getZerodhaLoginUrl(apiKey: string) {
+export function getZerodhaLoginUrl() {
+  const apiKey = process.env.ZERODHA_API_KEY;
   return `${ZERODHA_LOGIN_URL}?v=3&api_key=${apiKey}`;
 }
 
@@ -57,23 +58,37 @@ export async function loginZerodha(params: {
   requestToken: string;
 }) {
   try {
+    const apiKey = process.env.ZERODHA_API_KEY;
+    const apiSecret = process.env.ZERODHA_API_SECRET;
+
     const checksum = crypto
       .createHash("sha256")
-      .update(`${params.apiKey}${params.requestToken}${params.apiSecret}`)
+      .update(`${apiKey}${params.requestToken}${apiSecret}`)
       .digest("hex");
 
-    const response = await axios.post(`${ZERODHA_BASE_URL}/session/token`, {
-      api_key: params.apiKey,
+    const payload = new URLSearchParams({
+      api_key: apiKey,
       request_token: params.requestToken,
       checksum,
     });
+
+    const response = await axios.post(
+      `${ZERODHA_BASE_URL}/session/token`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-Kite-Version": "3",
+        },
+      }
+    );
 
     const { access_token, user_id } = response.data.data;
 
     await addOrUpdateStocksCredentials({
       userId: params.userId,
       exchange: StocksExchange.ZERODHA,
-      apiKey: params.apiKey,
+      apiKey: apiKey,
       clientCode: user_id,
       accessToken: access_token,
       expiresAt: endOfDay(),
@@ -84,15 +99,13 @@ export async function loginZerodha(params: {
     handleZerodhaError(error);
   }
 }
-
-export async function getZerodhaBalances(credentials: {
-  apiKey: string;
-  accessToken: string;
-}) {
+export async function getZerodhaBalances(credentials: { accessToken: string }) {
   try {
+    const apiKey = process.env.ZERODHA_API_KEY!;
+
     const headers = {
       "X-Kite-Version": "3",
-      Authorization: `token ${credentials.apiKey}:${credentials.accessToken}`,
+      Authorization: `token ${apiKey}:${credentials.accessToken}`,
     };
 
     const [marginsRes, holdingsRes] = await Promise.all([
@@ -101,8 +114,8 @@ export async function getZerodhaBalances(credentials: {
     ]);
 
     return {
-      money: marginsRes.data, // funds, margin, collateral
-      stocks: holdingsRes.data, // CNC holdings
+      money: marginsRes.data,
+      stocks: holdingsRes.data,
     };
   } catch (error: any) {
     handleZerodhaError(error);
@@ -110,22 +123,28 @@ export async function getZerodhaBalances(credentials: {
 }
 
 export async function createZerodhaOrder(
-  credentials: {
-    apiKey: string;
-    accessToken: string;
-  },
+  credentials: { apiKey: string; accessToken: string },
   payload: ZerodhaOrderPayload
 ) {
   try {
+    console.log("PAYLOAD:", payload);
+
     const variety = payload.variety ?? "regular";
+
+    // Convert payload to form-urlencoded
+    const formPayload = new URLSearchParams();
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value !== undefined) formPayload.append(key, String(value));
+    });
 
     const response = await axios.post(
       `${ZERODHA_BASE_URL}/orders/${variety}`,
-      payload,
+      formPayload.toString(),
       {
         headers: {
           "X-Kite-Version": "3",
           Authorization: `token ${credentials.apiKey}:${credentials.accessToken}`,
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );

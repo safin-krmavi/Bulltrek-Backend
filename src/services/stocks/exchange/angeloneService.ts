@@ -1,10 +1,14 @@
 import axios from "axios";
-import { ANGEL_INSTRUMENTS_URL, ANGELONE_BASE_URL } from "../../../constants/stocks/externalUrls";
-import { AngelOneOrderPayload, handleAngelOneError } from "../../../utils/stocks/exchange/angeloneUtils";
+import {
+  ANGEL_INSTRUMENTS_URL,
+  ANGELONE_BASE_URL,
+} from "../../../constants/stocks/externalUrls";
+import {
+  AngelOneOrderPayload,
+  handleAngelOneError,
+} from "../../../utils/stocks/exchange/angeloneUtils";
 import { StocksExchange } from "@prisma/client";
 import { addOrUpdateStocksCredentials } from "../credentialsService";
-
-
 
 export async function getAngelOneInstruments() {
   try {
@@ -29,12 +33,18 @@ export async function getAngelOneInstruments() {
       }
 
       // Futures
-      if (item.instrumenttype === "FUTSTK" || item.instrumenttype === "FUTIDX") {
+      if (
+        item.instrumenttype === "FUTSTK" ||
+        item.instrumenttype === "FUTIDX"
+      ) {
         futuresSymbols.push(item.symbol);
       }
 
       // Options
-      if (item.instrumenttype === "OPTSTK" || item.instrumenttype === "OPTIDX") {
+      if (
+        item.instrumenttype === "OPTSTK" ||
+        item.instrumenttype === "OPTIDX"
+      ) {
         optionsSymbols.push(item.symbol);
       }
     }
@@ -53,47 +63,157 @@ export async function getAngelOneInstruments() {
     };
   }
 }
-export async function loginAngelOne(params: {
-  userId: string;
-  apiKey: string;
-  clientCode: string;
-  password: string;
-  totp: string;
-}) {
+
+/**
+ * Returns the Angel One publisher login URL
+ * User should be redirected to this URL in their browser
+ */
+export function getAngelOneLoginUrl(userId: string) {
+  const apiKey = process.env.ANGELONE_API_KEY;
+
+  return `https://smartapi.angelone.in/publisher-login?api_key=${apiKey}&state=${userId}`;
+}
+
+/**
+ * After user logs in via browser, Angel One redirects to your callback URL with tokens
+ * Extract auth_token, feed_token, and refresh_token from query params and call this
+ */
+
+// ============================================================================
+// Handle Callback - Exchange auth_token for JWT
+// ============================================================================
+export async function handleAngelOneCallback(req: any) {
   try {
-    const response = await axios.post(
-      `${ANGELONE_BASE_URL}/rest/auth/angelbroking/user/v1/loginByPassword`,
+    const {
+      auth_token,
+      refresh_token,
+      feed_token,
+      state, // userId
+    } = req.query;
+
+    const apiKey = process.env.ANGELONE_API_KEY;
+    if (!apiKey) {
+      throw new Error("ANGELONE_API_KEY not found");
+    }
+
+    if (!auth_token || !refresh_token || !feed_token) {
+      throw new Error("Missing required tokens from Angel One callback");
+    }
+
+    if (!state) {
+      throw new Error("Missing state (userId) from callback");
+    }
+
+    console.log("📥 Received tokens from callback");
+
+    console.log("Auth Token (first 50 chars):", auth_token.substring(0, 50));
+
+    // ✅ CRITICAL: Exchange the auth_token for a proper JWT token
+    // The auth_token from callback is NOT usable directly - you must exchange it
+    const jwtRes = await axios.post(
+      `${ANGELONE_BASE_URL}/rest/auth/angelbroking/jwt/v1/generateTokens`,
       {
-        clientcode: params.clientCode,
-        password: params.password,
-        totp: params.totp,
+        refreshToken: refresh_token, // Use the refresh_token from callback
       },
       {
         headers: {
-          "X-PrivateKey": params.apiKey,
+          Authorization: `Bearer ${auth_token}`, // Use auth_token in header
+          "X-PrivateKey": apiKey,
+          "X-UserType": "USER",
+          "X-SourceID": "WEB",
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
+        timeout: 10000,
+      }
+    );
+
+    console.log("✅ JWT Generation Response:", jwtRes.data);
+
+    const {
+      jwtToken,
+      refreshToken: newRefreshToken,
+      feedToken: newFeedToken,
+    } = jwtRes.data.data;
+
+    // Store the NEW JWT token (not the original auth_token)
+    await addOrUpdateStocksCredentials({
+      userId: state,
+      exchange: StocksExchange.ANGELONE,
+      apiKey,
+      clientCode: "",
+      accessToken: jwtToken, // ✅ This is the REAL JWT for API calls
+      refreshToken: newRefreshToken, // ✅ New refresh token
+      feedToken: newFeedToken, // ✅ New feed token
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+
+    console.log("✅ Credentials stored successfully");
+
+    return {
+      success: true,
+      message: "Angel One connected successfully",
+    };
+  } catch (error: any) {
+    console.error("❌ Callback Error:", error.response?.data || error.message);
+    throw {
+      code: "ANGELONE_CALLBACK_ERROR",
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Angel One callback failed",
+      raw: error.response?.data || error,
+    };
+  }
+}
+
+/**
+ * Use this to refresh the access token when it expires (after 24 hours)
+ */
+export async function refreshAngelOneToken(params: {
+  userId: string;
+  refreshToken: string;
+}) {
+  try {
+    const apiKey = process.env.ANGELONE_API_KEY;
+
+    const response = await axios.post(
+      `${ANGELONE_BASE_URL}/rest/auth/angelbroking/jwt/v1/generateTokens`,
+      {
+        refreshToken: params.refreshToken,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-UserType": "USER",
+          "X-SourceID": "WEB",
+          "X-PrivateKey": apiKey,
+        },
+        timeout: 10000,
       }
     );
 
     const { jwtToken, refreshToken, feedToken } = response.data.data;
 
+    // Update stored credentials
     await addOrUpdateStocksCredentials({
       userId: params.userId,
       exchange: StocksExchange.ANGELONE,
-      apiKey: params.apiKey,
-      clientCode: params.clientCode,
+      apiKey,
+      clientCode: "",
       accessToken: jwtToken,
       refreshToken,
       feedToken,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
-    return { success: true };
+    return { success: true, jwtToken, feedToken };
   } catch (error: any) {
     handleAngelOneError(error);
   }
 }
+
 /**
  * Fetches Angel One holdings/balances
  */
@@ -114,6 +234,7 @@ export async function getAngelOneBalances(credentials: {
         headers,
       }),
     ]);
+    console.log(moneyRes);
 
     return {
       money: moneyRes.data, // margin, available cash
