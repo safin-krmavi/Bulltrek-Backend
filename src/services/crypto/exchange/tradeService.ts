@@ -12,7 +12,9 @@ import {
 import {
   createBinanceFutureTrade,
   createBinanceSpotTrade,
+  getAllFuturesOrdersBinance,
   getBinanceFuturesActivePositions,
+  getSpotTradeHistoryBinance,
 } from "./binanceService";
 import {
   createCoinDCXFutureTrade,
@@ -20,8 +22,6 @@ import {
   getCoinDCXFuturesActivePositions,
 } from "./coindcxService";
 import { getCryptoCredentials } from "../credentialsService";
-import { createOrderIntent } from "../../../utils/crypto/createOrderIntent";
-import prisma from "../../../config/db.config";
 
 export async function createSpotTrade(
   userId: string,
@@ -84,6 +84,43 @@ export async function createSpotTrade(
   }
 }
 
+export async function getSpotOrdersFromExchangeService(
+  exchange: CryptoExchange,
+  credentials: any,
+  symbol: string,
+  startTime?: number,
+  endTime?: number,
+  limit?: number
+) {
+  switch (exchange) {
+    case CryptoExchange.BINANCE:
+      return await getSpotTradeHistoryBinance(
+        credentials.apiKey,
+        credentials.apiSecret,
+        symbol,
+        startTime,
+        endTime,
+        limit
+      );
+
+    // case CryptoExchange.COINDCX:
+    // Placeholder for CoinDCX logic
+    // return await getSpotTradeHistoryCoinDCX(
+    //   credentials,
+    //   symbol,
+    //   startTime,
+    //   endTime,
+    //   limit
+    // );
+
+    default:
+      throw {
+        code: "UNSUPPORTED_EXCHANGE",
+        message: `Exchange ${exchange} is not supported`,
+      };
+  }
+}
+
 export async function createFuturesTrade(
   userId: string,
   exchange: CryptoExchange,
@@ -127,14 +164,14 @@ export async function createFuturesTrade(
           payload.positionMarginType
         );
 
-        exchangeResponse = createKucoinFutureTrade(credentials, payload);
+        exchangeResponse = await createKucoinFutureTrade(credentials, payload);
 
         break;
 
       case CryptoExchange.COINDCX:
         payload.orderType = mapFuturesOrderTypeToCoinDCX(payload.orderType);
 
-        exchangeResponse = createCoinDCXFutureTrade(credentials, payload);
+        exchangeResponse = await createCoinDCXFutureTrade(credentials, payload);
 
         break;
 
@@ -149,7 +186,7 @@ export async function createFuturesTrade(
     //   data: { exchangeOrderId: exchangeResponse.orderId?.toString() || null },
     // });
 
-    return {  exchangeResponse };
+    return { exchangeResponse };
   } catch (error: any) {
     console.error("ERROR_CREATING_SPOT_TRADE", {
       userId,
@@ -216,3 +253,37 @@ export const getActiveFuturesPositions = async (
         };
   }
 };
+
+export async function getFuturesOrdersFromExchangeService(
+  exchange: CryptoExchange,
+  credentials: any,
+  symbol: string,
+ 
+) {
+  switch (exchange) {
+    case CryptoExchange.BINANCE:
+      return await getAllFuturesOrdersBinance(
+        credentials.apiKey,
+        credentials.apiSecret,
+        {
+          symbol,
+        }
+      );
+
+    // case CryptoExchange.COINDCX:
+    // Placeholder for CoinDCX logic
+    // return await getSpotTradeHistoryCoinDCX(
+    //   credentials,
+    //   symbol,
+    //   startTime,
+    //   endTime,
+    //   limit
+    // );
+
+    default:
+      throw {
+        code: "UNSUPPORTED_EXCHANGE",
+        message: `Exchange ${exchange} is not supported`,
+      };
+  }
+}

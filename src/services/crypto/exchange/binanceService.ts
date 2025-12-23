@@ -8,6 +8,9 @@ import {
   BINANCE_SPOT_URL,
   BINANCE_FUTURES_URL,
   BINANCE_CREATE_ORDER_ENDPOINT,
+  BINANCE_SPOT_GET_ORDERS_ENDPOINT,
+  BINANCE_SPOT_GET_TRADES_ENDPOINT,
+  BINANCE_FUTURES_GET_TRADES_ENDPOINT,
 } from "../../../constants/crypto/externalUrls";
 import {
   createQueryString,
@@ -198,6 +201,88 @@ export async function createBinanceSpotTrade(
   }
 }
 
+export async function getAllSpotOrdersBinance(
+  apiKey: string,
+  apiSecret: string,
+  symbol?: string
+) {
+  try {
+    const endpoint = BINANCE_SPOT_GET_ORDERS_ENDPOINT;
+    const timestamp = Date.now();
+
+    // Create params object with required timestamp
+    const requestParams: Record<string, any> = {
+      timestamp,
+    };
+
+    // Add symbol if provided
+    if (symbol) {
+      requestParams.symbol = symbol;
+    }
+
+    const queryString = createQueryString(requestParams);
+    const signature = generateSignatureBinance(queryString, apiSecret);
+
+    const url = `${BINANCE_SPOT_BASE_URL}${endpoint}?${queryString}&signature=${signature}`;
+
+    const response = await axios.get(url, {
+      headers: {
+        "X-MBX-APIKEY": apiKey,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.log("ERROR_GETTING_BINANCE_ALL_SPOT_ORDERS", {
+      error: (error as any)?.response?.data || (error as any)?.message || error,
+    });
+    handleBinanceError(error);
+  }
+}
+
+export async function getSpotTradeHistoryBinance(
+  apiKey: string,
+  apiSecret: string,
+  symbol: string,
+  startTime?: number,
+  endTime?: number,
+  limit?: number
+) {
+  try {
+    const endpoint = BINANCE_SPOT_GET_TRADES_ENDPOINT;
+    const timestamp = Date.now();
+
+    // Create params object with required timestamp and symbol
+    const requestParams: Record<string, any> = {
+      symbol,
+      timestamp,
+    };
+
+    // Add optional parameters if provided
+    if (startTime) requestParams.startTime = startTime;
+    if (endTime) requestParams.endTime = endTime;
+    if (limit) requestParams.limit = limit;
+
+    const queryString = createQueryString(requestParams);
+    const signature = generateSignatureBinance(queryString, apiSecret);
+
+    const url = `${BINANCE_SPOT_BASE_URL}${endpoint}?${queryString}&signature=${signature}`;
+
+    const response = await axios.get(url, {
+      headers: {
+        "X-MBX-APIKEY": apiKey,
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.log("ERROR_GETTING_BINANCE_SPOT_TRADE_HISTORY", {
+      error: (error as any)?.response?.data || (error as any)?.message || error,
+    });
+    handleBinanceError(error);
+  }
+}
+
 // ----------------------FUTURES-------------------------
 export async function getBinanceFuturesBalances(credentials: any) {
   try {
@@ -306,6 +391,39 @@ export async function createBinanceFutureTrade(
     // console.log("ERROR_PLACING_BINANCE_FUTURES_ORDER", {
     //   error: (error as any)?.response?.data || (error as any)?.message || error,
     // });
+    handleBinanceError(error);
+  }
+}
+
+/**
+ * Get all futures orders for a symbol
+ */
+export async function getAllFuturesOrdersBinance(
+  apiKey: string,
+  apiSecret: string,
+  params: {
+    symbol: string;
+  }
+) {
+  try {
+    const endpoint = BINANCE_FUTURES_GET_TRADES_ENDPOINT;
+    const timestamp = Date.now();
+
+    const requestParams = { ...params, timestamp };
+    const queryString = createQueryString(requestParams);
+    const signature = generateSignatureBinance(queryString, apiSecret);
+
+    const url = `${BINANCE_FUTURES_BASE_URL}${endpoint}?${queryString}&signature=${signature}`;
+
+    const response = await axios.get(url, {
+      headers: { "X-MBX-APIKEY": apiKey },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.log("ERROR_GETTING_BINANCE_ALL_FUTURES_ORDERS", {
+      error: (error as any)?.response?.data || (error as any)?.message || error,
+    });
     handleBinanceError(error);
   }
 }

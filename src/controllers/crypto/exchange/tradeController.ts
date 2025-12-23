@@ -10,11 +10,13 @@ import { getCryptoCredentials } from "../../../services/crypto/credentialsServic
 import {
   createFuturesTrade,
   createSpotTrade,
+  getFuturesOrdersFromExchangeService,
+  getSpotOrdersFromExchangeService,
 } from "../../../services/crypto/exchange/tradeService";
 import { validateSpotTrade } from "../../../utils/crypto/exchange/spotTradeValidation";
 import { validateFuturesTrade } from "../../../utils/crypto/exchange/futuresTradeValidation";
 import { getActiveFuturesPositions } from "../../../services/crypto/exchange/tradeService";
-
+// SPOT
 export const createTradeController = async (req: any, res: Response) => {
   const { exchange, type, payload } = req.body;
   const userId = req.user.userId;
@@ -65,6 +67,55 @@ export const createTradeController = async (req: any, res: Response) => {
   }
 };
 
+export const getSpotOrdersFromExchange = async (req: any, res: Response) => {
+  try {
+    const { exchange, symbol, startTime, endTime, limit } = req.body;
+    const userId = req.user.userId;
+
+    if (!exchange) return sendBadRequest(res, "exchange is required");
+
+    // Fetch user credentials from DB
+    const rawCredentials = await getCryptoCredentials(userId, exchange);
+
+    const credentials = Array.isArray(rawCredentials)
+      ? rawCredentials[0]
+      : rawCredentials;
+
+    if (!credentials) {
+      sendBadRequest(res, "Credentials not found");
+    }
+
+    // Fetch trades
+    const trades = await getSpotOrdersFromExchangeService(
+      exchange,
+      credentials,
+      symbol,
+      startTime,
+      endTime,
+      limit
+    );
+
+    return res.status(200).json({ success: true, trades });
+  } catch (error: any) {
+    switch (error.code) {
+      case "AUTH_INVALID":
+        return sendUnauthorized(res, error.message);
+      case "BAD_REQUEST":
+      case "UNSUPPORTED_EXCHANGE":
+      case "RATE_LIMITED":
+        return sendBadRequest(res, error.message);
+      case "EXCHANGE_UNAVAILABLE":
+        return sendServerError(res, error.message);
+      default:
+        return sendServerError(
+          res,
+          error?.message || "Spot trade fetch failed"
+        );
+    }
+  }
+};
+
+// FUTURES
 export const getActiveFuturesPositionsController = async (
   req: any,
   res: Response
@@ -100,6 +151,51 @@ export const getActiveFuturesPositionsController = async (
         return sendServerError(
           res,
           error?.message || "Failed to fetch active positions"
+        );
+    }
+  }
+};
+
+export const getFuturesOrdersFromExchange = async (req: any, res: Response) => {
+  try {
+    const { exchange, symbol, startTime, endTime, limit } = req.body;
+    const userId = req.user.userId;
+
+    if (!exchange) return sendBadRequest(res, "exchange is required");
+
+    // Fetch user credentials from DB
+    const rawCredentials = await getCryptoCredentials(userId, exchange);
+
+    const credentials = Array.isArray(rawCredentials)
+      ? rawCredentials[0]
+      : rawCredentials;
+
+    if (!credentials) {
+      sendBadRequest(res, "Credentials not found");
+    }
+
+    // Fetch trades
+    const trades = await getFuturesOrdersFromExchangeService(
+      exchange,
+      credentials,
+      symbol
+    );
+
+    return res.status(200).json({ success: true, trades });
+  } catch (error: any) {
+    switch (error.code) {
+      case "AUTH_INVALID":
+        return sendUnauthorized(res, error.message);
+      case "BAD_REQUEST":
+      case "UNSUPPORTED_EXCHANGE":
+      case "RATE_LIMITED":
+        return sendBadRequest(res, error.message);
+      case "EXCHANGE_UNAVAILABLE":
+        return sendServerError(res, error.message);
+      default:
+        return sendServerError(
+          res,
+          error?.message || "Spot trade fetch failed"
         );
     }
   }

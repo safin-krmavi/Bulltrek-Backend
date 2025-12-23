@@ -294,6 +294,7 @@ export async function createKucoinFutureTrade(
       { headers }
     );
 
+    console.log("Response from Kucoin", response?.data);
     if (response.data.code !== "200000") {
       throw new Error(response.data.msg || "KuCoin API returned an error");
     }

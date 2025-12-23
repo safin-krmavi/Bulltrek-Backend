@@ -8,22 +8,25 @@ import {
 import {
   getStockBalances,
   getStockLoginUrl,
+  getStockPositions,
   handleStockAuthCallback,
   loginStockExchange,
+  placeStockOrder,
+  verifyStockCredentials,
 } from "../../../services/stocks/exchange/exchangeService";
 import { getStocksCredentials } from "../../../services/stocks/credentialsService";
 import { StocksExchange } from "@prisma/client";
-import prisma from "../../../config/db.config";
 
 export const getStockLoginUrlController = async (req, res) => {
-  const { exchange, apiKey } = req.body;
+  const { exchange } = req.body;
+      const userId = req.user.userId;
 
-  if (!exchange || !apiKey) {
-    return sendBadRequest(res, "exchange and apiKey are required");
+  if (!exchange) {
+    return sendBadRequest(res, "exchange is required");
   }
 
   try {
-    const data = getStockLoginUrl(exchange, apiKey);
+    const data = getStockLoginUrl(exchange,userId);
     return sendSuccess(res, "Login URL generated", data);
   } catch (error: any) {
     if (error.code === "NOT_REQUIRED") {
@@ -36,6 +39,14 @@ export const getStockLoginUrlController = async (req, res) => {
 export const zerodhaCallbackController = async (req, res) => {
   try {
     const data = handleStockAuthCallback(StocksExchange.ZERODHA, req);
+    return sendSuccess(res, "Callback handled", data);
+  } catch (error: any) {
+    return sendBadRequest(res, error.message);
+  }
+};
+export const angelOneCallbackController = async (req, res) => {
+  try {
+    const data = handleStockAuthCallback(StocksExchange.ANGELONE, req);
     return sendSuccess(res, "Callback handled", data);
   } catch (error: any) {
     return sendBadRequest(res, error.message);
@@ -57,9 +68,35 @@ export const loginStockExchangeController = async (req, res) => {
 
     return sendSuccess(res, "Broker connected successfully");
   } catch (error: any) {
+    if (error.code === "NOT_REQUIRED") {
+      return sendBadRequest(res, error.message);
+    }
     return sendServerError(res, error.message);
   }
 };
+
+export const verifyStockKeysController = async (
+  req: Request,
+  res: Response
+) => {
+  const { exchange, credentials } = req.body;
+
+  if (!exchange || !credentials) {
+    return sendBadRequest(res, "exchange and credentials are required");
+  }
+
+  try {
+    await verifyStockCredentials(exchange, credentials);
+    return sendSuccess(res, "Credentials verified successfully");
+  } catch (error: any) {
+    if (error.code === "AUTH_FAILED") {
+      return sendUnauthorized(res, error.message);
+    }
+
+    return sendServerError(res, error.message);
+  }
+};
+
 export const getStockBalancesController = async (req, res) => {
   const { exchange } = req.body;
   const userId = req.user.userId;
@@ -82,13 +119,74 @@ export const getStockBalancesController = async (req, res) => {
       };
     }
 
-    
     const balances = await getStockBalances(exchange, {
       apiKey: credentials.apiKey,
       accessToken: credentials.accessToken,
     });
 
     return sendSuccess(res, "Balances fetched", balances);
+  } catch (error: any) {
+    return sendServerError(res, error.message);
+  }
+};
+
+export const placeStockOrderController = async (req: any, res: Response) => {
+  const { exchange, order } = req.body;
+  const userId = req.user.userId;
+
+  if (!exchange || !order) {
+    return sendBadRequest(res, "exchange and order are required");
+  }
+
+  try {
+    const rawCredentials = await getStocksCredentials(userId, exchange);
+    const credentials = Array.isArray(rawCredentials)
+      ? rawCredentials[0]
+      : rawCredentials;
+
+    if (!credentials) {
+      return sendBadRequest(res, "Credentials not found");
+    }
+
+    const result = await placeStockOrder(
+      exchange,
+      {
+        apiKey: credentials.apiKey,
+        accessToken: credentials.accessToken,
+      },
+      order
+    );
+
+    return sendSuccess(res, "Order placed successfully", result);
+  } catch (error: any) {
+    return sendServerError(res, error.message);
+  }
+};
+
+export const getStockPositionsController = async (req: any, res: Response) => {
+  const { exchange } = req.body;
+  const userId = req.user.userId;
+
+  if (!exchange) {
+    return sendBadRequest(res, "exchange is required");
+  }
+
+  try {
+    const rawCredentials = await getStocksCredentials(userId, exchange);
+    const credentials = Array.isArray(rawCredentials)
+      ? rawCredentials[0]
+      : rawCredentials;
+
+    if (!credentials) {
+      return sendBadRequest(res, "Credentials not found");
+    }
+
+    const positions = await getStockPositions(exchange, {
+      apiKey: credentials.apiKey,
+      accessToken: credentials.accessToken,
+    });
+
+    return sendSuccess(res, "Positions fetched", positions);
   } catch (error: any) {
     return sendServerError(res, error.message);
   }

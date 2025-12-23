@@ -1,5 +1,5 @@
 // ZERODHA
-export const ZERODHA_BASE_URL = "https://api.kite.trade/";
+export const ZERODHA_BASE_URL = "https://api.kite.trade";
 export const ZERODHA_LOGIN_URL = "https://kite.zerodha.com/connect/login";
 
 // ANGEL ONE

@@ -16,6 +16,10 @@ import {
   verifyCoinDCXCredentials,
 } from "./coindcxService";
 import { FILE_PATH } from "../../../constants/crypto";
+import {
+  updateBinanceFuturesSymbolMeta,
+  updateBinanceSpotSymbolMeta,
+} from "../../../utils/crypto/exchange/binanceSymbolMeta";
 
 export const fetchSymbolPairs = async () => {
   //read the file from data/symbol_pairs.json
@@ -73,4 +77,43 @@ export async function getExchangeBalances(
     default:
       throw { code: "UNSUPPORTED_EXCHANGE", message: "Unsupported exchange" };
   }
+}
+/**
+ * Main service to refresh Binance symbol meta
+ */
+export async function refreshSymbolMeta(formattedData: any) {
+  // Extract the relevant symbol arrays from your formatted structure
+  const binanceSpotSymbols: string[] = (
+    formattedData
+      .find((item: any) => item.type === "CRYPTO_SPOT")
+      ?.data.find((d: any) => d.exchange === "BINANCE")?.data ?? []
+  ).map((s: any) => s.symbol);
+
+  const binanceFuturesSymbols: string[] = (
+    formattedData
+      .find((item: any) => item.type === "CRYPTO_FUTURES")
+      ?.data.find((d: any) => d.exchange === "BINANCE")?.data ?? []
+  ).map((s: any) => s.symbol);
+
+  console.log(
+    "[REFRESH_SYMBOL_META] BINANCE SPOT symbols count:",
+    binanceSpotSymbols.length
+  );
+  console.log(
+    "[REFRESH_SYMBOL_META] BINANCE FUTURES symbols count:",
+    binanceFuturesSymbols.length
+  );
+  console.log(
+    "[REFRESH_SYMBOL_META] Sample SPOT symbols:",
+    binanceSpotSymbols.slice(0, 5)
+  );
+  console.log(
+    "[REFRESH_SYMBOL_META] Sample FUTURES symbols:",
+    binanceFuturesSymbols.slice(0, 5)
+  );
+
+  await Promise.all([
+    updateBinanceSpotSymbolMeta(binanceSpotSymbols),
+    updateBinanceFuturesSymbolMeta(binanceFuturesSymbols),
+  ]);
 }

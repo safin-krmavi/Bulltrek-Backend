@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import rootrouter from "./routes/index";
-import { registerSocketManager } from "./sockets/bootstrap";
+import { resubscribeAllStrategies } from "./services/startegies/resubscribeStrategies";
 dotenv.config();
 
 const app = express();
@@ -14,6 +14,8 @@ app.use(express.json());
 
 // Register SocketManager first
 // registerSocketManager(app);
+// resubscribeAllStrategies();
+
 
 app.use("/api/v1/", rootrouter);
 
