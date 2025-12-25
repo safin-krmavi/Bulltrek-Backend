@@ -10,3 +10,7 @@ export const ANGELONE_LOGIN_URL =
   "https://apiconnect.angelbroking.com/rest/auth/authorize";
 export const ANGEL_INSTRUMENTS_URL =
   "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json";
+
+
+  
+export const KOTAK_NEO_LOGIN_BASE = "https://mis.kotaksecurities.com";

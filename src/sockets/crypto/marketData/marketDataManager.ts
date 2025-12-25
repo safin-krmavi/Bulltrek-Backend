@@ -132,9 +132,6 @@ export const MarketDataManager = {
     for (const strategyId of subscribers) {
       strategyRuntimeRegistry.onMarketTick({
         strategyId,
-        exchange,
-        segment,
-        symbol,
         price,
         timestamp,
       });

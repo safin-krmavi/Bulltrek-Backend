@@ -84,6 +84,23 @@ export async function updateStocksUser(
   return updatedUser;
 }
 
+export async function getStocksUsers() {
+  const users = await prisma.stocksUser.findMany({
+    include: {
+      credentials: true,
+    },
+  });
+
+  return users.map((client) => ({
+    id: client.id,
+    name: client.name,
+    email: client.email,
+    phone: client.phone, // use 'phone', not 'phoneNumber'
+    membership: client.membership || null, // optional
+    createdAt: client.createdAt,
+    exchanges: client.credentials.map((cred) => cred.exchange),
+  }));
+}
 export async function getStocksUser(userId: string) {
   const user = await prisma.stocksUser.findUnique({
     where: { id: userId },

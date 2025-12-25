@@ -1,99 +1,95 @@
-// services/tradeExecutionEngine.ts
-import { CryptoExchange } from "@prisma/client";
 import {
-  createFuturesTrade,
   createSpotTrade,
+  createFuturesTrade,
 } from "../crypto/exchange/tradeService";
-
-type TradeSide = "BUY" | "SELL";
-
-interface TradeOrder {
-  userId: string;
-  exchange: CryptoExchange;
-  tradeType: "SPOT" | "FUTURES";
-  symbol: string;
-  side: TradeSide;
-  quantity: number;
-  price: number;
-  orderType: "MARKET" | "LIMIT";
-  strategyId?: string;
-  attempt?: number;
-  onComplete?: () => void;
-}
+import { placeStockOrder } from "../stocks/exchange/exchangeService";
+import { TradeIntent } from "./tradeDispatcher";
 
 class TradeExecutionEngine {
-  private queue: TradeOrder[] = [];
-  private isProcessing = false;
+  private queues: Record<string, TradeIntent[]> = {};
+  private processing: Record<string, boolean> = {};
   private maxRetries = 3;
 
-  enqueue(
-    order: TradeOrder,
-    credentials: {
-      apiKey: string;
-      apiSecret: string;
-      apiPassphrase?: string;
-      apiKeyVersion?: string;
-    }
-  ) {
-    order.attempt = 0;
-    (order as any).credentials = credentials; // attach credentials to order
-    this.queue.push(order);
-    console.log("[TRADE_ENQUEUED]", { symbol: order.symbol, side: order.side });
-    this.processQueue();
+  enqueue(intent: TradeIntent) {
+    intent.attempt = 0;
+
+    const key = this.getQueueKey(intent);
+
+    if (!this.queues[key]) this.queues[key] = [];
+    if (!this.processing[key]) this.processing[key] = false;
+
+    this.queues[key].push(intent);
+    this.processQueue(key);
   }
 
-  private async processQueue() {
-    if (this.isProcessing || this.queue.length === 0) return;
+  private getQueueKey(order: TradeIntent) {
+    return `${order.segment}:${order.exchange}`;
+  }
 
-    this.isProcessing = true;
+  private async processQueue(key: string) {
+    if (this.processing[key]) return;
+    this.processing[key] = true;
 
-    while (this.queue.length > 0) {
-      const order = this.queue.shift()!;
-      const credentials = (order as any).credentials;
+    const queue = this.queues[key];
+
+    while (queue.length > 0) {
+      const order = queue.shift()!;
 
       try {
-        console.log("[ORDER_CREDENTIALS]", credentials);
-
-        if (order.tradeType === "SPOT") {
-          await createSpotTrade(
-            order.userId,
-            order.exchange,
-            credentials,
-            order
-          );
-        } else {
-          await createFuturesTrade(
-            order.userId,
-            order.exchange,
-            credentials,
-            order
-          );
+        if (!order.credentials) {
+          throw new Error("Missing credentials");
         }
 
-        console.log("[TRADE_EXECUTED]", {
-          symbol: order.symbol,
-          side: order.side,
-          strategyId: order.strategyId,
-        });
-        if (order.onComplete) order.onComplete();
-      } catch (err) {
-        console.error("[TRADE_FAILED]", { error: err, order });
-
-        if ((order.attempt || 0) < this.maxRetries) {
-          order.attempt! += 1;
-          this.queue.push(order);
-          console.log("[TRADE_REQUEUED]", { attempt: order.attempt });
+        if (order.segment === "CRYPTO") {
+          await this.executeCrypto(order);
         } else {
-          console.warn("[TRADE_DISCARDED]", { order });
+          await this.executeStock(order);
+        }
+
+        order.onComplete?.();
+      } catch (err) {
+        if ((order.attempt ?? 0) < this.maxRetries) {
+          order.attempt = (order.attempt ?? 0) + 1;
+          queue.push(order);
         }
       }
     }
+    if (queue.length === 0) {
+      delete this.queues[key];
+      delete this.processing[key];
+    }
 
-    this.isProcessing = false;
+    this.processing[key] = false;
   }
 
-  getQueueLength() {
-    return this.queue.length;
+  private async executeCrypto(order: TradeIntent) {
+    if (order.tradeType === "SPOT") {
+      await createSpotTrade(
+        order.userId,
+        order.exchange,
+        order.credentials,
+        order
+      );
+    } else {
+      await createFuturesTrade(
+        order.userId,
+        order.exchange,
+        order.credentials,
+        order
+      );
+    }
+  }
+
+  private async executeStock(order: TradeIntent) {
+    await placeStockOrder(order.exchange, order.credentials, {
+      symbol: order.symbol,
+      side: order.side,
+      quantity: order.quantity,
+      orderType: order.orderType,
+      price: order.price,
+      product: "INTRADAY",
+      exchange: "NSE",
+    });
   }
 }
 

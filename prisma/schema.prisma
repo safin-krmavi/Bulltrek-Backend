@@ -100,12 +100,13 @@ model StocksCredentials {
   userId        String
   exchange      String   // "ANGELONE" | "ZERODHA"
 
-  apiKey        String
-  clientCode    String?  // Angel: clientCode | Zerodha: user_id
+  apiKey        String   // Kotak accessToken
+  clientCode    String?  // Angel: clientCode | Zerodha: user_id | Kotak: clientCode
 
-  accessToken   String?
-  refreshToken  String?  // Angel One only
-  feedToken     String?  // Angel One only
+  accessToken   String?  // Kotak trading token
+  refreshToken  String?  // Angel One only, Kotak sid
+  feedToken     String?  // Angel One only, Kotak baseUrl
+  dataCenter    String?  // Kotak Only
 
   expiresAt     DateTime
 
@@ -250,11 +251,15 @@ model Strategy {
 
   status       String   @default("ACTIVE") // ACTIVE | PAUSED | STOPPED
 
+  nextRunAt      DateTime?   // NEW
+  lastExecutedAt DateTime?  // NEW
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@index([userId])
   @@index([exchange, segment, symbol])
+  @@index([nextRunAt])
 }
 
 enum KYCStatus {
@@ -273,6 +278,7 @@ enum CryptoExchange {
 enum StocksExchange {
   ZERODHA
   ANGELONE
+  KOTAK
 }
 enum CryptoTradeType {
   SPOT

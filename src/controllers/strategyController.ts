@@ -6,7 +6,8 @@ import {
   sendSuccess,
   sendServerError,
 } from "../utils/response";
-import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
+import { subscribeStrategyToMarketData } from "../sockets/marketDataRouter";
+
 export const createStrategyController = async (req: any, res: Response) => {
   const userId = req.user.userId;
   console.log(req.user);
@@ -24,6 +25,11 @@ export const createStrategyController = async (req: any, res: Response) => {
     stopLossPct,
     priceStart,
     priceStop,
+    // schedule-related (optional per frequency)
+    time, // "HH:mm"
+    hourInterval, // number
+    daysOfWeek, // number[]
+    datesOfMonth, // number[]
   } = req.body;
 
   if (
@@ -55,8 +61,20 @@ export const createStrategyController = async (req: any, res: Response) => {
       stopLossPct,
       priceStart,
       priceStop,
+      // schedule inputs (already coming from controller)
+      time,
+      hourInterval,
+      daysOfWeek,
+      datesOfMonth,
     });
-  await   MarketDataManager.subscribe(exchange, segment, symbol, strategy.id);
+    await subscribeStrategyToMarketData({
+      assetType,
+      exchange,
+      segment,
+      symbol,
+      strategyId: strategy.id,
+      userId,
+    });
     return sendSuccess(res, "Strategy created", strategy);
   } catch (error: any) {
     console.error("[STRATEGY_CREATE]", error);

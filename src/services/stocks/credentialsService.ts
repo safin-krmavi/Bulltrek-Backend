@@ -1,9 +1,5 @@
 import { StocksExchange } from "@prisma/client";
-import prisma from "../../config/db.config";
-import {
-  decodeCredentials,
-  encodeCredentials,
-} from "../../utils/credentialUtils";
+import prisma from "../../config/db.config"; 
 
 export async function addOrUpdateStocksCredentials(data: {
   userId: string;

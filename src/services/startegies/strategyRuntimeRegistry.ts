@@ -35,22 +35,22 @@ class StrategyRuntimeRegistry {
       exchange: strategy.exchange,
       segment: strategy.segment,
     });
+    if (this.runtimes.has(strategy.id)) return;
     const runtime = new StrategyRuntime(strategy);
     this.runtimes.set(strategy.id, runtime);
+  }
+  getRuntime(strategyId: string) {
+    return this.runtimes.get(strategyId);
   }
 
   onMarketTick({
     strategyId,
-    exchange,
-    segment,
-    symbol,
+
     price,
     timestamp,
   }: {
     strategyId: string;
-    exchange: string;
-    segment: CryptoTradeType;
-    symbol: string;
+
     price: number;
     timestamp: number;
   }) {
@@ -61,7 +61,7 @@ class StrategyRuntimeRegistry {
       });
       return;
     }
-    
+
     // console.log("[STRATEGY_TICK_DISPATCH]", {
     //   strategyId,
     //   symbol,

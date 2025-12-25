@@ -184,6 +184,8 @@ export async function connectNewUser(userId: string): Promise<void> {
     console.log("SETTING_UP_NEW_USER_CONNECTIONS", { userId });
 
     // Get user's exchange list from database
+   
+   
     const user = await prisma.cryptoUser.findUnique({
       where: { id: userId },
       include: { credentials: true },
@@ -263,6 +265,7 @@ export function registerSocketManager(app: Express) {
     connectUser: connectUserToExchange,
     disconnectUser,
     getActiveConnections: SocketManager.getActiveConnections,
+    
   };
 
   console.log("SOCKET MANAGER REGISTERED");

@@ -27,17 +27,17 @@ export function evaluateGrowthDCA(
   }
 
   // 2️⃣ Schedule check
-  if (state.lastExecutionAt) {
-    const diff = timestamp - state.lastExecutionAt;
-    const intervalMs = getIntervalMs(config.schedule);
-    if (diff < intervalMs) {
-      console.log("[GROWTH_DCA_EVALUATE] Skipping due to schedule interval", {
-        diff,
-        intervalMs,
-      });
-      return null;
-    }
-  }
+  // if (state.lastExecutionAt) {
+  //   const diff = timestamp - state.lastExecutionAt;
+  //   const intervalMs = getIntervalMs(config.schedule);
+  //   if (diff < intervalMs) {
+  //     console.log("[GROWTH_DCA_EVALUATE] Skipping due to schedule interval", {
+  //       diff,
+  //       intervalMs,
+  //     });
+  //     return null;
+  //   }
+  // }
 
   // 3️⃣ Capital check
   const nextCapital = state.investedCapital + config.capital?.perOrderAmount;
@@ -51,29 +51,22 @@ export function evaluateGrowthDCA(
 
   // 4️⃣ Price drop condition (skip for first order)
   if (state.lastBuyPrice) {
-    const dropPercent = ((state.lastBuyPrice - price) / state.lastBuyPrice) * 100;
+    const dropPercent =
+      ((state.lastBuyPrice - price) / state.lastBuyPrice) * 100;
     if (dropPercent < config.dca?.priceDropPercent) {
-      console.log("[GROWTH_DCA_EVALUATE] Skipping due to price not dropped enough", {
-        lastBuyPrice: state.lastBuyPrice,
-        currentPrice: price,
-        dropPercent,
-        requiredDrop: config.dca?.priceDropPercent,
-      });
+      console.log(
+        "[GROWTH_DCA_EVALUATE] Skipping due to price not dropped enough",
+        {
+          lastBuyPrice: state.lastBuyPrice,
+          currentPrice: price,
+          dropPercent,
+          requiredDrop: config.dca?.priceDropPercent,
+        }
+      );
       return null;
     }
   }
 
   console.log("[GROWTH_DCA_EVALUATE] Decision: BUY");
   return "BUY";
-}
-
-function getIntervalMs(schedule: any): number {
-  switch (schedule.frequency) {
-    case "DAILY":
-      return 24 * 60 * 60 * 1000;
-    case "WEEKLY":
-      return 7 * 24 * 60 * 60 * 1000;
-    default:
-      return 0;
-  }
 }
