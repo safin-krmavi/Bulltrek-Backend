@@ -2,7 +2,11 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import rootrouter from "./routes/index";
-import { resubscribeAllStrategies } from "./services/startegies/resubscribeStrategies";
+import { resubscribeAllStrategies } from "./services/strategies/resubscribeStrategies";
+import { fetchAndStoreZerodhaInstruments } from "./services/stocks/exchange/instrumentTokenService";
+import fs from "fs";
+import path from "path";
+import { runStrategyScheduler } from "./utils/scheduler/strategyScheduler";
 dotenv.config();
 
 const app = express();
@@ -15,8 +19,49 @@ app.use(express.json());
 // Register SocketManager first
 // registerSocketManager(app);
 // resubscribeAllStrategies();
+// setInterval(runStrategyScheduler, 60 * 1000);
 
+// (async () => {
+//   try {
+//     await fetchAndStoreZerodhaInstruments();
+//   } catch (err) {
+//     console.error("Failed to fetch Zerodha instruments:", err);
+//   }
+// })();
 
+// Paths
+const DATA_DIR = path.join(process.cwd(), "data");
+const ZERODHA_JSON_PATH = path.join(DATA_DIR, "zerodha_instruments.json");
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Function to safely fetch Zerodha instruments if missing
+async function ensureZerodhaInstruments() {
+  if (!fs.existsSync(ZERODHA_JSON_PATH)) {
+    try {
+      console.log("Fetching Zerodha instruments...");
+      const instruments = await fetchAndStoreZerodhaInstruments();
+
+      // Double-check write
+      fs.writeFileSync(
+        ZERODHA_JSON_PATH,
+        JSON.stringify(instruments, null, 2),
+        {
+          encoding: "utf-8",
+        }
+      );
+
+      console.log(`Zerodha instruments saved to ${ZERODHA_JSON_PATH}`);
+    } catch (err) {
+      console.error("Failed to fetch Zerodha instruments:", err);
+    }
+  } else {
+    console.log(`Zerodha instruments already exist at ${ZERODHA_JSON_PATH}`);
+  }
+}
 app.use("/api/v1/", rootrouter);
 
 // Routes
@@ -25,8 +70,11 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Only fetch once after server starts
+  await ensureZerodhaInstruments();
 });
 
 export { app, server };

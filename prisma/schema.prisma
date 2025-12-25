@@ -100,12 +100,13 @@ model StocksCredentials {
   userId        String
   exchange      String   // "ANGELONE" | "ZERODHA"
 
-  apiKey        String
-  clientCode    String?  // Angel: clientCode | Zerodha: user_id
+  apiKey        String   // Kotak accessToken
+  clientCode    String?  // Angel: clientCode | Zerodha: user_id | Kotak: clientCode
 
-  accessToken   String?
-  refreshToken  String?  // Angel One only
-  feedToken     String?  // Angel One only
+  accessToken   String?  // Kotak trading token
+  refreshToken  String?  // Angel One only, Kotak sid
+  feedToken     String?  // Angel One only, Kotak baseUrl
+  dataCenter    String?  // Kotak Only
 
   expiresAt     DateTime
 
@@ -250,12 +251,54 @@ model Strategy {
 
   status       String   @default("ACTIVE") // ACTIVE | PAUSED | STOPPED
 
+  nextRunAt      DateTime?   // NEW
+  lastExecutedAt DateTime?  // NEW
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@index([userId])
   @@index([exchange, segment, symbol])
+  @@index([nextRunAt])
 }
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+
+  type        NotificationType
+  title       String
+  message     String
+
+  severity    NotificationSeverity @default(INFO)
+
+  isRead      Boolean  @default(false)
+
+  meta        Json?    // strategyId, exchange, redirect hints, etc.
+
+  createdAt   DateTime @default(now())
+  readAt      DateTime?
+
+  @@index([userId, isRead])
+  @@index([type])
+}
+
+enum NotificationType {
+  STOCKS_SESSION_EXPIRED
+  STOCKS_SESSION_EXPIRING_SOON
+  STRATEGY_PAUSED
+  STRATEGY_RESUMED
+  STRATEGY_EXECUTION_FAILED
+  TRADE_REJECTED
+  SYSTEM_ALERT
+}
+
+enum NotificationSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
 
 enum KYCStatus {
   PENDING
@@ -273,6 +316,7 @@ enum CryptoExchange {
 enum StocksExchange {
   ZERODHA
   ANGELONE
+  KOTAK
 }
 enum CryptoTradeType {
   SPOT

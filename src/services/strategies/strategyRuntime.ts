@@ -1,9 +1,11 @@
 import { randomUUID } from "crypto";
-import { CryptoExchange, Strategy } from "@prisma/client";
+import { Strategy } from "@prisma/client";
 import { evaluateGrowthDCA } from "./evaluators/growthDcaEvaluator";
-import { tradeExecutionEngine } from "./tradeExecutionEngine";
-import { getCryptoCredentials } from "../crypto/credentialsService";
 import { formatQuantity } from "../../utils/crypto/exchange/quantityFormatter";
+import { isStrategyDue } from "../../utils/strategySchedule";
+import { computeNextRunAt } from "../../utils/scheduler/computeNextRunAt";
+import prisma from "../../config/db.config";
+import { tradeDispatcher } from "./tradeDispatcher";
 // import other strategy evaluators here when ready
 
 // Base runtime state
@@ -12,7 +14,7 @@ type BaseStrategyRuntimeState = {
   positionQty: number;
   avgEntryPrice: number | null;
   lastExecutionAt: number | null;
-  status: "RUNNING" | "PAUSED" | "STOPPED";
+  status: "ACTIVE" | "PAUSED" | "STOPPED";
 };
 
 type DCAEntry = {
@@ -27,7 +29,7 @@ type GrowthDCAState = {
   investedCapital: number;
   entries: DCAEntry[];
   lastExecutionAt: number | null;
-  status: "RUNNING" | "PAUSED" | "STOPPED";
+  status: "ACTIVE" | "PAUSED" | "STOPPED";
   pendingOrder?: boolean;
 };
 
@@ -44,6 +46,7 @@ export class StrategyRuntime<
 > {
   private strategy: Strategy;
   public state: StrategyStateMap[T];
+  public active: boolean = false;
 
   constructor(strategy: Strategy) {
     this.strategy = strategy;
@@ -55,7 +58,7 @@ export class StrategyRuntime<
           investedCapital: 0,
           entries: [],
           lastExecutionAt: null,
-          status: "RUNNING",
+          status: "ACTIVE",
         } as StrategyStateMap[T];
         break;
 
@@ -67,7 +70,7 @@ export class StrategyRuntime<
           positionQty: 0,
           avgEntryPrice: null,
           lastExecutionAt: null,
-          status: "RUNNING",
+          status: "ACTIVE",
         } as StrategyStateMap[T];
         break;
     }
@@ -83,7 +86,8 @@ export class StrategyRuntime<
    * Called on every market tick
    */
   onMarketTick(price: number, timestamp: number) {
-    if (this.state.status !== "RUNNING") return;
+    if (!this.active) return;
+    if (this.state.status !== "ACTIVE") return;
 
     // console.log("[STRATEGY_TICK]", {
     //   strategyId: this.strategy.id,
@@ -130,8 +134,23 @@ export class StrategyRuntime<
     //   pendingOrder: state.pendingOrder,
     // });
 
-    if (state.pendingOrder) {
-      console.log("[GROWTH_DCA] Skipping tick because pending order exists");
+    // 1️⃣ Pending order guard
+    if (state.pendingOrder) return;
+
+    // 2️⃣ Schedule gate (ONLY place)
+    const due = isStrategyDue(
+      config.schedule,
+      state.lastExecutionAt,
+      timestamp
+    );
+
+    if (!due) return;
+
+    // ⛔ SAFETY: investment cap
+    if (
+      state.investedCapital + config.capital.perOrderAmount >
+      config.capital.maxCapital
+    ) {
       return;
     }
 
@@ -140,8 +159,6 @@ export class StrategyRuntime<
 
     if (decision === "BUY") {
       const perOrder = config.capital.perOrderAmount;
-
-      const rawQty = perOrder / price;
 
       const qty = await formatQuantity({
         exchange: this.strategy.exchange,
@@ -170,6 +187,15 @@ export class StrategyRuntime<
       state.investedCapital += perOrder;
       state.lastExecutionAt = timestamp;
       state.pendingOrder = true;
+      state.lastExecutionAt = timestamp;
+
+      await prisma.strategy.update({
+        where: { id: this.strategy.id },
+        data: {
+          lastExecutedAt: new Date(timestamp),
+          nextRunAt: computeNextRunAt(config.schedule, new Date(timestamp)),
+        },
+      });
 
       console.log("[GROWTH_DCA] Placing BUY order", {
         strategyId: this.strategy.id,
@@ -181,38 +207,21 @@ export class StrategyRuntime<
         entriesCount: state.entries.length,
       });
 
-      const rawCredentials = await getCryptoCredentials(
-        this.strategy.userId,
-        this.strategy.exchange as CryptoExchange
-      );
-      const credentials = Array.isArray(rawCredentials)
-        ? rawCredentials[0]
-        : rawCredentials;
-
-      if (!credentials) {
-        console.warn("[TRADE_SKIPPED_NO_CREDENTIALS]", {
-          strategyId: this.strategy.id,
-        });
-        return;
-      }
-
-      tradeExecutionEngine.enqueue(
-        {
-          userId: this.strategy.userId,
-          exchange: this.strategy.exchange as any,
-          tradeType: this.strategy.segment as any,
-          symbol: this.strategy.symbol,
-          side: "BUY",
-          quantity: qty,
-          price,
-          orderType: "MARKET",
-          strategyId: this.strategy.id,
-          onComplete: () => {
-            state.pendingOrder = false;
-          },
+      tradeDispatcher.dispatch({
+        userId: this.strategy.userId,
+        exchange: this.strategy.exchange,
+        segment: this.strategy.assetType as "CRYPTO" | "STOCK", // "CRYPTO" | "STOCK"
+        tradeType: this.strategy.segment as any, // SPOT | FUTURES (crypto only)
+        symbol: this.strategy.symbol,
+        side: "BUY",
+        quantity: qty,
+        price,
+        orderType: "MARKET",
+        strategyId: this.strategy.id,
+        onComplete: () => {
+          state.pendingOrder = false;
         },
-        credentials
-      );
+      });
 
       return;
     }
@@ -255,41 +264,6 @@ export class StrategyRuntime<
     reason: "BOOK_PROFIT" | "STOP_LOSS"
   ) {
     const state = this.state as GrowthDCAState;
-
-    const rawCredentials = await getCryptoCredentials(
-      this.strategy.userId,
-      this.strategy.exchange as CryptoExchange
-    );
-    const credentials = Array.isArray(rawCredentials)
-      ? rawCredentials[0]
-      : rawCredentials;
-
-    if (!credentials) {
-      console.warn("[TRADE_SKIPPED_NO_CREDENTIALS]", {
-        strategyId: this.strategy.id,
-      });
-      return;
-    }
-    tradeExecutionEngine.enqueue(
-      {
-        userId: this.strategy.userId,
-        exchange: this.strategy.exchange as CryptoExchange,
-        tradeType: this.strategy.segment as any,
-        symbol: this.strategy.symbol,
-        side: "SELL",
-        quantity: entry.quantity,
-        price,
-        orderType: "MARKET",
-        strategyId: this.strategy.id,
-        onComplete: () => {
-          state.pendingOrder = false;
-        },
-      },
-      credentials
-    );
-
-    state.entries = state.entries.filter((e) => e.id !== entry.id);
-    state.investedCapital -= entry.quantity * entry.entryPrice;
     state.pendingOrder = true;
 
     console.log("[GROWTH_DCA_SELL_ENTRY]", {
@@ -297,6 +271,33 @@ export class StrategyRuntime<
       entryId: entry.id,
       reason,
       price,
+    });
+
+    tradeDispatcher.dispatch({
+      userId: this.strategy.userId,
+      exchange: this.strategy.exchange,
+      segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+      tradeType: this.strategy.segment as any,
+      symbol: this.strategy.symbol,
+      side: "SELL",
+      quantity: entry.quantity,
+      price,
+      orderType: "MARKET",
+      strategyId: this.strategy.id,
+
+      onComplete: () => {
+        // 3️⃣ Update state ONLY after successful SELL
+        state.entries = state.entries.filter((e) => e.id !== entry.id);
+        state.investedCapital -= entry.quantity * entry.entryPrice;
+        state.pendingOrder = false;
+
+        console.log("[GROWTH_DCA_SELL_COMPLETE]", {
+          strategyId: this.strategy.id,
+          entryId: entry.id,
+          remainingEntries: state.entries.length,
+          investedCapital: state.investedCapital,
+        });
+      },
     });
   }
 

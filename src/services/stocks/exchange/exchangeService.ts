@@ -6,7 +6,7 @@ import {
   getZerodhaPositions,
   handleZerodhaAuthCallback,
   loginZerodha,
-} from "./zerodhaService";
+} from "../exchange/zerodhaService";
 import {
   createAngelOneOrder,
   getAngelOneBalances,
@@ -17,6 +17,13 @@ import {
 import { CommonOrderPayload } from "../../../utils/stocks/exchange/tradeUtils";
 import { mapToZerodhaOrder } from "../../../utils/stocks/exchange/zerodhaUtils";
 import { mapToAngelOneOrder } from "../../../utils/stocks/exchange/angeloneUtils";
+import {
+  createKotakNeoOrder,
+  getKotakNeoHoldings,
+  getKotakNeoOrders,
+  kotakNeoTotpLogin,
+  kotakNeoValidateMpin,
+} from "./kotakService";
 
 /**
  * STEP 1: Get Login URL (only for Zerodha)
@@ -68,11 +75,46 @@ export async function loginStockExchange(
     case StocksExchange.ZERODHA:
       return loginZerodha(params);
 
+    case StocksExchange.KOTAK: {
+      console.log("[KOTAK] Login flow started", {
+        userId: params.userId,
+        ucc: params.clientCode,
+      });
+
+      const { viewToken, viewSid } = await kotakNeoTotpLogin({
+        accessToken: params.accessToken,
+        mobileNumber: params.mobileNumber,
+        ucc: params.clientCode,
+        totp: params.totp,
+      });
+
+      console.log("[KOTAK] TOTP login successful", {
+        userId: params.userId,
+        viewSidPresent: Boolean(viewSid),
+      });
+
+      const result = await kotakNeoValidateMpin({
+        userId: params.userId,
+        clientCode: params.clientCode,
+        accessToken: params.accessToken,
+        viewToken,
+        viewSid,
+        mpin: params.mpin,
+      });
+
+      console.log("[KOTAK] MPIN validation completed", {
+        userId: params.userId,
+      });
+
+      return result;
+    }
+
     case StocksExchange.ANGELONE:
       throw {
         code: "NOT_REQUIRED",
         message: "Unsupported broker",
       };
+
     default:
       throw {
         code: "UNSUPPORTED_BROKER",
@@ -97,6 +139,14 @@ export async function verifyStockCredentials(
     case StocksExchange.ANGELONE:
       await getAngelOneBalances(credentials);
       return { verified: true };
+    case StocksExchange.KOTAK:
+      const data = await getKotakNeoHoldings({
+        baseUrl: credentials.meta.baseUrl,
+        tradingToken: credentials.accessToken,
+        tradingSid: credentials.meta.sid,
+      });
+      console.log("DATA", data);
+      return { verified: true };
 
     default:
       throw {
@@ -119,6 +169,13 @@ export async function getStockBalances(
 
     case StocksExchange.ANGELONE:
       return getAngelOneBalances(credentials);
+
+    case StocksExchange.KOTAK:
+      return getKotakNeoHoldings({
+        baseUrl: credentials.feedToken,
+        tradingToken: credentials.accessToken,
+        tradingSid: credentials.refreshToken,
+      });
 
     default:
       throw {
@@ -146,6 +203,15 @@ export async function placeStockOrder(
         await mapToAngelOneOrder(payload)
       );
 
+    case StocksExchange.KOTAK:
+      return createKotakNeoOrder({
+        baseUrl: credentials.meta.baseUrl,
+        tradingToken: credentials.accessToken,
+        tradingSid: credentials.meta.sid,
+        symbol: payload.symbol,
+        quantity: payload.quantity,
+      });
+
     default:
       throw {
         code: "UNSUPPORTED_BROKER",
@@ -167,6 +233,13 @@ export async function getStockPositions(
 
     case StocksExchange.ANGELONE:
       return getAngelOnePositions(credentials);
+
+    case StocksExchange.KOTAK:
+      return getKotakNeoOrders({
+        baseUrl: credentials.meta.baseUrl,
+        tradingToken: credentials.accessToken,
+        tradingSid: credentials.meta.sid,
+      });
 
     default:
       throw {

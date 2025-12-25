@@ -4,7 +4,7 @@ import { BinanceMarketDataHandler } from "./binanceMarketDataHandler";
 import { CryptoExchange, CryptoTradeType } from "@prisma/client";
 import { KuCoinMarketDataHandler } from "./kucoinMarketDataHandler";
 import { CoinDCXFuturesHandler } from "./coindcxMarketDataHandler";
-import { strategyRuntimeRegistry } from "../../../services/startegies/strategyRuntimeRegistry";
+import { strategyRuntimeRegistry } from "../../../services/strategies/strategyRuntimeRegistry";
 
 export const MarketDataManager = {
   /**
@@ -132,9 +132,6 @@ export const MarketDataManager = {
     for (const strategyId of subscribers) {
       strategyRuntimeRegistry.onMarketTick({
         strategyId,
-        exchange,
-        segment,
-        symbol,
         price,
         timestamp,
       });

@@ -19,14 +19,14 @@ import { StocksExchange } from "@prisma/client";
 
 export const getStockLoginUrlController = async (req, res) => {
   const { exchange } = req.body;
-      const userId = req.user.userId;
+  const userId = req.user.userId;
 
   if (!exchange) {
     return sendBadRequest(res, "exchange is required");
   }
 
   try {
-    const data = getStockLoginUrl(exchange,userId);
+    const data = getStockLoginUrl(exchange, userId);
     return sendSuccess(res, "Login URL generated", data);
   } catch (error: any) {
     if (error.code === "NOT_REQUIRED") {
@@ -119,10 +119,7 @@ export const getStockBalancesController = async (req, res) => {
       };
     }
 
-    const balances = await getStockBalances(exchange, {
-      apiKey: credentials.apiKey,
-      accessToken: credentials.accessToken,
-    });
+    const balances = await getStockBalances(exchange, credentials);
 
     return sendSuccess(res, "Balances fetched", balances);
   } catch (error: any) {

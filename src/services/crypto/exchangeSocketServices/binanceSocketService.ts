@@ -2,8 +2,6 @@ import {
   mapBinanceFutureOrderStatus,
   mapBinanceStatusToTradeStatus,
 } from "../../../constants/crypto/exchange/binance";
-import { wait } from "./kucoinSocketServices";
-import { getActiveFuturesPositionsBySymbol } from "../exchange/binanceService";
 import prisma from "../../../config/db.config";
 import {
   CryptoExchange,
