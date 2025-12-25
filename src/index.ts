@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import rootrouter from "./routes/index";
-import { resubscribeAllStrategies } from "./services/startegies/resubscribeStrategies";
+import { resubscribeAllStrategies } from "./services/strategies/resubscribeStrategies";
 import { fetchAndStoreZerodhaInstruments } from "./services/stocks/exchange/instrumentTokenService";
 import fs from "fs";
 import path from "path";

@@ -1,5 +1,7 @@
+import { handleExpiredSession } from "../../utils/strategyUtils";
 import { getCryptoCredentials } from "../crypto/credentialsService";
 import { getStocksCredentials } from "../stocks/credentialsService";
+import { ensureValidStocksSession } from "./ensureValidStocksSession";
 import { tradeExecutionEngine } from "./tradeExecutionEngine";
 
 export type TradeIntent = {
@@ -39,7 +41,15 @@ export const tradeDispatcher = {
       const raw = await getStocksCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
       if (!credentials) throw new Error("No stock credentials");
-
+      try {
+        await ensureValidStocksSession({
+          userId: intent.userId,
+          exchange: intent.exchange,
+        });
+      } catch (err) {
+        await handleExpiredSession(intent, err);
+        return;
+      }
       tradeExecutionEngine.enqueue({
         ...intent,
         credentials,

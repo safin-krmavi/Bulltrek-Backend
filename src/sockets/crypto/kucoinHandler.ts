@@ -34,15 +34,7 @@ export async function getToken(
       ? "https://api-futures.kucoin.com"
       : "https://api.kucoin.com";
 
-  // Get timestamp and generate signature
-  const timestamp = await generateKucoinServerTime();
-  const signature = generateSignatureKucoin(
-    credentials.apiSecret,
-    timestamp,
-    "POST",
-    endpoint
-  );
-
+  
   console.log("GENERATING_KUCOIN_TOKEN", {
     market,
     url: `${baseUrl}${endpoint}`,

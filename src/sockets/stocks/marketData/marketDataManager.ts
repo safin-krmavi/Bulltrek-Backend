@@ -1,9 +1,10 @@
 // stockMarketDataManager.ts
 import { stockMarketDataRegistry } from "./marketDataRegistry";
-import { strategyRuntimeRegistry } from "../../../services/startegies/strategyRuntimeRegistry";
+import { strategyRuntimeRegistry } from "../../../services/strategies/strategyRuntimeRegistry";
 import { StocksExchange } from "@prisma/client";
 import { ZerodhaMarketDataHandler } from "./zerodhaMarketDataHandler";
 import { getStocksCredentials } from "../../../services/stocks/credentialsService";
+import { KotakMarketDataHandler } from "./kotakMarketDataHandler";
 // import { AngelOneMarketDataHandler } from "./angelOneMarketDataHandler"; // future exchanges
 
 type StockConnection = {
@@ -25,12 +26,19 @@ export const StockMarketDataManager = {
         throw new Error("Credentials not found");
       }
       // connect exchange-specific handler
-      if (exchange === "ZERODHA")
+      if (exchange === "ZERODHA") {
         ZerodhaMarketDataHandler.connect({
           userId,
           apiKey: credentials.apiKey,
           accessToken: credentials.accessToken!,
         });
+      } else if (exchange === "KOTAK") {
+        KotakMarketDataHandler.connect(userId, {
+          tradingToken: credentials.accessToken,
+          tradingSid: credentials.refreshToken,
+          dataCenter: credentials.dataCenter,
+        });
+      }
       // else if (exchange === "ANGEL_ONE") AngelOneMarketDataHandler.connect({ userId, ...auth });
     }
   },
@@ -83,9 +91,8 @@ export const StockMarketDataManager = {
     for (const strategyId of subscribers) {
       console.log("ON MARKET TICK");
       strategyRuntimeRegistry.onMarketTick({
-
         strategyId,
-       
+
         price,
         timestamp,
       });

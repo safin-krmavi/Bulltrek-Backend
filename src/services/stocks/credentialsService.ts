@@ -1,6 +1,5 @@
 import { StocksExchange } from "@prisma/client";
-import prisma from "../../config/db.config"; 
-
+import prisma from "../../config/db.config";
 export async function addOrUpdateStocksCredentials(data: {
   userId: string;
   exchange: StocksExchange;
@@ -17,30 +16,70 @@ export async function addOrUpdateStocksCredentials(data: {
     },
   });
 
-  if (existing) {
-    return prisma.stocksCredentials.update({
-      where: {
-        userId_exchange: { userId: data.userId, exchange: data.exchange },
+  const credentials = existing
+    ? await prisma.stocksCredentials.update({
+        where: {
+          userId_exchange: { userId: data.userId, exchange: data.exchange },
+        },
+        data,
+      })
+    : await prisma.stocksCredentials.create({ data });
+
+  if (data.expiresAt <= new Date()) {
+    throw new Error("CANNOT_RESUME_WITH_EXPIRED_CREDENTIALS");
+  }
+
+  // 🔁 RESUME paused STOCK strategies
+  const resumed = await prisma.strategy.updateMany({
+    where: {
+      userId: data.userId,
+      exchange: data.exchange,
+      assetType: "STOCK",
+      status: "PAUSED",
+    },
+    data: {
+      status: "ACTIVE",
+    },
+  });
+
+  if (resumed.count > 0) {
+    await prisma.notification.create({
+      data: {
+        userId: data.userId,
+        type: "STRATEGY_RESUMED",
+        severity: "INFO",
+        title: "Strategies resumed",
+        message:
+          "Your stock strategies have been resumed after successful login.",
+        meta: {
+          exchange: data.exchange,
+          resumedCount: resumed.count,
+        },
       },
-      data,
     });
   }
 
-  return prisma.stocksCredentials.create({ data });
+  return credentials;
 }
-
 export async function getStocksCredentials(
   userId: string,
   exchange?: StocksExchange
 ) {
-  if (exchange) {
-    return prisma.stocksCredentials.findUnique({
-      where: { userId_exchange: { userId, exchange } },
-    });
-  } else {
-    return prisma.stocksCredentials.findMany({ where: { userId } });
+  const creds = exchange
+    ? await prisma.stocksCredentials.findUnique({
+        where: { userId_exchange: { userId, exchange } },
+      })
+    : await prisma.stocksCredentials.findMany({ where: { userId } });
+
+  const now = new Date();
+
+  if (Array.isArray(creds)) {
+    return creds.map(c => ({ ...c, isExpired: c.expiresAt <= now }));
   }
+
+  return creds ? { ...creds, isExpired: creds.expiresAt <= now } : null;
 }
+
 
 export async function updateStocksCredentials(
   id: string,

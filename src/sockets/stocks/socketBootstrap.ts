@@ -44,9 +44,9 @@ export async function connectUserExchanges(
         });
       } else if (exchange === "KOTAK") {
         KotakOrderHandler.connect(userId, {
-          tradingSid: credentials.refreshToken,
           tradingToken: credentials.accessToken,
-          baseUrl: `https://${credentials.dataCenter}.kotaksecurities.com`,
+          tradingSid: credentials.refreshToken,
+          dataCenter: credentials.dataCenter,
         });
       } else {
         console.log("UNSUPPORTED_STOCK_EXCHANGE", { exchange });

@@ -148,6 +148,8 @@ export async function handleAngelOneCallback(req: any) {
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
+    
+
     console.log("✅ Credentials stored successfully");
 
     return {

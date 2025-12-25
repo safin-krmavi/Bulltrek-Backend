@@ -1,6 +1,6 @@
 import { isStrategyDue } from "../../utils/strategySchedule";
 import prisma from "../../config/db.config";
-import { strategyRuntimeRegistry } from "../../services/startegies/strategyRuntimeRegistry";
+import { strategyRuntimeRegistry } from "../../services/strategies/strategyRuntimeRegistry";
 
 export async function runStrategyScheduler() {
   console.log("[SCHEDULER] Running strategy scheduler");

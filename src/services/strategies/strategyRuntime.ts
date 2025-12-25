@@ -14,7 +14,7 @@ type BaseStrategyRuntimeState = {
   positionQty: number;
   avgEntryPrice: number | null;
   lastExecutionAt: number | null;
-  status: "RUNNING" | "PAUSED" | "STOPPED";
+  status: "ACTIVE" | "PAUSED" | "STOPPED";
 };
 
 type DCAEntry = {
@@ -29,7 +29,7 @@ type GrowthDCAState = {
   investedCapital: number;
   entries: DCAEntry[];
   lastExecutionAt: number | null;
-  status: "RUNNING" | "PAUSED" | "STOPPED";
+  status: "ACTIVE" | "PAUSED" | "STOPPED";
   pendingOrder?: boolean;
 };
 
@@ -58,7 +58,7 @@ export class StrategyRuntime<
           investedCapital: 0,
           entries: [],
           lastExecutionAt: null,
-          status: "RUNNING",
+          status: "ACTIVE",
         } as StrategyStateMap[T];
         break;
 
@@ -70,7 +70,7 @@ export class StrategyRuntime<
           positionQty: 0,
           avgEntryPrice: null,
           lastExecutionAt: null,
-          status: "RUNNING",
+          status: "ACTIVE",
         } as StrategyStateMap[T];
         break;
     }
@@ -87,7 +87,7 @@ export class StrategyRuntime<
    */
   onMarketTick(price: number, timestamp: number) {
     if (!this.active) return;
-    if (this.state.status !== "RUNNING") return;
+    if (this.state.status !== "ACTIVE") return;
 
     // console.log("[STRATEGY_TICK]", {
     //   strategyId: this.strategy.id,

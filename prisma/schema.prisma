@@ -262,6 +262,44 @@ model Strategy {
   @@index([nextRunAt])
 }
 
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+
+  type        NotificationType
+  title       String
+  message     String
+
+  severity    NotificationSeverity @default(INFO)
+
+  isRead      Boolean  @default(false)
+
+  meta        Json?    // strategyId, exchange, redirect hints, etc.
+
+  createdAt   DateTime @default(now())
+  readAt      DateTime?
+
+  @@index([userId, isRead])
+  @@index([type])
+}
+
+enum NotificationType {
+  STOCKS_SESSION_EXPIRED
+  STOCKS_SESSION_EXPIRING_SOON
+  STRATEGY_PAUSED
+  STRATEGY_RESUMED
+  STRATEGY_EXECUTION_FAILED
+  TRADE_REJECTED
+  SYSTEM_ALERT
+}
+
+enum NotificationSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+
 enum KYCStatus {
   PENDING
   APPROVED
