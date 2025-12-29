@@ -243,7 +243,7 @@ model Strategy {
   name         String   // "Growth DCA BTC"
   assetType    String   // CRYPTO | STOCK
   type         String   // GROWTH_DCA
-  exchange     String   // BINANCE | KUCOIN | COINDCX | NSE
+  exchange     String   // BINANCE | KUCOIN | COINDCX | ZERODHA
   segment      String   // SPOT | FUTURES | DELIVERY | CASH
   symbol       String   // BTCUSDT, B-BTC_USDT, RELIANCE
 

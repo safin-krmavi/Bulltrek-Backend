@@ -109,6 +109,140 @@ export const getStrategyById = async (strategyId: string) => {
   return strategy;
 };
 
+export const updateStrategy = async (
+  strategyId: string,
+  userId: string,
+  updates: any
+) => {
+  const existing = await prisma.strategy.findFirst({
+    where: { id: strategyId, userId },
+  });
+
+  if (!existing) {
+    throw new Error("Strategy not found");
+  }
+
+  if (existing.status === "STOPPED") {
+    throw new Error("Stopped strategies cannot be updated");
+  }
+
+  const {
+    name,
+    status,
+    investmentPerRun,
+    investmentCap,
+    frequency,
+    time,
+    hourInterval,
+    daysOfWeek,
+    datesOfMonth,
+    takeProfitPct,
+    stopLossPct,
+    priceStart,
+    priceStop,
+  } = updates;
+
+  let config = existing.config as any;
+  let nextRunAt = existing.nextRunAt;
+
+  // Capital update
+  if (investmentPerRun || investmentCap) {
+    config.capital = {
+      perOrderAmount: investmentPerRun ?? config.capital.perOrderAmount,
+      maxCapital: investmentCap ?? config.capital.maxCapital,
+    };
+
+    if (config.capital.perOrderAmount > config.capital.maxCapital) {
+      throw new Error("Per order amount cannot exceed max capital");
+    }
+  }
+
+  // Schedule update
+  if (frequency) {
+    config.schedule = buildSchedule({
+      frequency,
+      time,
+      hourInterval,
+      daysOfWeek,
+      datesOfMonth,
+    });
+    nextRunAt = computeNextRunAt(config.schedule);
+  }
+
+  // Entry / Exit / Risk updates
+  config.entry.priceTrigger = {
+    enabled: priceStart !== undefined && priceStop !== undefined,
+    startPrice: priceStart,
+    stopPrice: priceStop,
+  };
+
+  config.exit.bookProfit = {
+    enabled: takeProfitPct !== undefined,
+    percentage: takeProfitPct,
+  };
+
+  config.risk.stopLoss = {
+    enabled: stopLossPct !== undefined,
+    percentage: stopLossPct,
+  };
+
+  return prisma.strategy.update({
+    where: { id: strategyId },
+    data: {
+      name,
+      status,
+      config,
+      nextRunAt,
+    },
+  });
+};
+
+export const deleteStrategy = async (strategyId: string, userId: string) => {
+  const existing = await prisma.strategy.findFirst({
+    where: { id: strategyId, userId },
+  });
+
+  if (!existing) {
+    throw new Error("Strategy not found");
+  }
+
+  return prisma.strategy.delete({
+    where: { id: strategyId },
+  });
+};
+
+export const changeStrategyStatus = async (
+  strategyId: string,
+  userId: string,
+  status: "ACTIVE" | "PAUSED" | "STOPPED"
+) => {
+  const strategy = await prisma.strategy.findFirst({
+    where: { id: strategyId, userId },
+  });
+
+  if (!strategy) {
+    throw new Error("Strategy not found");
+  }
+
+  let nextRunAt = strategy.nextRunAt;
+
+  if (status === "ACTIVE") {
+    nextRunAt = computeNextRunAt((strategy.config as any).schedule);
+  }
+
+  if (status !== "ACTIVE") {
+    nextRunAt = null;
+  }
+
+  return prisma.strategy.update({
+    where: { id: strategyId },
+    data: {
+      status,
+      nextRunAt,
+    },
+  });
+};
+
 export const buildSchedule = (params: {
   frequency: string;
   time?: string;
@@ -130,7 +264,7 @@ export const buildSchedule = (params: {
           startTime: time,
         },
       };
-
+    
     case "DAILY":
       if (!time) {
         throw new Error("time required for DAILY frequency");

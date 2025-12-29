@@ -16,6 +16,7 @@ export async function subscribeStrategyToMarketData(params: SubscribeParams) {
   const { assetType, exchange, segment, symbol, strategyId, userId } = params;
 
   if (assetType === "CRYPTO") {
+    console.log("CRYPTO")
     return MarketDataManager.subscribe(
       exchange as CryptoExchange,
       segment,
@@ -25,6 +26,8 @@ export async function subscribeStrategyToMarketData(params: SubscribeParams) {
   }
 
   if (assetType === "STOCK") {
+    console.log("STOCKS")
+
     // fetch credentials internally inside ensureConnection
     await StockMarketDataManager.ensureConnection(
       exchange as StocksExchange,

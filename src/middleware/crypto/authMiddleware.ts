@@ -16,6 +16,7 @@ export async function verifyCryptoUser(
 ) {
   try {
     const authHeader = req.headers.authorization;
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return sendUnauthorized(res, "Authorization header missing or invalid");
     }

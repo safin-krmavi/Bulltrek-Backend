@@ -52,6 +52,7 @@ export const angelOneCallbackController = async (req, res) => {
     return sendBadRequest(res, error.message);
   }
 };
+
 export const loginStockExchangeController = async (req, res) => {
   const { exchange, payload } = req.body;
   const userId = req.user.userId;
