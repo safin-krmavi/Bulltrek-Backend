@@ -1,6 +1,6 @@
 // controllers/strategyController.ts
 import { Response, Request } from "express";
-import { createStrategy, getUserStrategies } from "../services/strategyService";
+import { changeStrategyStatus, createStrategy, deleteStrategy, getStrategyById, getUserStrategies, updateStrategy } from "../services/strategyService";
 import {
   sendBadRequest,
   sendSuccess,
@@ -81,6 +81,14 @@ export const createStrategyController = async (req: any, res: Response) => {
     return sendServerError(res, error.message);
   }
 };
+export const getStrategyByIdController = async (req: any, res: Response) => {
+  try {
+    const strategy = await getStrategyById(req.params.strategyId);
+    return sendSuccess(res, "Strategy fetched", strategy);
+  } catch (error: any) {
+    return sendServerError(res, error.message);
+  }
+};
 
 export const getUserStrategiesController = async (req: any, res: Response) => {
   const userId = req.user.userId;
@@ -91,5 +99,55 @@ export const getUserStrategiesController = async (req: any, res: Response) => {
   } catch (error: any) {
     console.error("[STRATEGY_CONTROLLER] Failed to fetch strategies", error);
     return sendServerError(res, error.message || "Failed to fetch strategies");
+  }
+};
+
+export const updateStrategyController = async (req: any, res: Response) => {
+  const userId = req.user.userId;
+  const { strategyId } = req.params;
+
+  try {
+    const updated = await updateStrategy(strategyId, userId, req.body);
+    return sendSuccess(res, "Strategy updated", updated);
+  } catch (error: any) {
+    console.error("[STRATEGY_UPDATE]", error);
+    return sendServerError(res, error.message);
+  }
+};
+
+export const deleteStrategyController = async (req: any, res: Response) => {
+  const userId = req.user.userId;
+  const { strategyId } = req.params;
+
+  try {
+    await deleteStrategy(strategyId, userId);
+    return sendSuccess(res, "Strategy deleted");
+  } catch (error: any) {
+    console.error("[STRATEGY_DELETE]", error);
+    return sendServerError(res, error.message);
+  }
+};
+
+export const updateStrategyStatusController = async (
+  req: any,
+  res: Response
+) => {
+  const userId = req.user.userId;
+  const { strategyId } = req.params;
+  const { status } = req.body;
+
+  if (!["ACTIVE", "PAUSED", "STOPPED"].includes(status)) {
+    return sendBadRequest(res, "Invalid status");
+  }
+
+  try {
+    const updated = await changeStrategyStatus(
+      strategyId,
+      userId,
+      status
+    );
+    return sendSuccess(res, "Strategy status updated", updated);
+  } catch (error: any) {
+    return sendServerError(res, error.message);
   }
 };
