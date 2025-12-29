@@ -55,7 +55,7 @@ export const ZerodhaMarketDataHandler = {
       console.log("ZERODHA_DISCONNECTED", { userId })
     );
     ticker.on("error", (err: any) => {
-      console.log("ZERODHA_ERROR", { userId, err });
+      console.log("ZERODHA_ERROR", { userId, err:err.message });
       if (
         err?.message?.includes("TokenException") ||
         err?.message?.includes("Invalid session")

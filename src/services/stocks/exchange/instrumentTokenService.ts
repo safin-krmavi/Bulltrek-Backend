@@ -16,7 +16,6 @@ const ZERODHA_JSON_PATH = path.join(
 export async function fetchAndStoreZerodhaInstruments(): Promise<
   Record<number, string>
 > {
-  console.log("HELLO");
 
   const res = await axios.get("https://api.kite.trade/instruments", {
     responseType: "text",

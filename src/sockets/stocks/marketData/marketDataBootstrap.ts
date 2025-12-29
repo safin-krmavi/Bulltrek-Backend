@@ -1,16 +1,24 @@
-import { Express } from "express";
+// marketBootstrap.ts
+import { StocksExchange } from "@prisma/client";
+import prisma from "../../../config/db.config";
 import { StockMarketDataManager } from "./marketDataManager";
 
-export function registerMarketDataManager(app: Express) {
-  app.locals.marketData = {
-    getActiveConnections: StockMarketDataManager.getActiveConnections,
-  };
-
-  console.log("MARKET_DATA_MANAGER_REGISTERED");
-
-  process.on("SIGINT", () => {
-    const connections = StockMarketDataManager.getActiveConnections();
-    console.log("CLOSING_MARKET_DATA_SOCKETS", connections.length);
-    process.exit();
+export async function bootstrapMarketData() {
+  const activeStrategies = await prisma.strategy.findMany({
+    where: {
+      status: "ACTIVE",
+      assetType: "STOCK",
+    },
   });
+
+  for (const strategy of activeStrategies) {
+    await StockMarketDataManager.subscribe(
+      strategy.exchange as StocksExchange,
+      strategy.segment,
+      strategy.symbol,
+      strategy.id
+    );
+  }
+
+  console.log("MARKET_BOOTSTRAP_COMPLETED");
 }

@@ -118,7 +118,6 @@ export const updateSymbolPairsController = async (
       },
     ];
     await fs.mkdir(DATA_DIR, { recursive: true });
-    console.log("hello");
     // Write data to file (overwrites if already exists)
     const response = await fs.writeFile(
       FILE_PATH,

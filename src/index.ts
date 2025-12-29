@@ -7,6 +7,8 @@ import { fetchAndStoreZerodhaInstruments } from "./services/stocks/exchange/inst
 import fs from "fs";
 import path from "path";
 import { runStrategyScheduler } from "./utils/scheduler/strategyScheduler";
+import { bootstrapCryptoMarketData } from "./sockets/crypto/marketData/marketDataBootstrap";
+import { bootstrapMarketData } from "./sockets/stocks/marketData/marketDataBootstrap";
 dotenv.config();
 
 const app = express();
@@ -18,8 +20,7 @@ app.use(express.json());
 
 // Register SocketManager first
 // registerSocketManager(app);
-// resubscribeAllStrategies();
-// setInterval(runStrategyScheduler, 60 * 1000);
+setInterval(runStrategyScheduler, 60 * 1000);
 
 // (async () => {
 //   try {
@@ -75,6 +76,10 @@ const server = app.listen(PORT, async () => {
 
   // Only fetch once after server starts
   await ensureZerodhaInstruments();
+
+  await bootstrapCryptoMarketData();
+  await bootstrapMarketData();
+  await resubscribeAllStrategies();
 });
 
 export { app, server };

@@ -10,14 +10,28 @@ export const MarketDataManager = {
   /**
    * Ensure socket exists for exchange + segment
    */
-  ensureConnection(exchange: string, segment: CryptoTradeType) {
-    if (!marketDataRegistry[exchange]?.[segment]) {
+  ensureConnection(exchange: CryptoExchange, segment: CryptoTradeType) {
+    if (!marketDataRegistry[exchange]) {
+      marketDataRegistry[exchange] = {};
+    }
+
+    if (!marketDataRegistry[exchange][segment]) {
+      // 🔥 CREATE EMPTY CONNECTION FIRST
+      marketDataRegistry[exchange][segment] = {
+        socket: null,
+        exchange,
+        segment,
+        symbols: new Set(),
+        subscribers: new Map(),
+      };
+
+      // Then connect async
       if (exchange === "BINANCE") {
         BinanceMarketDataHandler.connect(segment);
       } else if (exchange === "KUCOIN") {
         KuCoinMarketDataHandler.connect(segment);
       } else if (exchange === "COINDCX") {
-        CoinDCXFuturesHandler.connect(); // use margin if you want dynamic
+        CoinDCXFuturesHandler.connect();
       }
     }
   },
@@ -29,21 +43,24 @@ export const MarketDataManager = {
     segment: CryptoTradeType,
     socket: WebSocket
   ) {
-    if (!marketDataRegistry[exchange]) {
-      marketDataRegistry[exchange] = {};
+    const connection = marketDataRegistry[exchange]?.[segment];
+
+    if (!connection) {
+      // safety fallback (rare)
+      marketDataRegistry[exchange] ??= {};
+      marketDataRegistry[exchange][segment] = {
+        socket,
+        exchange,
+        segment,
+        symbols: new Set(),
+        subscribers: new Map(),
+      };
+    } else {
+      connection.socket = socket;
     }
 
-    marketDataRegistry[exchange][segment] = {
-      socket,
-      exchange,
-      segment,
-      symbols: new Set(),
-      subscribers: new Map(),
-    };
-
-    console.log("MARKET_SOCKET_REGISTERED", { exchange, segment });
+    console.log("MARKET_SOCKET_ATTACHED", { exchange, segment });
   },
-
   /**
    * Subscribe strategy to symbol
    */
@@ -57,6 +74,7 @@ export const MarketDataManager = {
 
     const connection = marketDataRegistry[exchange]?.[segment];
     if (!connection) return;
+    console.log("EXCHANGE ", exchange);
 
     connection.symbols.add(symbol);
 
@@ -73,7 +91,21 @@ export const MarketDataManager = {
       strategyId,
       count: connection.subscribers.get(symbol)!.size,
     });
+
+    // console.log("CHECK THIS", marketDataRegistry);
   },
+
+  hasSubscribers(
+    exchange: string,
+    segment: CryptoTradeType,
+    symbol: string
+  ): boolean {
+    const connection = marketDataRegistry[exchange]?.[segment];
+    if (!connection) return false;
+
+    return connection.symbols.has(symbol);
+  },
+
   /**
    * Unsubscribe
    */
