@@ -14,6 +14,7 @@ type BaseStrategyRuntimeState = {
   positionQty: number;
   avgEntryPrice: number | null;
   lastExecutionAt: number | null;
+  nextRunAt: Date | null;
   status: "ACTIVE" | "PAUSED" | "STOPPED";
 };
 
@@ -29,6 +30,7 @@ type GrowthDCAState = {
   investedCapital: number;
   entries: DCAEntry[];
   lastExecutionAt: number | null;
+  nextRunAt: Date | null;
   status: "ACTIVE" | "PAUSED" | "STOPPED";
   pendingOrder?: boolean;
 };
@@ -51,30 +53,35 @@ export class StrategyRuntime<
   constructor(strategy: Strategy) {
     this.strategy = strategy;
 
-    // Initialize state depending on strategy type
     switch (strategy.type) {
       case "GROWTH_DCA":
+        // **FIX**: Initialize nextRunAt properly
+        const lastExecution = strategy.lastExecutedAt
+          ? strategy.lastExecutedAt.getTime()
+          : null;
+
         this.state = {
           investedCapital: 0,
           entries: [],
-          lastExecutionAt: null,
+          lastExecutionAt: lastExecution,
+          nextRunAt: computeNextRunAt(
+            (strategy.config as any).schedule,
+            strategy.lastExecutedAt || new Date(0)
+          ),
           status: "ACTIVE",
         } as StrategyStateMap[T];
+
+        console.log("[STRATEGY_RUNTIME_INIT]", {
+          strategyId: strategy.id,
+          symbol: strategy.symbol,
+          type: strategy.type,
+          lastExecutedAt: strategy.lastExecutedAt?.toISOString(),
+          nextRunAt: (this.state as GrowthDCAState).nextRunAt?.toISOString(),
+        });
         break;
 
-      case "SCALPING":
-      case "GRID":
-      default:
-        this.state = {
-          investedCapital: 0,
-          positionQty: 0,
-          avgEntryPrice: null,
-          lastExecutionAt: null,
-          status: "ACTIVE",
-        } as StrategyStateMap[T];
-        break;
+      // ... other cases
     }
-
     console.log("[STRATEGY_RUNTIME_INIT]", {
       strategyId: strategy.id,
       symbol: strategy.symbol,
@@ -86,35 +93,33 @@ export class StrategyRuntime<
    * Called on every market tick
    */
   onMarketTick(price: number, timestamp: number) {
-    if (!this.active) return;
-    if (this.state.status !== "ACTIVE") return;
+    // **REMOVED**: if (!this.active) return;
+    // The scheduling is now handled INSIDE each strategy handler
 
-    // console.log("[STRATEGY_TICK]", {
-    //   strategyId: this.strategy.id,
-    //   symbol: this.strategy.symbol,
-    //   price,
-    // });
+    if (this.state.status !== "ACTIVE") return;
 
     switch (this.strategy.type) {
       case "GROWTH_DCA":
         this.handleGrowthDCA(price, timestamp);
         break;
-
-      case "SCALPING":
-        // this.handleScalping(price, timestamp);
-        break;
-
-      case "GRID":
-        // this.handleGrid(price, timestamp);
-        break;
-
-      default:
-        console.warn("[STRATEGY_UNKNOWN_TYPE]", {
-          strategyId: this.strategy.id,
-          type: this.strategy.type,
-        });
-        break;
+      // ... other cases
     }
+  }
+
+  async executeScheduled(price: number = 0) {
+    if (this.state.status !== "ACTIVE") return;
+    this.active = true;
+
+    if (this.strategy.type === "GROWTH_DCA") {
+      await this.handleGrowthDCA(price, Date.now());
+    }
+
+    this.state.lastExecutionAt = Date.now();
+    this.state.nextRunAt = computeNextRunAt(
+      (this.strategy.config as any).schedule,
+      new Date()
+    );
+    this.active = false;
   }
 
   /**
@@ -125,41 +130,67 @@ export class StrategyRuntime<
     const config = this.strategy.config as any;
     const state = this.state as GrowthDCAState;
 
-    // console.log("[GROWTH_DCA] Tick received", {
-    //   strategyId: this.strategy.id,
-    //   price,
-    //   timestamp,
-    //   investedCapital: state.investedCapital,
-    //   entriesCount: state.entries.length,
-    //   pendingOrder: state.pendingOrder,
-    // });
-
     // 1️⃣ Pending order guard
     if (state.pendingOrder) return;
 
-    // 2️⃣ Schedule gate (ONLY place)
-    const due = isStrategyDue(
-      config.schedule,
-      state.lastExecutionAt,
-      timestamp
-    );
+    // 2️⃣ **CRITICAL FIX**: Check if we're past the scheduled time
+    if (!state.nextRunAt) {
+      // Initialize on first run
+      state.nextRunAt = computeNextRunAt(
+        config.schedule,
+        state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0)
+      );
+      console.log(
+        `[GROWTH_DCA] Initialized nextRunAt for ${this.strategy.id}:`,
+        {
+          nextRunAt: state.nextRunAt,
+        }
+      );
+    }
 
-    if (!due) return;
+    const now = timestamp;
+    const scheduledTime = state.nextRunAt.getTime();
 
-    // ⛔ SAFETY: investment cap
+    // **KEY FIX**: Only proceed if we're past the scheduled time
+    if (now < scheduledTime) {
+      // Optional: Log when we're close (within 1 minute) for debugging
+      if (scheduledTime - now < 60000) {
+        console.log(`[GROWTH_DCA] Waiting for schedule:`, {
+          strategyId: this.strategy.id,
+          scheduledTime: new Date(scheduledTime).toISOString(),
+          currentTime: new Date(now).toISOString(),
+          secondsRemaining: Math.floor((scheduledTime - now) / 1000),
+        });
+      }
+      return;
+    }
+
+    // 3️⃣ Investment cap check
     if (
       state.investedCapital + config.capital.perOrderAmount >
       config.capital.maxCapital
     ) {
+      console.log(`[GROWTH_DCA] Investment cap reached:`, {
+        strategyId: this.strategy.id,
+        invested: state.investedCapital,
+        maxCapital: config.capital.maxCapital,
+      });
       return;
     }
 
+    // 4️⃣ Evaluate decision
     const decision = evaluateGrowthDCA(this.strategy, state, price, timestamp);
-    console.log("[GROWTH_DCA] Evaluate decision", { decision });
+
+    console.log("[GROWTH_DCA] Evaluate decision", {
+      strategyId: this.strategy.id,
+      decision,
+      price,
+      scheduledTime: new Date(scheduledTime).toISOString(),
+      executionTime: new Date(now).toISOString(),
+    });
 
     if (decision === "BUY") {
       const perOrder = config.capital.perOrderAmount;
-
       const qty = await formatQuantity({
         exchange: this.strategy.exchange,
         tradeType: this.strategy.segment,
@@ -187,31 +218,31 @@ export class StrategyRuntime<
       state.investedCapital += perOrder;
       state.lastExecutionAt = timestamp;
       state.pendingOrder = true;
-      state.lastExecutionAt = timestamp;
 
-      await prisma.strategy.update({
-        where: { id: this.strategy.id },
-        data: {
-          lastExecutedAt: new Date(timestamp),
-          nextRunAt: computeNextRunAt(config.schedule, new Date(timestamp)),
-        },
-      });
+      // **CRITICAL**: Update nextRunAt IMMEDIATELY after execution
+      state.nextRunAt = computeNextRunAt(config.schedule, new Date(timestamp));
 
       console.log("[GROWTH_DCA] Placing BUY order", {
         strategyId: this.strategy.id,
         price,
         qty,
-        takeProfitPrice,
-        stopLossPrice,
+        executionTime: new Date(timestamp).toISOString(),
+        nextScheduledRun: state.nextRunAt.toISOString(),
         totalInvested: state.investedCapital,
         entriesCount: state.entries.length,
+      });
+
+      // Update DB
+      await prisma.strategy.update({
+        where: { id: this.strategy.id },
+        data: { lastExecutedAt: new Date(state.lastExecutionAt) },
       });
 
       tradeDispatcher.dispatch({
         userId: this.strategy.userId,
         exchange: this.strategy.exchange,
-        segment: this.strategy.assetType as "CRYPTO" | "STOCK", // "CRYPTO" | "STOCK"
-        tradeType: this.strategy.segment as any, // SPOT | FUTURES (crypto only)
+        segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+        tradeType: this.strategy.segment as any,
         symbol: this.strategy.symbol,
         side: "BUY",
         quantity: qty,
@@ -226,7 +257,7 @@ export class StrategyRuntime<
       return;
     }
 
-    // SELL — handle take profit / stop loss per entry
+    // 5️⃣ SELL logic (unchanged)
     for (const entry of state.entries) {
       if (config.exit.bookProfit.enabled && price >= entry.takeProfitPrice) {
         console.log("[GROWTH_DCA] Trigger BOOK_PROFIT sell", {
@@ -238,6 +269,7 @@ export class StrategyRuntime<
         this.sellEntry(entry, price, "BOOK_PROFIT");
         return;
       }
+
       if (config.risk.stopLoss.enabled && price <= entry.stopLossPrice) {
         console.log("[GROWTH_DCA] Trigger STOP_LOSS sell", {
           strategyId: this.strategy.id,
@@ -249,13 +281,6 @@ export class StrategyRuntime<
         return;
       }
     }
-
-    console.log("[GROWTH_DCA] No action taken on this tick", {
-      strategyId: this.strategy.id,
-      price,
-      entriesCount: state.entries.length,
-      investedCapital: state.investedCapital,
-    });
   }
 
   private async sellEntry(

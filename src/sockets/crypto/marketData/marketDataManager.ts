@@ -3,8 +3,8 @@ import { marketDataRegistry } from "./marketDataRegistry";
 import { BinanceMarketDataHandler } from "./binanceMarketDataHandler";
 import { CryptoExchange, CryptoTradeType } from "@prisma/client";
 import { KuCoinMarketDataHandler } from "./kucoinMarketDataHandler";
-import { CoinDCXFuturesHandler } from "./coindcxMarketDataHandler";
 import { strategyRuntimeRegistry } from "../../../services/strategies/strategyRuntimeRegistry";
+import { CoinDCXHandler } from "./coindcxMarketDataHandler";
 
 export const MarketDataManager = {
   /**
@@ -31,7 +31,7 @@ export const MarketDataManager = {
       } else if (exchange === "KUCOIN") {
         KuCoinMarketDataHandler.connect(segment);
       } else if (exchange === "COINDCX") {
-        CoinDCXFuturesHandler.connect();
+        CoinDCXHandler.connect(segment);
       }
     }
   },
@@ -152,13 +152,13 @@ export const MarketDataManager = {
 
     const subscribers = connection.subscribers.get(symbol);
     if (!subscribers || subscribers.size === 0) return;
-    console.log("[MARKET_TICK]", {
-      exchange,
-      segment,
-      symbol,
-      price,
-      subscribers: subscribers.size,
-    });
+    // console.log("[MARKET_TICK]", {
+    //   exchange,
+    //   segment,
+    //   symbol,
+    //   price,
+    //   subscribers: subscribers.size,
+    // });
     const timestamp = Date.now();
 
     for (const strategyId of subscribers) {

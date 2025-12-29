@@ -1,10 +1,8 @@
-import { isStrategyDue } from "../../utils/strategySchedule";
 import prisma from "../../config/db.config";
 import { strategyRuntimeRegistry } from "../../services/strategies/strategyRuntimeRegistry";
+import { computeNextRunAt } from "./computeNextRunAt";
 
 export async function runStrategyScheduler() {
-  const now = Date.now();
-
   const strategies = await prisma.strategy.findMany({
     where: { status: "ACTIVE" },
   });
@@ -13,14 +11,21 @@ export async function runStrategyScheduler() {
     const runtime = strategyRuntimeRegistry.getRuntime(strategy.id);
     if (!runtime) return;
 
-    const lastExecution = runtime.state.lastExecutionAt || null;
+    // Initialize nextRunAt if not present
+    if (!runtime.state.nextRunAt) {
+      const lastRun = runtime.state.lastExecutionAt
+        ? new Date(runtime.state.lastExecutionAt)
+        : new Date(0);
 
-    const due = isStrategyDue((strategy.config as any).schedule, lastExecution, now);
+      runtime.state.nextRunAt = computeNextRunAt(
+        (strategy.config as any).schedule,
+        lastRun
+      );
 
-    runtime.active = due;
-
-    if (due) {
-      console.log(`[SCHEDULER] Activating strategy ${strategy.id}`);
+      console.log(`[SCHEDULER] Initialized nextRunAt for ${strategy.id}:`, {
+        nextRunAt: runtime.state.nextRunAt,
+        lastExecutionAt: runtime.state.lastExecutionAt,
+      });
     }
   });
 }

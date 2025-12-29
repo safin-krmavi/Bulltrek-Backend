@@ -37,13 +37,12 @@ export function isStrategyDue(
   schedule: any,
   lastExecutionAt: number | null,
   now: number
-) {
+): boolean {
   const from = lastExecutionAt ? new Date(lastExecutionAt) : new Date(0);
   const nextRunAt = computeNextRunAt(schedule, from);
 
   return now >= nextRunAt.getTime();
 }
-
 /* ---------- helpers ---------- */
 
 function isNewDay(last: number, now: number) {
