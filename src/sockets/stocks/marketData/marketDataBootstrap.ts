@@ -2,7 +2,12 @@
 import { StocksExchange } from "@prisma/client";
 import prisma from "../../../config/db.config";
 import { StockMarketDataManager } from "./marketDataManager";
+import { startStrategyScheduler } from "../../../utils/scheduler/scheduler";
 
+export async function bootstrapStockAll() {
+  await bootstrapMarketData();
+  startStrategyScheduler();
+}
 export async function bootstrapMarketData() {
   const activeStrategies = await prisma.strategy.findMany({
     where: {
@@ -14,7 +19,7 @@ export async function bootstrapMarketData() {
   for (const strategy of activeStrategies) {
     await StockMarketDataManager.subscribe(
       strategy.exchange as StocksExchange,
-      strategy.segment,
+      strategy.userId,
       strategy.symbol,
       strategy.id
     );

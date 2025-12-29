@@ -42,6 +42,9 @@ class StrategyRuntimeRegistry {
   getRuntime(strategyId: string) {
     return this.runtimes.get(strategyId);
   }
+  getAllRuntimes() {
+    return Array.from(this.runtimes.values());
+  }
 
   onMarketTick({
     strategyId,

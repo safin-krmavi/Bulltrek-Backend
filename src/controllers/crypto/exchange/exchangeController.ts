@@ -20,6 +20,7 @@ import fs from "fs/promises";
 import { FILE_PATH, DATA_DIR } from "../../../constants/crypto";
 import { getAngelOneInstruments } from "../../../services/stocks/exchange/angeloneService";
 import { getSymbolPrecision } from "../../../utils/crypto/exchange/precisionResolver";
+import { fetchAndStoreKotakInstruments } from "../../../services/stocks/exchange/kotakInstrumentService";
 // import { promises as fs } from "fs";
 
 export const fetchSymbolPairsController = async (
@@ -41,14 +42,14 @@ export const updateSymbolPairsController = async (
   res: Response
 ) => {
   try {
-    const [binanceData, kucoinData, coinDCXData, angelData] = await Promise.all(
-      [
+    const [binanceData, kucoinData, coinDCXData, angelData, kotakData] =
+      await Promise.all([
         getBinanceUSDTData(),
         getKucoinAllData(),
         getCoinDCXAllData(),
         getAngelOneInstruments(),
-      ]
-    );
+        fetchAndStoreKotakInstruments(),
+      ]);
 
     const formattedData = [
       {
@@ -96,6 +97,7 @@ export const updateSymbolPairsController = async (
             exchange: "ANGELONE",
             data: angelData.equitySymbols,
           },
+          { exchange: "KOTAK", data: Object.values(kotakData) }, 
         ],
       },
       {
