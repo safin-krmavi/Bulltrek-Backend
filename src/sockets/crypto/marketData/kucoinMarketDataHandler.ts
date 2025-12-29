@@ -15,6 +15,7 @@ async function getKuCoinToken(segment: CryptoTradeType) {
   return data;
 }
 
+let pingTimer: NodeJS.Timeout;
 export const KuCoinMarketDataHandler = {
   async connect(segment: CryptoTradeType) {
     try {
@@ -23,10 +24,25 @@ export const KuCoinMarketDataHandler = {
       const wsUrl = `${tokenData.instanceServers[0].endpoint}?token=${
         tokenData.token
       }&connectId=${Date.now()}`;
+      console.log("HERE YOU GO:", wsUrl);
       const ws = new WebSocket(wsUrl);
+
+      const pingInterval = tokenData.instanceServers[0].pingInterval;
 
       ws.on("open", () => {
         console.log("KUCOIN_SOCKET_OPEN", { segment });
+
+        // 🔥 START HEARTBEAT (CLIENT → SERVER)
+        pingTimer = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(
+              JSON.stringify({
+                id: Date.now(),
+                type: "ping",
+              })
+            );
+          }
+        }, pingInterval);
 
         // Subscribe to all tickers (all-market)
         const topic =
@@ -48,32 +64,50 @@ export const KuCoinMarketDataHandler = {
       ws.on("message", (raw) => {
         try {
           const msg = JSON.parse(raw.toString());
-
+          // console.log("KUCOIN MESSAGE", msg);
           // Ignore ping, respond with pong
           if (msg.type === "ping") {
             ws.send(JSON.stringify({ id: Date.now(), type: "pong" }));
             return;
           }
 
+          if (msg.type !== "message" || !msg.subject || !msg.data?.price) {
+            return;
+          }
+
+          const symbol = msg.subject.toUpperCase();
+          if (symbol === "PEPE-USDT") {
+            // console.log("FOUND",msg.data)
+          }
+          // 🔥 HARD FILTER — only registered symbols pass
+          if (!MarketDataManager.hasSubscribers("KUCOIN", segment, symbol)) {
+            return;
+          }
+
+          const price = parseFloat(msg.data.price);
+          if (!price) return;
+
+          MarketDataManager.updatePrice("KUCOIN", segment, symbol, price);
+
           // Handle ticker updates
-          if (msg.type === "message" && msg.subject === "trade.ticker") {
-            const tick = msg.data;
-            const symbol = tick.symbol.toUpperCase();
-            const ltp = parseFloat(tick.price || tick.lastTradedPrice);
-            if (!ltp) return;
+          // if (msg.type === "message" && msg.subject === "trade.ticker") {
+          //   const tick = msg.data;
+          //   const symbol = tick.symbol.toUpperCase();
+          //   const ltp = parseFloat(tick.price || tick.lastTradedPrice);
+          //   if (!ltp) return;
 
-            MarketDataManager.updatePrice("KUCOIN", segment, symbol, ltp);
-          }
+          //   MarketDataManager.updatePrice("KUCOIN", segment, symbol, ltp);
+          // }
 
-          // Some messages may have array of tickers
-          if (msg.type === "message" && Array.isArray(msg.data)) {
-            for (const tick of msg.data) {
-              const symbol = tick.symbol.toUpperCase();
-              const ltp = parseFloat(tick.price || tick.lastTradedPrice);
-              if (!ltp) continue;
-              MarketDataManager.updatePrice("KUCOIN", segment, symbol, ltp);
-            }
-          }
+          // // Some messages may have array of tickers
+          // if (msg.type === "message" && Array.isArray(msg.data)) {
+          //   for (const tick of msg.data) {
+          //     const symbol = tick.symbol.toUpperCase();
+          //     const ltp = parseFloat(tick.price || tick.lastTradedPrice);
+          //     if (!ltp) continue;
+          //     MarketDataManager.updatePrice("KUCOIN", segment, symbol, ltp);
+          //   }
+          // }
         } catch (err) {
           console.log("KUCOIN_SOCKET_PARSE_ERROR", segment, err);
         }
@@ -81,11 +115,12 @@ export const KuCoinMarketDataHandler = {
 
       ws.on("close", () => {
         console.log("KUCOIN_SOCKET_CLOSED", { segment });
-        // optional: reconnect logic here
+        if (pingTimer) clearInterval(pingTimer);
       });
 
       ws.on("error", (err) => {
         console.log("KUCOIN_SOCKET_ERROR", { segment, err });
+        if (pingTimer) clearInterval(pingTimer);
       });
 
       MarketDataManager.registerSocket("KUCOIN", segment, ws);

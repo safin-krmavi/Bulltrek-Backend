@@ -1,16 +1,24 @@
-import { Express } from "express";
+// marketBootstrap.ts
+import { CryptoExchange, CryptoTradeType } from "@prisma/client";
+import prisma from "../../../config/db.config";
 import { MarketDataManager } from "./marketDataManager";
 
-export function registerMarketDataManager(app: Express) {
-  app.locals.marketData = {
-    getActiveConnections: MarketDataManager.getActiveConnections,
-  };
-
-  console.log("MARKET_DATA_MANAGER_REGISTERED");
-
-  process.on("SIGINT", () => {
-    const connections = MarketDataManager.getActiveConnections();
-    console.log("CLOSING_MARKET_DATA_SOCKETS", connections.length);
-    process.exit();
+export async function bootstrapCryptoMarketData() {
+  const activeStrategies = await prisma.strategy.findMany({
+    where: {
+      status: "ACTIVE",
+      assetType: "CRYPTO",
+    },
   });
+
+  for (const strategy of activeStrategies) {
+    await MarketDataManager.subscribe(
+      strategy.exchange as CryptoExchange,
+      strategy.segment as CryptoTradeType,
+      strategy.symbol,
+      strategy.id
+    );
+  }
+
+  console.log("MARKET_BOOTSTRAP_COMPLETED");
 }
