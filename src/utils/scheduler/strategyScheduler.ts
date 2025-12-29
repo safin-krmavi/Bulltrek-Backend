@@ -3,8 +3,6 @@ import prisma from "../../config/db.config";
 import { strategyRuntimeRegistry } from "../../services/strategies/strategyRuntimeRegistry";
 
 export async function runStrategyScheduler() {
-  console.log("[SCHEDULER] Running strategy scheduler");
-
   const now = Date.now();
 
   const strategies = await prisma.strategy.findMany({
@@ -17,11 +15,12 @@ export async function runStrategyScheduler() {
 
     const lastExecution = runtime.state.lastExecutionAt || null;
 
-    if (isStrategyDue((strategy.config as any).schedule, lastExecution, now)) {
+    const due = isStrategyDue((strategy.config as any).schedule, lastExecution, now);
+
+    runtime.active = due;
+
+    if (due) {
       console.log(`[SCHEDULER] Activating strategy ${strategy.id}`);
-      runtime.active = true;
-    } else {
-      runtime.active = false;
     }
   });
 }
