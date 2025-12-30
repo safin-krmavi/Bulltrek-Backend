@@ -1,9 +1,121 @@
 import axios from "axios";
+
+import csv from "csv-parser";
+import { Readable } from "stream";
+
 import { KOTAK_NEO_LOGIN_BASE } from "../../../constants/stocks/externalUrls";
-import { addOrUpdateStocksCredentials } from "../credentialsService";
+import {
+  addOrUpdateStocksCredentials,
+  getStocksCredentials,
+} from "../credentialsService";
 import { StocksExchange } from "@prisma/client";
 import { handleKotakError } from "../../../utils/stocks/exchange/kotakUtils";
 import { kotakHttpsAgent } from "../../../utils/stocks/exchange/kotakHttp";
+import prisma from "../../../config/db.config";
+
+/**
+ * Fetch all Kotak symbols (NSE CM)
+ * userId is mandatory
+ */
+export async function fetchAndStoreKotakSymbols(): Promise<
+  Record<string, any>
+> {
+  try {
+    const adminUser = await prisma.stocksUser.findFirst({
+      where: {
+        role: {
+          name: "ADMIN_STOCKS",
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!adminUser) {
+      throw new Error("No ADMIN stocks user found");
+    }
+
+    // 1. Fetch credentials
+    const creds = await getStocksCredentials(
+      adminUser.id,
+      StocksExchange.KOTAK
+    );
+
+    if (!creds || Array.isArray(creds)) {
+      throw new Error("Invalid Kotak credentials");
+    }
+
+    if (creds.isExpired) {
+      throw new Error("Kotak access token expired");
+    }
+
+    // 2. Fetch scrip master file paths
+    const { data } = await axios.get(
+      `${creds.feedToken}/script-details/1.0/masterscrip/file-paths`,
+      {
+        headers: {
+          Authorization: creds.apiKey,
+          "Content-Type": "application/json",
+        },
+        timeout: 15000,
+      }
+    );
+
+    const fileUrls: string[] = data?.data?.filesPaths ?? [];
+
+    if (!fileUrls.length) {
+      throw new Error("No scripmaster files returned by Kotak");
+    }
+
+    const symbolMap: Record<string, any> = {};
+
+    // 3. Iterate ALL CSV files
+    for (const fileUrl of fileUrls) {
+      const response = await axios.get(fileUrl, {
+        responseType: "stream",
+        timeout: 30_000,
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        Readable.from(response.data)
+          .pipe(csv())
+          .on("data", (row) => {
+            if (!row.pExchSeg || !row.pSymbol) return;
+
+            const key = `${row.pExchSeg}|${row.pSymbol}`;
+
+            symbolMap[key] = {
+              exchangeSegment: row.pExchSeg, // nse_cm, bse_cm, nse_fo, etc.
+              pSymbol: row.pSymbol,
+              tradingSymbol: row.pTrdSymbol ?? null,
+              lotSize: row.lLotSize ? Number(row.lLotSize) : undefined,
+              expiry: row.lExpiryDate ? Number(row.lExpiryDate) : undefined,
+            };
+          })
+          .on("end", resolve)
+          .on("error", reject);
+      });
+    }
+
+    console.log(
+      `[Kotak] Stored ${
+        Object.keys(symbolMap).length
+      } total symbols (ALL segments)`
+    );
+
+    return symbolMap;
+  } catch (error: any) {
+    console.error("[Kotak ScripMaster Error]", {
+      message: error?.message,
+      stack: error?.stack,
+    });
+
+    throw new Error(
+      error?.message || "Failed to fetch and store Kotak symbols"
+    );
+  }
+}
 
 export async function kotakNeoTotpLogin(params: {
   accessToken: string;
@@ -226,8 +338,7 @@ export async function getKotakNeoHoldings(params: {
   tradingSid: string;
 }) {
   try {
-
-    console.log(params)
+    console.log(params);
     const res = await axios.get(`${params.baseUrl}/portfolio/v1/holdings`, {
       httpsAgent: kotakHttpsAgent,
       headers: {

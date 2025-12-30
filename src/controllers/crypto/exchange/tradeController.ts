@@ -5,11 +5,12 @@ import {
   sendUnauthorized,
   sendServerError,
 } from "../../../utils/response";
-import { CryptoExchange, CryptoTradeType } from "@prisma/client";
+import { CryptoExchange, CryptoTradeType, TradeSide, TradeStatus } from "@prisma/client";
 import { getCryptoCredentials } from "../../../services/crypto/credentialsService";
 import {
   createFuturesTrade,
   createSpotTrade,
+  getCryptoTradeHistoryService,
   getFuturesOrdersFromExchangeService,
   getSpotOrdersFromExchangeService,
 } from "../../../services/crypto/exchange/tradeService";
@@ -198,5 +199,54 @@ export const getFuturesOrdersFromExchange = async (req: any, res: Response) => {
           error?.message || "Spot trade fetch failed"
         );
     }
+  }
+};
+
+export const getCryptoTradeHistoryController = async (
+  req: any,
+  res: Response
+) => {
+  try {
+    const userId = req.user.userId;
+
+    const {
+      exchange,
+      type,
+      symbol,
+      side,
+      status,
+      startDate,
+      endDate,
+      page,
+      limit,
+    } = req.query;
+
+    if (exchange && !Object.values(CryptoExchange).includes(exchange)) {
+      return sendBadRequest(res, "Invalid exchange");
+    }
+
+    if (type && !Object.values(CryptoTradeType).includes(type)) {
+      return sendBadRequest(res, "Invalid trade type");
+    }
+
+    const result = await getCryptoTradeHistoryService({
+      userId,
+      exchange: exchange as CryptoExchange,
+      type: type as CryptoTradeType,
+      symbol: symbol as string,
+      side: side as TradeSide,
+      status: status as TradeStatus,
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 20,
+    });
+
+    return sendSuccess(res, "Trade history fetched successfully", result);
+  } catch (error: any) {
+    return sendServerError(
+      res,
+      error?.message || "Failed to fetch trade history"
+    );
   }
 };

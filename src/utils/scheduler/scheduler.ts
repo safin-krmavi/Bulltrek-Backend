@@ -12,7 +12,7 @@ export function startStrategyScheduler() {
       if (!schedule) return;
 
       if (isStrategyDue(schedule, runtime.state.lastExecutionAt, now)) {
-        console.log(`[SCHEDULER] Triggering strategy ${runtime.strategy.id}`);
+        console.log(`[SCHEDULER] Triggering strategy ${runtime.state.status}`);
         const lastPrice = 0; // optionally fetch last known price from market
         await runtime.executeScheduled(lastPrice);
       }

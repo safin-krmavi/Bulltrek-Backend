@@ -1,4 +1,4 @@
-import { CryptoExchange, CryptoTradeType, TradeStatus } from "@prisma/client";
+import { CryptoExchange, CryptoTradeType, TradeSide, TradeStatus } from "@prisma/client";
 import {
   createKucoinFutureTrade,
   createKucoinSpotTrade,
@@ -22,6 +22,7 @@ import {
   getCoinDCXFuturesActivePositions,
 } from "./coindcxService";
 import { getCryptoCredentials } from "../credentialsService";
+import prisma from "../../../config/db.config";
 
 export async function createSpotTrade(
   userId: string,
@@ -287,3 +288,80 @@ export async function getFuturesOrdersFromExchangeService(
       };
   }
 }
+
+interface TradeHistoryParams {
+  userId: string;
+  exchange?: CryptoExchange;
+  type?: CryptoTradeType;
+  symbol?: string;
+  side?: TradeSide;
+  status?: TradeStatus;
+  startDate?: Date;
+  endDate?: Date;
+  page?: number;
+  limit?: number;
+}
+
+export const getCryptoTradeHistoryService = async (
+  params: TradeHistoryParams
+) => {
+  const {
+    userId,
+    exchange,
+    type,
+    symbol,
+    side,
+    status,
+    startDate,
+    endDate,
+    page = 1,
+    limit = 20,
+  } = params;
+
+  const where: any = {
+    userId,
+    ...(exchange && { exchange }),
+    ...(type && { type }),
+    ...(symbol && { symbol }),
+    ...(side && { side }),
+    ...(status && { status }),
+    ...(startDate || endDate
+      ? {
+          executedAt: {
+            ...(startDate && { gte: startDate }),
+            ...(endDate && { lte: endDate }),
+          },
+        }
+      : {}),
+  };
+
+  const [trades, total] = await Promise.all([
+    prisma.cryptoTrades.findMany({
+      where,
+      orderBy: { executedAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        order: {
+          select: {
+            orderType: true,
+            requestedQty: true,
+            requestedPrice: true,
+            exchangeOrderId: true,
+          },
+        },
+      },
+    }),
+    prisma.cryptoTrades.count({ where }),
+  ]);
+
+  return {
+    trades,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};

@@ -3,6 +3,16 @@ import * as stockExchangeController from "../../controllers/stocks/exchange/exch
 import { verifyStocksUser } from "../../middleware/stocks/authMiddleware";
 
 const exchangeRouter = express.Router();
+
+exchangeRouter.get(
+  "/symbol-pairs",
+  stockExchangeController.fetchStocksSymbolPairsController
+);
+exchangeRouter.put(
+  "/symbol-pairs",
+  stockExchangeController.updateStockSymbolPairsController
+);
+
 exchangeRouter.post(
   "/login-url",
   verifyStocksUser,

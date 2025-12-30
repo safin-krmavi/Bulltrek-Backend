@@ -1,6 +1,9 @@
 import axios from "axios";
 import crypto from "crypto";
 
+import csv from "csv-parser";
+import { Readable } from "stream";
+
 import {
   ZERODHA_BASE_URL,
   ZERODHA_LOGIN_URL,
@@ -10,9 +13,74 @@ import {
   handleZerodhaError,
   ZerodhaOrderPayload,
 } from "../../../utils/stocks/exchange/zerodhaUtils";
-import { StocksExchange, TradeSide } from "@prisma/client";
-import prisma from "../../../config/db.config";
+import { StocksExchange,  } from "@prisma/client";
 import { addOrUpdateStocksCredentials } from "../credentialsService";
+import path from "path";
+import fs from "fs";
+import { STOCKS_FILE_PATH } from "../../../constants/stocks";
+
+
+export function loadZerodhaInstrumentTokenMapFromFile(): Record<number, string> {
+  if (!fs.existsSync(STOCKS_FILE_PATH)) return {};
+
+  const raw = fs.readFileSync(STOCKS_FILE_PATH, "utf-8");
+  const parsed = JSON.parse(raw);
+
+  const stocksBlock = parsed.find((block: any) => block.type === "STOCKS");
+  if (!stocksBlock) return {};
+
+  const zerodhaBlock = stocksBlock.data.find((ex: any) => ex.exchange === "ZERODHA");
+  if (!zerodhaBlock) return {};
+
+  const map: Record<number, string> = {};
+  zerodhaBlock.data.forEach((item: any) => {
+    if (item.instrumentToken && item.tradingsymbol) {
+      map[Number(item.instrumentToken)] = item.tradingsymbol;
+    }
+  });
+
+  return map;
+}
+
+/**
+ * Fetch instruments from Zerodha API and store JSON
+ */
+export async function fetchAndStoreZerodhaInstruments(): Promise<
+  Record<number, string>
+> {
+
+  const res = await axios.get("https://api.kite.trade/instruments", {
+    responseType: "text",
+  });
+  const tempMap: Record<number, string> = {};
+
+  await new Promise<void>((resolve, reject) => {
+    Readable.from(res.data)
+      .pipe(csv())
+      .on("data", (row) => {
+        if (
+          row.exchange === "NSE" &&
+          row.instrument_token &&
+          row.tradingsymbol
+        ) {
+          const token = Number(row.instrument_token);
+          tempMap[token] = row.tradingsymbol;
+        }
+      })
+      .on("end", resolve)
+      .on("error", reject);
+  });
+
+  // fs.writeFileSync(ZERODHA_JSON_PATH, JSON.stringify(tempMap, null, 2), {
+  //   encoding: "utf-8",
+  // });
+  console.log(
+    `[Zerodha Instruments] Fetched & stored ${
+      Object.keys(tempMap).length
+    } tokens.`
+  );
+  return tempMap;
+}
 
 /**
  * STEP 1: Generate Zerodha Login URL

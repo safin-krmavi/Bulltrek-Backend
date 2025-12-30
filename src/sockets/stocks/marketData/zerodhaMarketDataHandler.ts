@@ -2,9 +2,8 @@
 import { KiteTicker } from "kiteconnect";
 import { instrumentTokenToSymbol } from "../../../utils/stocks/exchange/instrumentTokenMap";
 import { SocketManager } from "../../socketManagement";
-import { StocksExchange } from "@prisma/client";
 import { StockMarketDataManager } from "./marketDataManager";
-import { loadZerodhaInstrumentTokensFromFile } from "../../../services/stocks/exchange/instrumentTokenService";
+import { loadZerodhaInstrumentTokenMapFromFile } from "../../../services/stocks/exchange/zerodhaService";
 
 type ZerodhaConnectParams = {
   userId: string;
@@ -19,7 +18,12 @@ export const ZerodhaMarketDataHandler = {
     apiKey,
     accessToken,
   }: Omit<ZerodhaConnectParams, "instrumentTokens">) {
-    const instrumentTokens = await loadZerodhaInstrumentTokensFromFile();
+    const tokenMap = loadZerodhaInstrumentTokenMapFromFile();
+    const instrumentTokens = Object.keys(tokenMap).map(Number);
+
+    for (const [token, symbol] of Object.entries(tokenMap)) {
+      instrumentTokenToSymbol[Number(token)] = symbol;
+    }
 
     const ticker = new KiteTicker({
       api_key: apiKey,
@@ -55,7 +59,7 @@ export const ZerodhaMarketDataHandler = {
       console.log("ZERODHA_DISCONNECTED", { userId })
     );
     ticker.on("error", (err: any) => {
-      console.log("ZERODHA_ERROR", { userId, err:err.message });
+      console.log("ZERODHA_ERROR", { userId, err: err.message });
       if (
         err?.message?.includes("TokenException") ||
         err?.message?.includes("Invalid session")

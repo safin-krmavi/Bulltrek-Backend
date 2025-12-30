@@ -44,7 +44,7 @@ export async function connectUserExchanges(
         });
       } else if (exchange === "KOTAK") {
         KotakOrderHandler.connect(userId, {
-          tradingToken: credentials.accessToken,
+          tradingToken: credentials.apiKey,
           tradingSid: credentials.refreshToken,
           dataCenter: credentials.dataCenter,
         });
