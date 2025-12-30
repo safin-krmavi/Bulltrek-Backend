@@ -13,6 +13,7 @@ import {
 import { StocksExchange, TradeSide } from "@prisma/client";
 import prisma from "../../../config/db.config";
 import { addOrUpdateStocksCredentials } from "../credentialsService";
+import zerodhaInstruments from "../../../../data/zerodha_instruments.json";
 
 /**
  * STEP 1: Generate Zerodha Login URL
@@ -173,5 +174,69 @@ export async function getZerodhaPositions(credentials: {
     return response.data;
   } catch (error: any) {
     handleZerodhaError(error);
+  }
+}
+export function getZerodhaInstruments(search?: string) {
+  try {
+    // Convert object to array format with proper typing
+    const instruments = Object.entries(zerodhaInstruments as Record<string, string>).map(
+      ([instrumentToken, tradingSymbol]) => ({
+        instrumentToken,
+        tradingSymbol,
+      })
+    );
+
+    // If search query provided, filter instruments
+    if (search) {
+      const searchLower = search.toLowerCase();
+      return instruments.filter((instrument) =>
+        instrument.tradingSymbol.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return instruments;
+  } catch (error) {
+    console.error("ERROR_GETTING_ZERODHA_INSTRUMENTS", error);
+    throw error;
+  }
+}
+
+export function getZerodhaInstrumentByToken(instrumentToken: string) {
+  try {
+    const instruments = zerodhaInstruments as Record<string, string>;
+    const tradingSymbol = instruments[instrumentToken];
+    
+    if (!tradingSymbol) {
+      throw new Error(`Instrument token ${instrumentToken} not found`);
+    }
+
+    return {
+      instrumentToken,
+      tradingSymbol,
+    };
+  } catch (error) {
+    console.error("ERROR_GETTING_ZERODHA_INSTRUMENT", error);
+    throw error;
+  }
+}
+
+export function getZerodhaInstrumentBySymbol(symbol: string) {
+  try {
+    const instruments = zerodhaInstruments as Record<string, string>;
+    const entry = Object.entries(instruments).find(
+      ([_, tradingSymbol]) => tradingSymbol === symbol.toUpperCase()
+    );
+
+    if (!entry) {
+      throw new Error(`Symbol ${symbol} not found`);
+    }
+
+    return {
+      instrumentToken: entry[0],
+      tradingSymbol: entry[1],
+    };
+  } catch (error) {
+    console.error("ERROR_GETTING_ZERODHA_INSTRUMENT_BY_SYMBOL", error);
+    throw error;
   }
 }

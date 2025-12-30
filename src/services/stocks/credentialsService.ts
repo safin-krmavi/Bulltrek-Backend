@@ -81,23 +81,50 @@ export async function getStocksCredentials(
 }
 
 
-export async function updateCredentialsController(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    const data = req.body;
-    const updated = await credentialsService.updateCryptoCredentials(id, data);
-    return sendSuccess(res, "Credentials updated successfully", updated);
-  } catch (err: any) {
-    return sendBadRequest(res, err.message);
-  }
+export async function updateStocksCredentials(
+  id: string,
+  data: Partial<{
+    apiKey: string;
+    clientCode: string;
+    accessToken: string;
+    refreshToken: string;
+    feedToken: string;
+    expiresAt: Date;
+  }>
+) {
+  return prisma.stocksCredentials.update({ where: { id }, data });
 }
 
-export async function deleteCredentialsController(req: Request, res: Response) {
+export async function deleteStocksCredentials(id: string) {
+  return prisma.stocksCredentials.delete({ where: { id } });
+}
+
+export async function getConnectedStockExchanges(userId: string) {
   try {
-    const { id } = req.params;
-    await credentialsService.deleteCryptoCredentials(id);
-    return sendSuccess(res, "Credentials deleted successfully");
-  } catch (err: any) {
-    return sendBadRequest(res, err.message);
+    const credentials = await prisma.stocksCredentials.findMany({
+      where: { userId },
+      select: {
+        exchange: true,
+        createdAt: true,
+        expiresAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    // Check if credentials are expired
+    const now = new Date();
+    const connectedExchanges = credentials.map((cred) => ({
+      exchange: cred.exchange,
+      isActive: cred.expiresAt > now,
+      expiresAt: cred.expiresAt,
+      connectedAt: cred.createdAt,
+    }));
+
+    return connectedExchanges;
+  } catch (error) {
+    console.error("ERROR_GETTING_CONNECTED_EXCHANGES", error);
+    throw error;
   }
 }

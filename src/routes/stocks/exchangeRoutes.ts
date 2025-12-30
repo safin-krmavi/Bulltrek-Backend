@@ -64,4 +64,34 @@ exchangeRouter.post(
   stockExchangeController.getStockPositionsController
 );
 
+
+exchangeRouter.get(
+  "/zerodha/instruments",
+  stockExchangeController.getZerodhaInstrumentsController
+);
+
+/**
+ * Get Zerodha instrument by token
+ */
+exchangeRouter.get(
+  "/zerodha/instruments/:instrumentToken",
+  stockExchangeController.getZerodhaInstrumentByTokenController
+);
+
+/**
+ * Get Zerodha instrument by symbol
+ */
+exchangeRouter.get(
+  "/zerodha/instrument",
+  stockExchangeController.getZerodhaInstrumentBySymbolController
+);
+
+/**
+ * Get connected exchanges for user
+ */
+exchangeRouter.get(
+  "/connected",
+  stockExchangeController.getConnectedExchangesController
+);
+
 export default exchangeRouter;
