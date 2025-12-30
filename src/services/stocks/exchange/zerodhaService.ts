@@ -13,14 +13,16 @@ import {
   handleZerodhaError,
   ZerodhaOrderPayload,
 } from "../../../utils/stocks/exchange/zerodhaUtils";
-import { StocksExchange,  } from "@prisma/client";
+import { StocksExchange } from "@prisma/client";
 import { addOrUpdateStocksCredentials } from "../credentialsService";
 import path from "path";
 import fs from "fs";
 import { STOCKS_FILE_PATH } from "../../../constants/stocks";
 
-
-export function loadZerodhaInstrumentTokenMapFromFile(): Record<number, string> {
+export function loadZerodhaInstrumentTokenMapFromFile(): Record<
+  number,
+  string
+> {
   if (!fs.existsSync(STOCKS_FILE_PATH)) return {};
 
   const raw = fs.readFileSync(STOCKS_FILE_PATH, "utf-8");
@@ -29,7 +31,9 @@ export function loadZerodhaInstrumentTokenMapFromFile(): Record<number, string> 
   const stocksBlock = parsed.find((block: any) => block.type === "STOCKS");
   if (!stocksBlock) return {};
 
-  const zerodhaBlock = stocksBlock.data.find((ex: any) => ex.exchange === "ZERODHA");
+  const zerodhaBlock = stocksBlock.data.find(
+    (ex: any) => ex.exchange === "ZERODHA"
+  );
   if (!zerodhaBlock) return {};
 
   const map: Record<number, string> = {};
@@ -48,7 +52,6 @@ export function loadZerodhaInstrumentTokenMapFromFile(): Record<number, string> 
 export async function fetchAndStoreZerodhaInstruments(): Promise<
   Record<number, string>
 > {
-
   const res = await axios.get("https://api.kite.trade/instruments", {
     responseType: "text",
   });
@@ -241,5 +244,95 @@ export async function getZerodhaPositions(credentials: {
     return response.data;
   } catch (error: any) {
     handleZerodhaError(error);
+  }
+}
+
+/**
+ * Load Zerodha instruments from file
+ */
+function loadZerodhaInstrumentsFromFile(): Record<string, string> {
+  if (!fs.existsSync(STOCKS_FILE_PATH)) return {};
+
+  const raw = fs.readFileSync(STOCKS_FILE_PATH, "utf-8");
+  const parsed = JSON.parse(raw);
+
+  const stocksBlock = parsed.find((block: any) => block.type === "STOCKS");
+  if (!stocksBlock) return {};
+
+  const zerodhaBlock = stocksBlock.data.find(
+    (ex: any) => ex.exchange === "ZERODHA"
+  );
+  if (!zerodhaBlock) return {};
+
+  const map: Record<string, string> = {};
+  zerodhaBlock.data.forEach((item: any) => {
+    if (item.instrumentToken && item.tradingsymbol) {
+      map[String(item.instrumentToken)] = item.tradingsymbol;
+    }
+  });
+
+  return map;
+}
+
+/**
+ * Get all Zerodha instruments, optionally filter by search string
+ */
+export function getZerodhaInstruments(search?: string) {
+  try {
+    const instruments = Object.entries(loadZerodhaInstrumentsFromFile()).map(
+      ([instrumentToken, tradingSymbol]) => ({ instrumentToken, tradingSymbol })
+    );
+
+    if (search) {
+      const searchLower = search.toLowerCase();
+      return instruments.filter((instrument) =>
+        instrument.tradingSymbol.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return instruments;
+  } catch (error) {
+    console.error("ERROR_GETTING_ZERODHA_INSTRUMENTS", error);
+    throw error;
+  }
+}
+
+/**
+ * Get Zerodha instrument by token
+ */
+export function getZerodhaInstrumentByToken(instrumentToken: string) {
+  try {
+    const instruments = loadZerodhaInstrumentsFromFile();
+    const tradingSymbol = instruments[instrumentToken];
+
+    if (!tradingSymbol) {
+      throw new Error(`Instrument token ${instrumentToken} not found`);
+    }
+
+    return { instrumentToken, tradingSymbol };
+  } catch (error) {
+    console.error("ERROR_GETTING_ZERODHA_INSTRUMENT", error);
+    throw error;
+  }
+}
+
+/**
+ * Get Zerodha instrument by symbol
+ */
+export function getZerodhaInstrumentBySymbol(symbol: string) {
+  try {
+    const instruments = loadZerodhaInstrumentsFromFile();
+    const entry = Object.entries(instruments).find(
+      ([_, tradingSymbol]) => tradingSymbol === symbol.toUpperCase()
+    );
+
+    if (!entry) {
+      throw new Error(`Symbol ${symbol} not found`);
+    }
+
+    return { instrumentToken: entry[0], tradingSymbol: entry[1] };
+  } catch (error) {
+    console.error("ERROR_GETTING_ZERODHA_INSTRUMENT_BY_SYMBOL", error);
+    throw error;
   }
 }

@@ -17,11 +17,18 @@ import {
   placeStockOrder,
   verifyStockCredentials,
 } from "../../../services/stocks/exchange/exchangeService";
-import { getStocksCredentials } from "../../../services/stocks/credentialsService";
+import {
+  getStocksCredentials,
+  getConnectedStockExchanges,
+} from "../../../services/stocks/credentialsService";
 import { StocksExchange } from "@prisma/client";
 import { fetchAndStoreZerodhaInstruments } from "../../../services/stocks/exchange/zerodhaService";
 import { fetchAndStoreKotakSymbols } from "../../../services/stocks/exchange/kotakService";
-
+import {
+  getZerodhaInstruments,
+  getZerodhaInstrumentByToken,
+  getZerodhaInstrumentBySymbol,
+} from "../../../services/stocks/exchange/zerodhaService";
 export const fetchStocksSymbolPairsController = async (
   req: Request,
   res: Response
@@ -272,5 +279,90 @@ export const getStockPositionsController = async (req: any, res: Response) => {
     return sendSuccess(res, "Positions fetched", positions);
   } catch (error: any) {
     return sendServerError(res, error.message);
+  }
+};
+
+export const getZerodhaInstrumentsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { search } = req.query;
+
+    const instruments = getZerodhaInstruments(search as string);
+
+    return sendSuccess(res, "Zerodha instruments fetched successfully", {
+      total: instruments.length,
+      instruments,
+    });
+  } catch (error: any) {
+    return sendServerError(
+      res,
+      error?.message || "Failed to fetch instruments"
+    );
+  }
+};
+
+export const getZerodhaInstrumentByTokenController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { instrumentToken } = req.params;
+
+    if (!instrumentToken) {
+      return sendBadRequest(res, "instrumentToken is required");
+    }
+
+    const instrument = getZerodhaInstrumentByToken(instrumentToken);
+
+    return sendSuccess(res, "Instrument fetched successfully", instrument);
+  } catch (error: any) {
+    return sendBadRequest(res, error?.message || "Instrument not found");
+  }
+};
+
+export const getZerodhaInstrumentBySymbolController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { symbol } = req.query;
+
+    if (!symbol) {
+      return sendBadRequest(res, "symbol is required");
+    }
+
+    const instrument = getZerodhaInstrumentBySymbol(symbol as string);
+
+    return sendSuccess(res, "Instrument fetched successfully", instrument);
+  } catch (error: any) {
+    return sendBadRequest(res, error?.message || "Instrument not found");
+  }
+};
+
+export const getConnectedExchangesController = async (
+  req: any,
+  res: Response
+) => {
+  try {
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return sendBadRequest(res, "userId is required");
+    }
+
+    const connectedExchanges = await getConnectedStockExchanges(userId);
+
+    return sendSuccess(
+      res,
+      "Connected exchanges fetched successfully",
+      connectedExchanges
+    );
+  } catch (error: any) {
+    return sendServerError(
+      res,
+      error?.message || "Failed to fetch connected exchanges"
+    );
   }
 };

@@ -98,3 +98,33 @@ export async function updateStocksCredentials(
 export async function deleteStocksCredentials(id: string) {
   return prisma.stocksCredentials.delete({ where: { id } });
 }
+
+export async function getConnectedStockExchanges(userId: string) {
+  try {
+    const credentials = await prisma.stocksCredentials.findMany({
+      where: { userId },
+      select: {
+        exchange: true,
+        createdAt: true,
+        expiresAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    // Check if credentials are expired
+    const now = new Date();
+    const connectedExchanges = credentials.map((cred) => ({
+      exchange: cred.exchange,
+      isActive: cred.expiresAt > now,
+      expiresAt: cred.expiresAt,
+      connectedAt: cred.createdAt,
+    }));
+
+    return connectedExchanges;
+  } catch (error) {
+    console.error("ERROR_GETTING_CONNECTED_EXCHANGES", error);
+    throw error;
+  }
+}
