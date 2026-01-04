@@ -6,7 +6,7 @@ import { startStrategyScheduler } from "../../../utils/scheduler/scheduler";
 
 export async function bootstrapStockAll() {
   await bootstrapMarketData();
-  startStrategyScheduler();
+  // startStrategyScheduler();
 }
 export async function bootstrapMarketData() {
   const activeStrategies = await prisma.strategy.findMany({

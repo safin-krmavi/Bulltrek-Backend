@@ -5,8 +5,14 @@ import http from "http";
 import { initSocketService } from "./socketHandleOrders";
 import { runStrategyScheduler } from "./utils/scheduler/strategyScheduler";
 import rootrouter from "./routes";
-import { bootstrapAll } from "./sockets/crypto/marketData/marketDataBootstrap";
-import { bootstrapStockAll } from "./sockets/stocks/marketData/marketDataBootstrap";
+import {
+  bootstrapAll,
+  bootstrapCryptoMarketData,
+} from "./sockets/crypto/marketData/marketDataBootstrap";
+import {
+  bootstrapMarketData,
+  bootstrapStockAll,
+} from "./sockets/stocks/marketData/marketDataBootstrap";
 import { resubscribeAllStrategies } from "./services/strategies/resubscribeStrategies";
 
 dotenv.config();
@@ -30,8 +36,8 @@ server.listen(PORT, async () => {
 
   try {
     // 1️⃣ Bootstrap market data
-    await bootstrapAll();
-    await bootstrapStockAll();
+    await bootstrapCryptoMarketData();
+    await bootstrapMarketData();
     console.log("Market data bootstrapped");
 
     // 2️⃣ Load all strategies into runtime

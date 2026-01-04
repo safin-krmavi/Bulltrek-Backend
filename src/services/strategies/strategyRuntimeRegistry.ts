@@ -73,6 +73,16 @@ class StrategyRuntimeRegistry {
 
     runtime.onMarketTick(price, timestamp);
   }
+
+  remove(strategyId: string) {
+    const existed = this.runtimes.delete(strategyId);
+
+    if (existed) {
+      console.log("[STRATEGY_RUNTIME_REMOVED]", { strategyId });
+    } else {
+      console.warn("[STRATEGY_RUNTIME_REMOVE_MISS]", { strategyId });
+    }
+  }
 }
 
 export const strategyRuntimeRegistry = new StrategyRuntimeRegistry();

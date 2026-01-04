@@ -46,3 +46,39 @@ export async function subscribeStrategyToMarketData(params: SubscribeParams) {
 
   throw new Error("Unsupported asset type");
 }
+
+
+export async function unsubscribeStrategyFromMarketData(
+  params: SubscribeParams
+) {
+  const { assetType, exchange, segment, symbol, strategyId, userId } = params;
+
+  console.log(
+    "[UNSUBSCRIBE]",
+    assetType,
+    exchange,
+    symbol,
+    "strategy:",
+    strategyId
+  );
+
+  if (assetType === "CRYPTO") {
+    return MarketDataManager.unsubscribe(
+      exchange as CryptoExchange,
+      segment,
+      symbol,
+      strategyId
+    );
+  }
+
+  if (assetType === "STOCK") {
+    return StockMarketDataManager.unsubscribe(
+      exchange as StocksExchange,
+      userId,
+      symbol,
+      strategyId
+    );
+  }
+
+  throw new Error("Unsupported asset type");
+}

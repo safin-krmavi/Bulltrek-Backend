@@ -317,6 +317,35 @@ model Strategy {
   @@index([nextRunAt])
 }
 
+// Marketplace
+model StrategyPurchase {
+  id              String   @id @default(uuid())
+
+  originalStrategyId String
+  buyerUserId     String
+
+  forkedStrategyId String
+
+  createdAt       DateTime @default(now())
+}
+
+
+
+// Copy Trading
+model StrategyCopySubscription {
+  id             String   @id @default(uuid())
+  strategyId     String
+  followerUserId String
+
+  multiplier     Float    @default(1) // quantity scaling
+  isActive       Boolean  @default(true)
+
+  createdAt      DateTime @default(now())
+
+  @@unique([strategyId, followerUserId])
+}
+
+
 model Notification {
   id          String   @id @default(uuid())
   userId      String

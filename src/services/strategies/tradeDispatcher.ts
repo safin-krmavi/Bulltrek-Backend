@@ -1,3 +1,4 @@
+import prisma from "../../config/db.config";
 import { handleExpiredSession } from "../../utils/strategyUtils";
 import { getCryptoCredentials } from "../crypto/credentialsService";
 import { getStocksCredentials } from "../stocks/credentialsService";
@@ -21,19 +22,52 @@ export type TradeIntent = {
 
   attempt?: number;
   onComplete?: () => void;
+
+  // internal
+  isCopyTrade?: boolean;
 };
 
 export const tradeDispatcher = {
-  async dispatch(intent: TradeIntent) {
-    console.log(`[Dispatcher] Dispatching trade intent:`, intent);
+  async dispatch(originalIntent: TradeIntent) {
+    console.log(`[Dispatcher] Dispatching trade intent:`, originalIntent);
 
+    // 1️⃣ Execute for strategy owner (clone to avoid mutation bleed)
+    await this.dispatchForUser({ ...originalIntent });
+
+    // 2️⃣ Copy trading only if strategyId exists
+    if (!originalIntent.strategyId) return;
+
+    const followers = await prisma.strategyCopySubscription.findMany({
+      where: {
+        strategyId: originalIntent.strategyId,
+        isActive: true,
+      },
+    });
+
+    for (const follower of followers) {
+      // ❗ Skip owner to prevent double execution
+      if (follower.followerUserId === originalIntent.userId) continue;
+
+      const qty = originalIntent.quantity * follower.multiplier;
+
+      // ❗ Never enqueue invalid quantities
+      if (qty <= 0) continue;
+
+      await this.dispatchForUser({
+        ...originalIntent,
+        userId: follower.followerUserId,
+        quantity: qty,
+        onComplete: undefined, // followers never mutate strategy state
+        isCopyTrade: true,
+      });
+    }
+  },
+
+  async dispatchForUser(intent: TradeIntent) {
     if (intent.segment === "CRYPTO") {
       const raw = await getCryptoCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
-      if (!credentials) throw new Error("No crypto credentials");
-      console.log(
-        `[Dispatcher] Enqueuing crypto trade for symbol: ${intent.symbol}`
-      );
+      if (!credentials) return;
 
       tradeExecutionEngine.enqueue({
         ...intent,
@@ -45,28 +79,17 @@ export const tradeDispatcher = {
     if (intent.segment === "STOCK") {
       const raw = await getStocksCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
-      if (!credentials) throw new Error("No stock credentials");
-      try {
-        console.log(
-          `[Dispatcher] Ensuring valid stock session for user: ${intent.userId}`
-        );
+      if (!credentials) return;
 
+      try {
         await ensureValidStocksSession({
           userId: intent.userId,
           exchange: intent.exchange,
         });
       } catch (err) {
-        console.warn(
-          `[Dispatcher] Stocks session expired, handling for user: ${intent.userId}`,
-          err
-        );
-
         await handleExpiredSession(intent, err);
         return;
       }
-      console.log(
-        `[Dispatcher] Enqueuing stock trade for symbol: ${intent.symbol}`
-      );
 
       tradeExecutionEngine.enqueue({
         ...intent,
@@ -74,7 +97,5 @@ export const tradeDispatcher = {
       });
       return;
     }
-
-    throw new Error("Unsupported segment");
   },
 };
