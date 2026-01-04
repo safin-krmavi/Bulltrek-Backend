@@ -23,7 +23,7 @@ export type SocketConnection = {
 
 // Primary data store for all active connections
 export const socketRegistry: {
-  [clientId: string]: {
+  [userId: string]: {
     [exchange: string]: {
       [market: string]: SocketConnection;
     };
@@ -31,10 +31,10 @@ export const socketRegistry: {
 } = {};
 
 export function logEvent(event: string, details: Record<string, any>) {
-  const { clientId, exchange, market, ...rest } = details;
+  const { userId, exchange, market, ...rest } = details;
   console.log(
     `[${event}] | Exchange: ${exchange} | Market: ${market || "-"} | Client: ${
-      clientId || "-"
+      userId || "-"
     } |`,
     rest
   );

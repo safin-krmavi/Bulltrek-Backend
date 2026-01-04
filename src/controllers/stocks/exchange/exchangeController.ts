@@ -238,14 +238,7 @@ export const placeStockOrderController = async (req: any, res: Response) => {
       return sendBadRequest(res, "Credentials not found");
     }
 
-    const result = await placeStockOrder(
-      exchange,
-      {
-        apiKey: credentials.apiKey,
-        accessToken: credentials.accessToken,
-      },
-      order
-    );
+    const result = await placeStockOrder(exchange, credentials, order);
 
     return sendSuccess(res, "Order placed successfully", result);
   } catch (error: any) {

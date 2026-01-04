@@ -1,8 +1,5 @@
-import { CryptoExchange } from "@prisma/client";
-import prisma from "../../../config/db.config";
 import {
   handleFilledFuturesOrder,
-  updateTradeStatus,
 } from "../../../services/crypto/exchangeSocketServices/kucoinSocketServices";
 
 const kucoinTradeUpdateQueues: Map<string, any[]> = new Map();
@@ -15,50 +12,49 @@ async function processKucoinUpdateQueue(key: string, userId: string) {
   kucoinTradeUpdateProcessing.add(key);
 
   while (queue.length > 0) {
-    const { data, credentials } = queue.shift()!;
+    const { data } = queue.shift()!;
 
-    const MAX_ATTEMPTS = 10;
-    let attempt = 0;
-    let tradeFound = false;
+    // const MAX_ATTEMPTS = 10;
+    // let attempt = 0;
+    // let tradeFound = false;
 
-    while (attempt < MAX_ATTEMPTS && !tradeFound) {
-      const trade = await prisma.cryptoTrades.findFirst({
-        where: {
-          userId,
-          orderId: data.orderId,
-          exchange: CryptoExchange.KUCOIN,
-        },
+    // while (attempt < MAX_ATTEMPTS && !tradeFound) {
+    //   const trade = await prisma.cryptoTrades.findFirst({
+    //     where: {
+    //       userId,
+    //       orderId: data.orderId,
+    //       exchange: CryptoExchange.KUCOIN,
+    //     },
+    //   });
+
+    //   if (trade) {
+    //     tradeFound = true;
+
+    try {
+      // await updateTradeStatus(userId, data);
+
+      // if (
+      //   data.type === "filled" &&
+      //   data.status?.toLowerCase() === "done" &&
+      //   parseFloat(data.filledSize) > 0
+      // ) {
+      await handleFilledFuturesOrder(data, userId);
+      // }
+    } catch (err) {
+      console.log("ERROR_UPDATING_KUCOIN_TRADE", {
+        error: err,
       });
-
-      if (trade) {
-        tradeFound = true;
-
-        // ✅ Apply update
-        try {
-          // await updateTradeStatus(userId, data);
-
-          // if (
-          //   data.type === "filled" &&
-          //   data.status?.toLowerCase() === "done" &&
-          //   parseFloat(data.filledSize) > 0
-          // ) {
-          await handleFilledFuturesOrder(data, userId, credentials);
-          // }
-        } catch (err) {
-          console.log("ERROR_UPDATING_KUCOIN_TRADE", {
-            error: err,
-          });
-          //
-        }
-      } else {
-        await new Promise((res) => setTimeout(res, 1000)); // wait 1 sec
-        attempt++;
-      }
+      //
     }
+    // } else {
+    //   await new Promise((res) => setTimeout(res, 1000)); // wait 1 sec
+    //   attempt++;
+    // }
+    // }
 
-    if (!tradeFound) {
-      console.log("TRADE_NOT_FOUND_AFTER_POLLING", { key });
-    }
+    // if (!tradeFound) {
+    //   console.log("TRADE_NOT_FOUND_AFTER_POLLING", { key });
+    // }
   }
 
   kucoinTradeUpdateProcessing.delete(key);

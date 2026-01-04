@@ -1,19 +1,14 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import rootrouter from "./routes/index";
-import { resubscribeAllStrategies } from "./services/strategies/resubscribeStrategies";
-import fs from "fs";
-import path from "path";
+import http from "http";
+import { initSocketService } from "./socketHandleOrders";
 import { runStrategyScheduler } from "./utils/scheduler/strategyScheduler";
-import {
-  bootstrapAll,
-  bootstrapCryptoMarketData,
-} from "./sockets/crypto/marketData/marketDataBootstrap";
-import {
-  bootstrapMarketData,
-  bootstrapStockAll,
-} from "./sockets/stocks/marketData/marketDataBootstrap";
+import rootrouter from "./routes";
+import { bootstrapAll } from "./sockets/crypto/marketData/marketDataBootstrap";
+import { bootstrapStockAll } from "./sockets/stocks/marketData/marketDataBootstrap";
+import { resubscribeAllStrategies } from "./services/strategies/resubscribeStrategies";
+
 dotenv.config();
 
 const app = express();
@@ -23,34 +18,36 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Register SocketManager first
-// registerSocketManager(app);
-// setInterval(runStrategyScheduler, 60 * 1000);
- 
-
-// Paths
-const DATA_DIR = path.join(process.cwd(), "data");
-const ZERODHA_JSON_PATH = path.join(DATA_DIR, "zerodha_instruments.json");
-
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
+// API routes
 app.use("/api/v1/", rootrouter);
+app.get("/", (req, res) => res.send("BullTrek Backend running"));
 
-// Routes
-app.get("/", (req, res) => {
-  res.send("BullTrek Backend running");
-});
+// Create HTTP server for both APIs and sockets
+const server = http.createServer(app);
 
-// Start server
-const server = app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
 
-  await bootstrapAll();
-  await bootstrapStockAll();
-  await resubscribeAllStrategies();
-});
+  try {
+    // 1️⃣ Bootstrap market data
+    await bootstrapAll();
+    await bootstrapStockAll();
+    console.log("Market data bootstrapped");
 
-export { app, server };
+    // 2️⃣ Load all strategies into runtime
+    await resubscribeAllStrategies();
+    console.log("Strategies loaded into runtime");
+
+    // 3️⃣ Initialize all sockets (crypto + stock)
+    await initSocketService(server);
+    console.log("Sockets initialized");
+
+    // 4️⃣ Start strategy scheduler
+    setInterval(runStrategyScheduler, 60 * 1000);
+    console.log("Strategy scheduler running");
+  } catch (err) {
+    console.error("Error during server startup:", err);
+    process.exit(1);
+  }
+});
+export { app };

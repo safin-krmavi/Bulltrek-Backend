@@ -188,15 +188,22 @@ export const CoinDCXHandler = {
   // Handle CoinDCX spot order updates
   async handleSpotOrderUpdate(order: any, userId: string): Promise<void> {
     try {
+      console.log("COINDCX ORDER IN HANDLER", order);
       const exchangeOrderId = (order.id || order.order_id)?.toString();
       if (!exchangeOrderId) return;
-
       const orderType = resolveOrderTypeKey(order.order_type)?.toUpperCase();
       const tradeStatus = mapStatus(order.status);
-
+      console.log("TRADE STATUS", tradeStatus);
       const requestedQty = parseFloat(order.total_quantity || "0");
-      const filledQty = parseFloat(order.filled_quantity || "0");
+      const filledQty = parseFloat(
+        order.filled_quantity ||
+          order.executed_quantity ||
+          order.filled_qty ||
+          "0"
+      );
 
+      console.log("REQUESTED QTY", requestedQty);
+      console.log("FILLED QTY", filledQty);
       const price =
         order.price_per_unit && order.price_per_unit !== 0
           ? order.price_per_unit
@@ -213,8 +220,11 @@ export const CoinDCXHandler = {
           exchange: CryptoExchange.COINDCX,
         },
       });
+      console.log("LOCAL ORDER FOUND?", !!localOrder);
 
       if (!localOrder) {
+        console.log("CREATING LOCAL ORDER");
+
         localOrder = await prisma.cryptoOrder.create({
           data: {
             userId,
@@ -230,11 +240,16 @@ export const CoinDCXHandler = {
             exchangeOrderId,
           },
         });
+        console.log("LOCAL ORDER CREATED", localOrder.id);
       } else {
+        console.log("LOCAL ORDER STATUS", localOrder.status);
+
         if (
           tradeStatusPriority[tradeStatus] >
           tradeStatusPriority[localOrder.status]
         ) {
+          console.log("UPDATING LOCAL ORDER STATUS");
+
           await prisma.cryptoOrder.update({
             where: { id: localOrder.id },
             data: {
@@ -255,12 +270,20 @@ export const CoinDCXHandler = {
         },
         orderBy: { createdAt: "desc" },
       });
+      console.log("EXISTING TRADE FOUND?", !!existingTrade);
 
       const isExecutable =
         tradeStatus === TradeStatus.EXECUTED ||
         tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-      if (!existingTrade && isExecutable && filledQty > 0) {
+      console.log("IS EXECUTABLE?", isExecutable);
+
+      if (
+        !existingTrade &&
+        isExecutable &&
+        (filledQty > 0 || requestedQty > 0)
+      ) {
+        console.log("CREATING TRADE ENTRY");
         const newTrade = await prisma.cryptoTrades.create({
           data: {
             userId,
@@ -269,20 +292,21 @@ export const CoinDCXHandler = {
             symbol: order.market,
             side: order.side.toUpperCase(),
             orderType,
-            orderId: localOrder.id, // 🔗 local order reference
-            quantity: filledQty,
+            orderId: localOrder.id,
+            quantity: requestedQty,
             price,
             fee: parseFloat(order.fee || "0"),
             status: tradeStatus,
           },
         });
+        console.log("TRADE CREATED", newTrade.id);
 
         await applySpotTradeExecution({
           userId,
           exchange: CryptoExchange.COINDCX,
           asset: order.market,
           side: order.side.toUpperCase(),
-          quantity: filledQty,
+          quantity: requestedQty,
           price,
           fee: parseFloat(order.fee || "0"),
           tradeId: newTrade.id,
@@ -292,6 +316,7 @@ export const CoinDCXHandler = {
           tradeStatusPriority[tradeStatus] >
           tradeStatusPriority[existingTrade.status]
         ) {
+          console.log("HIGHER PRIORITY STATUS ENCOUNTERED");
           await prisma.cryptoTrades.update({
             where: { id: existingTrade.id },
             data: {

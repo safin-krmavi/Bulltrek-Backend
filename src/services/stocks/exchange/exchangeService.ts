@@ -1,4 +1,4 @@
-import { StocksExchange } from "@prisma/client";
+import { CryptoTradeType, StocksExchange, TradeSide } from "@prisma/client";
 import {
   createZerodhaOrder,
   getZerodhaBalances,
@@ -141,9 +141,9 @@ export async function verifyStockCredentials(
       return { verified: true };
     case StocksExchange.KOTAK:
       const data = await getKotakNeoHoldings({
-        baseUrl: credentials.meta.baseUrl,
+        baseUrl: credentials.feedToken,
         tradingToken: credentials.accessToken,
-        tradingSid: credentials.meta.sid,
+        tradingSid: credentials.refreshToken,
       });
       console.log("DATA", data);
       return { verified: true };
@@ -204,12 +204,16 @@ export async function placeStockOrder(
       );
 
     case StocksExchange.KOTAK:
+
       return createKotakNeoOrder({
-        baseUrl: credentials.meta.baseUrl,
+        baseUrl: credentials.feedToken,
         tradingToken: credentials.accessToken,
-        tradingSid: credentials.meta.sid,
+        tradingSid: credentials.refreshToken,
         symbol: payload.symbol,
         quantity: payload.quantity,
+        side: payload.side === TradeSide.BUY ? "B" : "S",
+        orderType: payload.orderType === "MARKET" ? "MKT" : "LMT",
+        price:payload.price
       });
 
     default:
@@ -236,9 +240,9 @@ export async function getStockPositions(
 
     case StocksExchange.KOTAK:
       return getKotakNeoOrders({
-        baseUrl: credentials.meta.baseUrl,
+        baseUrl: credentials.feedToken,
         tradingToken: credentials.accessToken,
-        tradingSid: credentials.meta.sid,
+        tradingSid: credentials.refreshToken,
       });
 
     default:

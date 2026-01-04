@@ -5,6 +5,16 @@ import { CryptoExchange, CryptoTradeType } from "@prisma/client";
 import { KuCoinMarketDataHandler } from "./kucoinMarketDataHandler";
 import { strategyRuntimeRegistry } from "../../../services/strategies/strategyRuntimeRegistry";
 import { CoinDCXHandler } from "./coindcxMarketDataHandler";
+import { fetchBinanceMarketPrice } from "../../../services/crypto/exchange/binanceService";
+import { fetchKucoinMarketPrice } from "../../../services/crypto/exchange/kucoinService";
+import { fetchCoinDCXMarketPrice } from "../../../services/crypto/exchange/coindcxService";
+const cryptoLastPrices: {
+  [exchange: string]: {
+    [segment: string]: {
+      [symbol: string]: number;
+    };
+  };
+} = {};
 
 export const MarketDataManager = {
   /**
@@ -145,11 +155,15 @@ export const MarketDataManager = {
     symbol: string,
     price: number
   ) {
+    cryptoLastPrices[exchange] ??= {};
+    cryptoLastPrices[exchange][segment] ??= {};
+    cryptoLastPrices[exchange][segment][symbol] = price;
+
     const connection = marketDataRegistry[exchange]?.[segment];
     if (!connection) return;
 
     if (!connection.symbols.has(symbol)) return;
-
+    // console.log("HERE");
     const subscribers = connection.subscribers.get(symbol);
     if (!subscribers || subscribers.size === 0) return;
     // console.log("[MARKET_TICK]", {
@@ -162,6 +176,7 @@ export const MarketDataManager = {
     const timestamp = Date.now();
 
     for (const strategyId of subscribers) {
+      // console.log("STRATEGY", strategyId);
       strategyRuntimeRegistry.onMarketTick({
         strategyId,
         price,
@@ -170,6 +185,43 @@ export const MarketDataManager = {
     }
   },
 
+  getLastPrice(
+    exchange: string,
+    segment: CryptoTradeType,
+    symbol: string
+  ): number | null {
+    return cryptoLastPrices[exchange]?.[segment]?.[symbol] ?? null;
+  },
+  async fetchMarketPrice(
+    exchange: CryptoExchange,
+    segment: CryptoTradeType,
+    symbol: string
+  ): Promise<number | null> {
+    // First check cache
+    const cached = this.getLastPrice(exchange, segment, symbol);
+    if (cached) return cached;
+
+    // 🔥 Fallback: fetch from API if no cached tick
+    try {
+      if (exchange === "BINANCE") {
+        return await fetchBinanceMarketPrice({ symbol, assetType: segment });
+      } else if (exchange === "KUCOIN") {
+        return await fetchKucoinMarketPrice({ symbol, assetType: segment });
+      } else if (exchange === "COINDCX") {
+        return await fetchCoinDCXMarketPrice({ symbol, assetType: segment });
+      }
+    } catch (err) {
+      console.error("[CRYPTO_FETCH_PRICE_ERROR]", {
+        exchange,
+        segment,
+        symbol,
+        err,
+      });
+      return null;
+    }
+
+    return null;
+  },
   /**
    * Debug
    */

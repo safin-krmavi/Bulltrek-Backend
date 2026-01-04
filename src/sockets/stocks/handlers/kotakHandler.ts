@@ -6,6 +6,7 @@ import {
 } from "../../../services/stocks/exchangeSocketServices/kotakSocketService";
 import { SocketManager } from "../../socketManagement";
 import { logEvent } from "../../utils";
+import { enqueueKotakTradeUpdate } from "../queues/kotakOrderQueue";
 
 type KotakCredentials = {
   tradingToken: string; // session token from login API
@@ -19,7 +20,7 @@ type KotakCredentials = {
  */
 function buildKotakOrderWsUrl(dataCenter: string): string {
   const dc = dataCenter.toLowerCase();
-  
+
   // Map data centers to their WebSocket URLs
   // Source: Kotak Neo Demo.js connectHsi() function
   switch (dc) {
@@ -59,7 +60,7 @@ function buildHeartbeatMessage() {
   return "{type:hb}";
 }
 export const KotakOrderHandler = {
-  connect(
+  async connect(
     userId: string,
     credentials: KotakCredentials,
     retryCount: number = 0
@@ -77,7 +78,11 @@ export const KotakOrderHandler = {
       attempt: retryCount + 1,
     });
 
-    if (!credentials.tradingToken || !credentials.tradingSid || !credentials.dataCenter) {
+    if (
+      !credentials.tradingToken ||
+      !credentials.tradingSid ||
+      !credentials.dataCenter
+    ) {
       console.error("[KOTAK][HSI] Missing required credentials", { userId });
       return null;
     }
@@ -86,7 +91,7 @@ export const KotakOrderHandler = {
       handshakeTimeout: 10000,
       headers: {
         "User-Agent": "Mozilla/5.0",
-        "Origin": "https://neo.kotaksecurities.com",
+        Origin: "https://neo.kotaksecurities.com",
         "Sec-WebSocket-Protocol": "json",
         "Sec-WebSocket-Version": "13",
       },
@@ -112,7 +117,10 @@ export const KotakOrderHandler = {
         market: "ORDERS",
       });
 
-      console.log("[KOTAK][HSI] ✓ WebSocket opened, sending handshake", { userId, wsUrl });
+      console.log("[KOTAK][HSI] ✓ WebSocket opened, sending handshake", {
+        userId,
+        wsUrl,
+      });
 
       const connectionMsg = buildConnectionMessage(credentials);
 
@@ -141,6 +149,61 @@ export const KotakOrderHandler = {
     socket.on("message", (raw) => {
       try {
         const message = JSON.parse(raw.toString());
+        console.log("KOTAK MESSAGE: ", message);
+        // KOTAK MESSAGE:  {
+        //   type: 'order',
+        //   data: {
+        //     avgPrc: '0.00',
+        //     brdLtQty: '1',
+        //     dscQty: 0,
+        //     exOrdId: 'NA',
+        //     expDt: 'NA',
+        //     exSeg: 'nse_cm',
+        //     fldQty: 0,
+        //     hsUpTm: '2026/01/04 11:22:33',
+        //     lotSz: '1',
+        //     mfdBy: 'NA',
+        //     mktPro: '0.00',
+        //     multiplier: '1',
+        //     nOrdNo: '260104000001926',
+        //     optTp: 'XX',
+        //     ordDtTm: '04-Jan-2026 11:22:33',
+        //     ordGenTp: 'NA',
+        //     ordSt: 'rejected',
+        //     ordValDt: 'NA',
+        //     prc: '1.00',
+        //     prcTp: 'L',
+        //     precision: '2',
+        //     prod: 'CNC',
+        //     qty: 1,
+        //     rejRsn: 'Adapter is Logged Off',
+        //     reqId: '1',
+        //     series: 'EQ',
+        //     stkPrc: '0.00',
+        //     sym: 'ITBEES',
+        //     symOrdId: 'NA',
+        //     tok: '19084',
+        //     trdSym: 'ITBEES-EQ',
+        //     trgPrc: '0.00',
+        //     trnsTp: 'B',
+        //     unFldSz: 0,
+        //     usrId: 'BCYPJ1833P',
+        //     vldt: 'DAY',
+        //     updRecvTm: 1767505953317073000,
+        //     boeSec: 1767505953,
+        //     uSec: '1767505953',
+        //     strategyCode: 'NA',
+        //     GuiOrdId: 'XYKJV-b481a6a8-c995-4602-b84e-987d909c56e1',
+        //     actId: 'XYKJV',
+        //     ordSrc: 'ADMINCPPAPI_NEOTRADEAPI',
+        //     exCfmTm: 'NA',
+        //     it: 'EQ'
+        //   }
+        // }
+        if (message.type === "order") {
+          enqueueKotakTradeUpdate(message, userId, handleKotakOrderUpdate);
+        }
+
         // handle messages here (order, trade, error, etc.)
       } catch (err) {
         console.error("[KOTAK][HSI] Message parse error", {
@@ -178,25 +241,57 @@ export const KotakOrderHandler = {
         reason: reasonStr,
       });
 
-      console.log("[KOTAK][HSI] WebSocket closed", { userId, code, reason: reasonStr, wsUrl, retryCount });
+      console.log("[KOTAK][HSI] WebSocket closed", {
+        userId,
+        code,
+        reason: reasonStr,
+        wsUrl,
+        retryCount,
+      });
 
       SocketManager.removeSocket(userId, StocksExchange.KOTAK, "ORDERS");
 
-      if (shouldRetry && code !== 1000 && code !== 1001 && retryCount < MAX_RETRIES) {
-        console.log(`[KOTAK][HSI] Reconnecting in ${RETRY_DELAY}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`, { userId });
-        setTimeout(() => this.connect(userId, credentials, retryCount + 1), RETRY_DELAY);
+      if (
+        shouldRetry &&
+        code !== 1000 &&
+        code !== 1001 &&
+        retryCount < MAX_RETRIES
+      ) {
+        console.log(
+          `[KOTAK][HSI] Reconnecting in ${RETRY_DELAY}ms (attempt ${
+            retryCount + 1
+          }/${MAX_RETRIES})`,
+          { userId }
+        );
+        setTimeout(
+          () => this.connect(userId, credentials, retryCount + 1),
+          RETRY_DELAY
+        );
       } else if (retryCount >= MAX_RETRIES) {
-        console.error("[KOTAK][HSI] ✗ Max reconnection attempts reached", { userId, retryCount });
+        console.error("[KOTAK][HSI] ✗ Max reconnection attempts reached", {
+          userId,
+          retryCount,
+        });
         setTimeout(() => this.connect(userId, credentials, 0), 300000);
       }
     });
 
-    SocketManager.registerSocket(userId, StocksExchange.KOTAK, "ORDERS", socket, "stock");
+    SocketManager.registerSocket(
+      userId,
+      StocksExchange.KOTAK,
+      "ORDERS",
+      socket,
+      "stock"
+    );
     return socket;
   },
 
   disconnect(userId: string) {
-    const socket = SocketManager.getSocket(userId, StocksExchange.KOTAK, "ORDERS") as WebSocket | undefined;
+    const socket = SocketManager.getSocket(
+      userId,
+      StocksExchange.KOTAK,
+      "ORDERS"
+    ) as WebSocket | undefined;
     if (socket && socket.readyState === WebSocket.OPEN) {
       console.log("[KOTAK][HSI] Manually disconnecting", { userId });
       socket.close(1000, "Manual disconnect");

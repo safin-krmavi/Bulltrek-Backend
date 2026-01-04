@@ -38,13 +38,13 @@ export async function connectUserExchanges(
 
       // Exchange-specific socket connection
       if (exchange === "ZERODHA") {
-        ZerodhaOrderHandler.connect(userId, {
+        await ZerodhaOrderHandler.connect(userId, {
           accessToken: credentials.accessToken,
           apiKey: process.env.ZERODHA_API_KEY!,
         });
       } else if (exchange === "KOTAK") {
-        KotakOrderHandler.connect(userId, {
-          tradingToken: credentials.apiKey,
+        await KotakOrderHandler.connect(userId, {
+          tradingToken: credentials.accessToken,
           tradingSid: credentials.refreshToken,
           dataCenter: credentials.dataCenter,
         });

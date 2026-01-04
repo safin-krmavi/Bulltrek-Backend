@@ -1,0 +1,2090 @@
+{
+  "XBTUSDTM": {
+    "priceTick": 0.1,
+    "quantityStep": 1
+  },
+  "ETHUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "SOLUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "WIFUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PEPEUSDTM": {
+    "priceTick": 1e-10,
+    "quantityStep": 1
+  },
+  "DOGEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "XRPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "0GUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "1000000MOGUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "10000CATUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "10000SATSUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "1000BONKUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "1000CHEEMSUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "1000RATSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "1INCHUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "1MBABYDOGEUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "2ZUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "42USDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "4USDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "A2ZUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "AAVEUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "ACEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ACHUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ACTSOLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ADAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AERGOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AEROUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "AEVOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AGIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AGLDUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "AGTUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "AINUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AIOTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "AIOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AIXBTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AKEUSDTM": {
+    "priceTick": 1e-8,
+    "quantityStep": 1
+  },
+  "ALCHUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ALGOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ALICEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ALLOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ALPINEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ALTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ALUUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ANIMEUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ANKRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "APEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "API3USDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "APRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "APTUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ARBUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ARCUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ARIAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ARKMUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ARKUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ARPAUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ARUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ASPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ASRUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ASTERUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ASTRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ATHUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ATOMUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ATUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "AUCTIONUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "AUDIOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AVAAIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AVAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "AVAXUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "AVNTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AWEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "AXLUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "AXSUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "B2USDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "B3USDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "BABYUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BANANAS31USDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "BANANAUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "BANDUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "BANKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BANUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BARDUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BASUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BATUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "BBUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "BCHUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "BDXNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BDXUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BEATUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BELUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "BERAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "BIGTIMEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BINANCELIFEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BIOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BLASTUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "BLESSUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "BLUAIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BLURUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BMTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BNBUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "BNTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "BOBBOBUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "BOMEUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "BRETTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BSUUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BSVUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "BTRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "BUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "C98USDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CAKEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "CAMPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CARVUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "CATIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CELOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "CELRUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "CETUSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CFXUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CGPTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CHILLGUYUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CHRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CHZUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CKBUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "CLANKERUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "CLOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "COAIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "COMMONUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "COMPUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "COOKIEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "COTIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "COWUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "CROSSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CROUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CRVUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "CTCUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "CTSIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CUDISUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CVCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "CVXUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "CYBERUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "CYSUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "DAMUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "DASHUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "DEEPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "DEGENUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "DENTUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "DGRAMUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "DMCUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "DODOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "DOGSUSDTM": {
+    "priceTick": 1e-8,
+    "quantityStep": 1
+  },
+  "DOGUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "DOLOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "DOODUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "DOTUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "DRIFTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "DUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "DUSKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "DYDXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "DYMUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "EDENUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "EDUUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "EGLDUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "EIGENUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ENAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ENJUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ENSOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ENSUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "EPTUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ERAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ESPORTSUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ESUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ETCUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ETHFIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "EULUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "EVAAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FARTCOINUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FETUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FFUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "FHEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "FILUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FLOCKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "FLOKIUSDTM": {
+    "priceTick": 1e-9,
+    "quantityStep": 1
+  },
+  "FLOWUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FLUIDUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "FLUXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FOLKSUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "FORMUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FORTHUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "FTTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "FUNUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "FUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "FXSUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "GAIBUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GALAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GASUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "GIGGLEUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "GLMRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GMTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GMXUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "GOATUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GPSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GRASSUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "GRIFFAINUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GRTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GTCUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "GUAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GUNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "GUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HAEDALUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HANAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HBARUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HEIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "HEMIUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "HFTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HIGHUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "HIPPOUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "HIVEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "HMSTRUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "HOLOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HOMEUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "HOOKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HOTUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "HUMAUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "HUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HYPERUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "HYPEUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ICNTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ICPUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ICXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "IDOLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "IDUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "IKAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ILVUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "IMXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "INITUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "INJUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "INUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "IOTAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "IOTXUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "IOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "IPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "IRUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "IRYSUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "JASMYUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "JCTUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "JELLYJELLYUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "JOEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "JTOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "JUPUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "KAIAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "KAITOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "KASUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "KAVAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "KCSUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "KERNELUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "KGENUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "KITEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "KNCUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "KOMAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "KSMUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "LABUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "LAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "LDOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "LIGHTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "LINEAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "LINKUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "LISTAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "LITUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "LPTUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "LQTYUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "LRCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "LTCUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "LUNAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "LUNCUSDTM": {
+    "priceTick": 1e-9,
+    "quantityStep": 1
+  },
+  "LYNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MAGICUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MANAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MANTAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MASKUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MAVIAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MAVUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MBOXUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MELANIAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MEMEUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "MERLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "METISUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "METUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MEWUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "MINAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MIRAUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "MITOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MLNUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "MMTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MOCAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MONUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MOODENGUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MORPHOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MOVEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MOVRUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "MTLUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "MUBARAKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "MYXUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "NAORISUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "NEARUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "NEIROCTOUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "NEOUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "NEWTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "NFPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "NIGHTUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "NILUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "NKNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "NMRUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "NOMUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "NOTUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "NTRNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "NXPCUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "OGNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "OGUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "OMUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ONDOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ONEUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ONTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ONUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "OPENUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "OPUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ORBSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ORCAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ORDERUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ORDIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "OXTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PARTIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PAXGUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "PENDLEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PENGUUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "PEOPLEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PHAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PHBUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PIEVERSEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PIPPINUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PIXELUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PLAIUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "PLANCKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PLUMEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PNUTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "POLUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "POLYXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "POPCATUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PORTALUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "POWERUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "POWRUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PRCLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PROMPTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PROMUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PROVEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "PTBUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "PUFFERUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "PUMPUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "PYTHUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "QNTUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "QTUMUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "QUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "RAREUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "RAVEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "RAYUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "RDNTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "RECALLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "REDSTONEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "RENDERUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "RESOLVUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "REZUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "RIFUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "RIVERUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "RLSUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "ROAMUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "RONUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ROSEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "RSRUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "RUNEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "RVNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "RVVUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "SAGAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SAHARAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SANDUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SAPIENUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SCRUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SEIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SENTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SFPUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SHELLUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SHIBUSDTM": {
+    "priceTick": 1e-9,
+    "quantityStep": 1
+  },
+  "SIGNUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SIRENUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SKLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SKYAIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SKYUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SNXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SOLAYERUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SOLVUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SOMIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SONICUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SOONUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SOPHUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SPELLUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "SPKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SPXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SSVUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "STABLEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "STBLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "STEEMUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "STGUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "STORJUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "STOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "STRKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "STXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SUIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SUNUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "SUPERUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SUPRAUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "SUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SUSHIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "SWARMSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SXPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SXTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "SYRUPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TACUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "TAGUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "TAIKOUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "TAKEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TANSSIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TAOUSDTM": {
+    "priceTick": 0.1,
+    "quantityStep": 1
+  },
+  "TAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "THETAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "THEUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "TIAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "TNSRUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "TONUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "TOSHIUSDTM": {
+    "priceTick": 1e-8,
+    "quantityStep": 1
+  },
+  "TOWNSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TRADOORUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "TRBUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "TREEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TRUMPUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "TRUSTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TRUTHUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "TRUUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TRXUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TSTBSCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TURBOUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "TURTLEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TUTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "TWTUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "UAIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "UBUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "UMAUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "UNIUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "USDCUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "USELESSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "USTCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "USUALUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "USUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "UUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "VANAUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "VANRYUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "VELOUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "VELVETUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "VETUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "VFYUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "VICUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "VINEUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "VIRTUALUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "VOOIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "VRAUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "VVVUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "WALUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "WAVESUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "WAXPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "WCTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "WETUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "WILDUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "WLDUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "WLFIUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "WOOUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "WUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "XAIUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "XANUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "XAUTUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "XECUSDTM": {
+    "priceTick": 1e-8,
+    "quantityStep": 1
+  },
+  "XLMUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "XMRUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "XNYUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "XPINUSDTM": {
+    "priceTick": 1e-7,
+    "quantityStep": 1
+  },
+  "XPLUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "XTZUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "XVGUSDTM": {
+    "priceTick": 0.000001,
+    "quantityStep": 1
+  },
+  "XVSUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "YALAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "YBUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "YFIUSDTM": {
+    "priceTick": 1,
+    "quantityStep": 1
+  },
+  "YGGUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "YZYUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ZBTUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZECUSDTM": {
+    "priceTick": 0.01,
+    "quantityStep": 1
+  },
+  "ZENUSDTM": {
+    "priceTick": 0.001,
+    "quantityStep": 1
+  },
+  "ZEREBROUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZETAUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ZEUSUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZIGUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZILUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZKCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZKJUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZKPUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZKUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZORAUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZRCUSDTM": {
+    "priceTick": 0.00001,
+    "quantityStep": 1
+  },
+  "ZROUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  },
+  "ZRXUSDTM": {
+    "priceTick": 0.0001,
+    "quantityStep": 1
+  }
+}

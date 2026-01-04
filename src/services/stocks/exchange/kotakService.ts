@@ -1,4 +1,6 @@
 import axios from "axios";
+import fs from "fs/promises";
+import path from "path";
 
 import csv from "csv-parser";
 import { Readable } from "stream";
@@ -12,6 +14,7 @@ import { StocksExchange } from "@prisma/client";
 import { handleKotakError } from "../../../utils/stocks/exchange/kotakUtils";
 import { kotakHttpsAgent } from "../../../utils/stocks/exchange/kotakHttp";
 import prisma from "../../../config/db.config";
+import { STOCKS_FILE_PATH } from "../../../constants/stocks";
 
 /**
  * Fetch all Kotak symbols (NSE CM)
@@ -115,6 +118,47 @@ export async function fetchAndStoreKotakSymbols(): Promise<
       error?.message || "Failed to fetch and store Kotak symbols"
     );
   }
+}
+
+export async function fetchKotakSymbolsFromFile() {
+  try {
+    const data = await fs.readFile(STOCKS_FILE_PATH, "utf-8");
+    const parsed = JSON.parse(data);
+
+    const kotakBlock = parsed
+      ?.find((b: any) => b.type === "STOCKS")
+      ?.data?.find((e: any) => e.exchange === "KOTAK");
+
+    return kotakBlock?.data ?? [];
+  } catch (error) {
+    console.error("[KOTAK][SYMBOL_FILE_READ] Failed", error);
+    throw new Error("Failed to read Kotak symbols from file");
+  }
+}
+
+export async function getKotakSymbol(params: {
+  tradingSymbol?: string;
+  pSymbol?: string;
+  exchangeSegment?: string;
+}) {
+  const symbols = await fetchKotakSymbolsFromFile();
+
+  return (
+    symbols.find((s: any) => {
+      if (
+        params.exchangeSegment &&
+        s.exchangeSegment !== params.exchangeSegment
+      )
+        return false;
+
+      if (params.tradingSymbol && s.tradingSymbol === params.tradingSymbol)
+        return true;
+
+      if (params.pSymbol && s.pSymbol === params.pSymbol) return true;
+
+      return false;
+    }) ?? null
+  );
 }
 
 export async function kotakNeoTotpLogin(params: {
@@ -283,25 +327,38 @@ export async function createKotakNeoOrder(params: {
   symbol: string; // e.g. ITBEES-EQ
   quantity: number;
   side?: "B" | "S";
-  orderType?: "MKT" | "LMT";
+  orderType?: string;
+  price?: number; // required for LIMIT
 }) {
   try {
-    const jData = {
+    const isMarket = (params.orderType ?? "MARKET") === "MKT";
+
+    if (!isMarket && !params.price) {
+      throw new Error("Price is required for LIMIT orders");
+    }
+
+    const jData: Record<string, string> = {
       am: "NO",
       dq: "0",
       es: "nse_cm",
-      mp: "0",
       pc: "CNC",
       pf: "N",
-      pr: "0",
       tt: params.side ?? "B",
-      pt: params.orderType ?? "MKT",
-
       qt: String(params.quantity),
       rt: "DAY",
       tp: "0",
       ts: params.symbol,
     };
+
+    if (isMarket) {
+      jData.pt = "MKT";
+      jData.pr = "0";
+      jData.mp = "0";
+    } else {
+      jData.pt = "L";
+      jData.pr = params.price!.toString();
+      jData.mp = "0";
+    }
 
     const body = new URLSearchParams({
       jData: JSON.stringify(jData),
@@ -395,6 +452,92 @@ export async function getKotakNeoOrders(params: {
     console.error("❌ KOTAK_GET_ORDERS_FAILED", {
       error: error?.response?.data?.error[0]?.message || error?.response,
     });
+    handleKotakError(error);
+  }
+}
+
+export async function fetchKotakMarketPrice(params: {
+  userId: string;
+  symbol: string; // neosymbol
+}) {
+  const { userId, symbol } = params;
+  const kotakSymbol = await getKotakSymbol({
+    tradingSymbol: symbol,
+  });
+
+  if (!kotakSymbol) {
+    throw new Error(`Kotak symbol not found: ${symbol}`);
+  }
+
+  const { exchangeSegment, pSymbol } = kotakSymbol;
+
+  try {
+    const rawCredentials = await getStocksCredentials(
+      userId,
+      StocksExchange.KOTAK
+    );
+    const credentials = Array.isArray(rawCredentials)
+      ? rawCredentials[0]
+      : rawCredentials;
+
+    if (!credentials) {
+      throw new Error("Credentiala not found");
+    }
+
+    if (!symbol) {
+      throw new Error("Symbol must be provided");
+    }
+    const fetchLtp = async (key: string) => {
+      const res = await axios.get(
+        `${credentials.feedToken}/script-details/1.0/quotes/neosymbol/${key}/ltp`,
+        {
+          httpsAgent: kotakHttpsAgent,
+          headers: {
+            Authorization: credentials.apiKey,
+            "Content-Type": "application/json",
+          },
+          timeout: 10000,
+        }
+      );
+
+      if (
+        res?.data?.fault?.message.includes("Invalid neosymbol values") &&
+        pSymbol
+      ) {
+        const fallbackKey = `${exchangeSegment}|${pSymbol}`;
+        return await fetchLtp(fallbackKey);
+      }
+      const quote = res.data?.[0];
+      console.log("QUOTE:", res?.data);
+      if (!quote?.ltp) {
+        throw new Error(`LTP not available for ${key}`);
+      }
+
+      return Number(quote.ltp);
+    };
+    const primaryKey = `${exchangeSegment}|${symbol}`;
+
+    try {
+      return await fetchLtp(primaryKey);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || "";
+      console.log(error);
+      // fallback ONLY for invalid neosymbol
+      if (message.includes("Invalid neosymbol values") && pSymbol) {
+        const fallbackKey = `${exchangeSegment}|${pSymbol}`;
+        return await fetchLtp(fallbackKey);
+      }
+
+      throw error;
+    }
+  } catch (error: any) {
+    console.error("[KOTAK][MARKET_PRICE] Failed", {
+      symbol,
+      pSymbol,
+      exchangeSegment,
+      error: error?.response?.data || error.message,
+    });
+
     handleKotakError(error);
   }
 }

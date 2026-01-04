@@ -1,25 +1,25 @@
 type TradeKey = string;
-type TradeMessage = { message: any; clientId: string };
+type TradeMessage = { message: any; userId: string };
 
 const tradeQueues: Map<TradeKey, TradeMessage[]> = new Map();
 const processing: Set<TradeKey> = new Set();
 
-function getTradeKey(message: any, clientId: string): string {
-  return `${clientId}-${message.orderId}-${message.symbol || ""}`; // Add more fields if needed
+function getTradeKey(message: any, userId: string): string {
+  return `${userId}-${message.orderId}-${message.symbol || ""}`; // Add more fields if needed
 }
 
 export function enqueueTradeUpdate(
   message: any,
-  clientId: string,
+  userId: string,
   handler: (msg: any, uid: string) => Promise<void>
 ) {
-  const key = getTradeKey(message, clientId);
+  const key = getTradeKey(message, userId);
 
   if (!tradeQueues.has(key)) {
     tradeQueues.set(key, []);
   }
 
-  tradeQueues.get(key)!.push({ message, clientId });
+  tradeQueues.get(key)!.push({ message, userId });
 
   if (!processing.has(key)) {
     processQueue(key, handler);
@@ -36,9 +36,9 @@ async function processQueue(
   processing.add(key);
 
   while (queue.length > 0) {
-    const { message, clientId } = queue.shift()!;
+    const { message, userId } = queue.shift()!;
     try {
-      await handler(message, clientId);
+      await handler(message, userId);
     } catch (err) {
       console.log("ERROR_PROCESSING_KUCOIN_QUEUE_MESSAGE", {
         queueKey: key,

@@ -24,7 +24,6 @@ export const KuCoinMarketDataHandler = {
       const wsUrl = `${tokenData.instanceServers[0].endpoint}?token=${
         tokenData.token
       }&connectId=${Date.now()}`;
-      console.log("HERE YOU GO:", wsUrl);
       const ws = new WebSocket(wsUrl);
 
       const pingInterval = tokenData.instanceServers[0].pingInterval;
@@ -76,17 +75,17 @@ export const KuCoinMarketDataHandler = {
           }
 
           const symbol = msg.subject.toUpperCase();
-          if (symbol === "PEPE-USDT") {
-            // console.log("FOUND",msg.data)
-          }
           // 🔥 HARD FILTER — only registered symbols pass
           if (!MarketDataManager.hasSubscribers("KUCOIN", segment, symbol)) {
             return;
           }
 
+
           const price = parseFloat(msg.data.price);
           if (!price) return;
-
+          if (symbol === "PEPE-USDT") {
+            // console.log("PRICE", price);
+          }
           MarketDataManager.updatePrice("KUCOIN", segment, symbol, price);
 
           // Handle ticker updates

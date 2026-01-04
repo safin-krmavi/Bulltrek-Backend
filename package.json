@@ -7,7 +7,6 @@
     "build": "tsc",
     "watch:ts": "tsc -w",
     "dev": "nodemon dist/index.js",
-    "socket:dev": "nodemon dist/socketHandleOrders/index.js",
     "start": "node dist/index.js",
     "start:dev": "nodemon --esm -r ts-node/register src/index.ts"
   },
@@ -21,6 +20,7 @@
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
+    "csvtojson": "^2.0.14",
     "decimal.js": "^10.6.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

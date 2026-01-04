@@ -6,18 +6,18 @@ export const SocketManager = {
    * Register a new socket connection
    */
   registerSocket(
-    clientId: string,
+    userId: string,
     exchange: string,
     market: string,
     socket: WebSocket | Socket,
     platform: Platform, // <-- add this
     pingInterval?: ReturnType<typeof setInterval>
   ): void {
-    if (!socketRegistry[clientId]) socketRegistry[clientId] = {};
-    if (!socketRegistry[clientId][exchange])
-      socketRegistry[clientId][exchange] = {};
+    if (!socketRegistry[userId]) socketRegistry[userId] = {};
+    if (!socketRegistry[userId][exchange])
+      socketRegistry[userId][exchange] = {};
 
-    socketRegistry[clientId][exchange][market] = {
+    socketRegistry[userId][exchange][market] = {
       socket,
       pingInterval,
       market,
@@ -25,7 +25,7 @@ export const SocketManager = {
     };
 
     console.log("REGISTERED_SOCKET_CONNECTION", {
-      clientId,
+      userId,
       exchange,
       market,
       platform,
@@ -35,18 +35,18 @@ export const SocketManager = {
    * Get a socket connection if it exists
    */
   getSocket(
-    clientId: string,
+    userId: string,
     exchange: string,
     market: string
   ): SocketConnection | undefined {
-    return socketRegistry[clientId]?.[exchange]?.[market];
+    return socketRegistry[userId]?.[exchange]?.[market];
   },
 
   /**
    * Close and clean up a socket connection
    */
-  removeSocket(clientId: string, exchange: string, market: string): void {
-    const connection = this.getSocket(clientId, exchange, market);
+  removeSocket(userId: string, exchange: string, market: string): void {
+    const connection = this.getSocket(userId, exchange, market);
 
     if (connection) {
       // Clean up ping interval
@@ -68,20 +68,20 @@ export const SocketManager = {
       }
 
       // Remove from registry
-      if (socketRegistry[clientId]?.[exchange]) {
-        delete socketRegistry[clientId][exchange][market];
+      if (socketRegistry[userId]?.[exchange]) {
+        delete socketRegistry[userId][exchange][market];
 
         // Clean up empty objects
-        if (Object.keys(socketRegistry[clientId][exchange]).length === 0) {
-          delete socketRegistry[clientId][exchange];
+        if (Object.keys(socketRegistry[userId][exchange]).length === 0) {
+          delete socketRegistry[userId][exchange];
 
-          if (Object.keys(socketRegistry[clientId]).length === 0) {
-            delete socketRegistry[clientId];
+          if (Object.keys(socketRegistry[userId]).length === 0) {
+            delete socketRegistry[userId];
           }
         }
       }
       console.log("REMOVED_SOCKET_CONNECTION", {
-        clientId,
+        userId,
         exchange,
         market,
       });
@@ -91,12 +91,12 @@ export const SocketManager = {
   /**
    * Close all sockets for a user
    */
-  removeUserSockets(clientId: string): void {
-    const userExchanges = socketRegistry[clientId];
+  removeUserSockets(userId: string): void {
+    const userExchanges = socketRegistry[userId];
     if (userExchanges) {
       Object.keys(userExchanges).forEach((exchange) => {
         Object.keys(userExchanges[exchange]).forEach((market) => {
-          this.removeSocket(clientId, exchange, market);
+          this.removeSocket(userId, exchange, market);
         });
       });
     }
@@ -112,18 +112,16 @@ export const SocketManager = {
   /**
    * Get all active exchanges for a user
    */
-  getUserExchanges(clientId: string): string[] {
-    return socketRegistry[clientId]
-      ? Object.keys(socketRegistry[clientId])
-      : [];
+  getUserExchanges(userId: string): string[] {
+    return socketRegistry[userId] ? Object.keys(socketRegistry[userId]) : [];
   },
 
   /**
    * Get all active markets for a user and exchange
    */
-  getUserExchangeMarkets(clientId: string, exchange: string): string[] {
-    return socketRegistry[clientId]?.[exchange]
-      ? Object.keys(socketRegistry[clientId][exchange])
+  getUserExchangeMarkets(userId: string, exchange: string): string[] {
+    return socketRegistry[userId]?.[exchange]
+      ? Object.keys(socketRegistry[userId][exchange])
       : [];
   },
 
@@ -131,20 +129,20 @@ export const SocketManager = {
    * List all active connections (for debugging)
    */
   getActiveConnections(): {
-    clientId: string;
+    userId: string;
     exchange: string;
     market: string;
   }[] {
     const connections: {
-      clientId: string;
+      userId: string;
       exchange: string;
       market: string;
     }[] = [];
 
-    Object.keys(socketRegistry).forEach((clientId) => {
-      Object.keys(socketRegistry[clientId]).forEach((exchange) => {
-        Object.keys(socketRegistry[clientId][exchange]).forEach((market) => {
-          connections.push({ clientId, exchange, market });
+    Object.keys(socketRegistry).forEach((userId) => {
+      Object.keys(socketRegistry[userId]).forEach((exchange) => {
+        Object.keys(socketRegistry[userId][exchange]).forEach((market) => {
+          connections.push({ userId, exchange, market });
         });
       });
     });

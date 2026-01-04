@@ -13,8 +13,8 @@ import {
   verifyExchangeCredentials,
 } from "../../../services/crypto/exchange/exchangeService";
 import { getCryptoCredentials } from "../../../services/crypto/credentialsService";
-import { getBinanceUSDTData } from "../../../services/crypto/exchange/binanceService";
-import { getKucoinAllData } from "../../../services/crypto/exchange/kucoinService";
+import { fetchBinanceSymbols } from "../../../services/crypto/exchange/binanceService";
+import { fetchKucoinSymbols } from "../../../services/crypto/exchange/kucoinService";
 import { getCoinDCXAllData } from "../../../services/crypto/exchange/coindcxService";
 import fs from "fs/promises";
 import { FILE_PATH, DATA_DIR } from "../../../constants/crypto";
@@ -41,8 +41,8 @@ export const updateSymbolPairsController = async (
 ) => {
   try {
     const [binanceData, kucoinData, coinDCXData] = await Promise.all([
-      getBinanceUSDTData(),
-      getKucoinAllData(),
+      fetchBinanceSymbols(),
+      fetchKucoinSymbols(),
       getCoinDCXAllData(),
     ]);
 

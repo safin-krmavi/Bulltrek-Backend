@@ -1,20 +1,39 @@
-import { CryptoExchange, CryptoTradeType, TradeSide, TradeStatus } from "@prisma/client";
 import {
-  createKucoinFutureTrade,
-  createKucoinSpotTrade,
+  CryptoExchange,
+  CryptoTradeType,
+  TradeSide,
+  TradeStatus,
+} from "@prisma/client";
+import {
+  cancelKucoinFuturesOrder,
+  cancelKucoinSpotOrder,
+  createKucoinFuturesOrder,
+  createKucoinSpotOrder,
   ensureKucoinMarginMode,
-  getKucoinFuturesActivePositions,
+  fetchKucoinFuturesActivePositions,
+  fetchKucoinFuturesOrderById,
+  fetchKucoinFuturesOrders,
+  fetchKucoinFuturesTrades,
+  fetchKucoinOpenSpotOrders,
+  fetchKucoinSpotOrderById,
+  fetchKucoinSpotTrades,
 } from "./kucoinService";
 import {
   mapFuturesOrderTypeToCoinDCX,
   mapSpotOrderTypeToCoinDCX,
 } from "../../../utils/crypto/exchange/coindcxUtils";
 import {
-  createBinanceFutureTrade,
-  createBinanceSpotTrade,
-  getAllFuturesOrdersBinance,
-  getBinanceFuturesActivePositions,
-  getSpotTradeHistoryBinance,
+  createBinanceFuturesOrder,
+  createBinanceSpotOrder,
+  fetchBinanceFuturesOrders,
+  fetchBinanceFuturesActivePositions,
+  fetchBinanceSpotTrades,
+  cancelBinanceSpotOrder,
+  cancelBinanceFuturesOrder,
+  fetchBinanceSpotOrderById,
+  fetchBinanceOpenSpotOrders,
+  fetchBinanceFuturesOrderById,
+  fetchBinanceFuturesTrades,
 } from "./binanceService";
 import {
   createCoinDCXFutureTrade,
@@ -45,10 +64,10 @@ export async function createSpotTrade(
 
     switch (exchange) {
       case CryptoExchange.BINANCE:
-        exchangeResponse = await createBinanceSpotTrade(credentials, payload);
+        exchangeResponse = await createBinanceSpotOrder(credentials, payload);
         break;
       case CryptoExchange.KUCOIN:
-        exchangeResponse = await createKucoinSpotTrade(credentials, payload);
+        exchangeResponse = await createKucoinSpotOrder(credentials, payload);
         break;
       case CryptoExchange.COINDCX:
         payload.orderType = mapSpotOrderTypeToCoinDCX(payload.orderType);
@@ -63,10 +82,6 @@ export async function createSpotTrade(
     }
 
     console.log("EXCHANGE RESPONSE", exchangeResponse);
-    // await prisma.cryptoOrder.update({
-    //   where: { id: order.id },
-    //   data: { exchangeOrderId: exchangeResponse.orderId?.toString() || null },
-    // });
 
     return { exchangeResponse };
   } catch (error: any) {
@@ -82,43 +97,6 @@ export async function createSpotTrade(
     //   data: { status: TradeStatus.CANCELLED },
     // });
     throw error;
-  }
-}
-
-export async function getSpotOrdersFromExchangeService(
-  exchange: CryptoExchange,
-  credentials: any,
-  symbol: string,
-  startTime?: number,
-  endTime?: number,
-  limit?: number
-) {
-  switch (exchange) {
-    case CryptoExchange.BINANCE:
-      return await getSpotTradeHistoryBinance(
-        credentials.apiKey,
-        credentials.apiSecret,
-        symbol,
-        startTime,
-        endTime,
-        limit
-      );
-
-    // case CryptoExchange.COINDCX:
-    // Placeholder for CoinDCX logic
-    // return await getSpotTradeHistoryCoinDCX(
-    //   credentials,
-    //   symbol,
-    //   startTime,
-    //   endTime,
-    //   limit
-    // );
-
-    default:
-      throw {
-        code: "UNSUPPORTED_EXCHANGE",
-        message: `Exchange ${exchange} is not supported`,
-      };
   }
 }
 
@@ -144,28 +122,33 @@ export async function createFuturesTrade(
 
     switch (exchange) {
       case CryptoExchange.BINANCE:
-        exchangeResponse = await createBinanceFutureTrade(credentials, payload);
+        exchangeResponse = await createBinanceFuturesOrder(
+          credentials,
+          payload
+        );
 
         break;
 
       case CryptoExchange.KUCOIN:
-        console.log("HI");
         payload.positionMarginType =
           payload.positionMarginType?.toLowerCase() === "crossed"
             ? "CROSS"
             : "ISOLATED";
-        await ensureKucoinMarginMode(
-          {
-            apiKey: credentials.apiKey,
-            apiSecret: credentials.apiSecret,
-            apiPassphrase: credentials.apiPassphrase,
-            apiKeyVersion: credentials.apiKeyVersion,
-          },
-          payload.symbol,
-          payload.positionMarginType
-        );
 
-        exchangeResponse = await createKucoinFutureTrade(credentials, payload);
+        console.log("HI", payload.positionMarginType);
+
+        // await ensureKucoinMarginMode(
+        //   {
+        //     apiKey: credentials.apiKey,
+        //     apiSecret: credentials.apiSecret,
+        //     apiPassphrase: credentials.apiPassphrase,
+        //     apiKeyVersion: credentials.apiKeyVersion,
+        //   },
+        //   payload.symbol,
+        //   payload.positionMarginType
+        // );
+
+        exchangeResponse = await createKucoinFuturesOrder(credentials, payload);
 
         break;
 
@@ -189,7 +172,7 @@ export async function createFuturesTrade(
 
     return { exchangeResponse };
   } catch (error: any) {
-    console.error("ERROR_CREATING_SPOT_TRADE", {
+    console.error("ERROR_CREATING_FUTURES_TRADE", {
       userId,
       exchange,
       payload,
@@ -224,17 +207,10 @@ export const getActiveFuturesPositions = async (
   try {
     switch (exchange) {
       case CryptoExchange.BINANCE:
-        return await getBinanceFuturesActivePositions(credentials);
+        return await fetchBinanceFuturesActivePositions(credentials);
 
       case CryptoExchange.KUCOIN:
-        // if (!credentials.apiPassphrase || !credentials.apiKeyVersion) {
-        //   throw {
-        //     code: "BAD_REQUEST",
-        //     message: "KuCoin requires apiPassphrase and apiKeyVersion",
-        //   };
-        // }
-
-        return await getKucoinFuturesActivePositions(credentials);
+        return await fetchKucoinFuturesActivePositions(credentials);
 
       case CryptoExchange.COINDCX:
         return await getCoinDCXFuturesActivePositions(credentials);
@@ -254,40 +230,6 @@ export const getActiveFuturesPositions = async (
         };
   }
 };
-
-export async function getFuturesOrdersFromExchangeService(
-  exchange: CryptoExchange,
-  credentials: any,
-  symbol: string,
- 
-) {
-  switch (exchange) {
-    case CryptoExchange.BINANCE:
-      return await getAllFuturesOrdersBinance(
-        credentials.apiKey,
-        credentials.apiSecret,
-        {
-          symbol,
-        }
-      );
-
-    // case CryptoExchange.COINDCX:
-    // Placeholder for CoinDCX logic
-    // return await getSpotTradeHistoryCoinDCX(
-    //   credentials,
-    //   symbol,
-    //   startTime,
-    //   endTime,
-    //   limit
-    // );
-
-    default:
-      throw {
-        code: "UNSUPPORTED_EXCHANGE",
-        message: `Exchange ${exchange} is not supported`,
-      };
-  }
-}
 
 interface TradeHistoryParams {
   userId: string;
@@ -365,3 +307,119 @@ export const getCryptoTradeHistoryService = async (
     },
   };
 };
+
+export async function cancelCryptoOrderService({
+  userId,
+  exchange,
+  type,
+  symbol,
+  orderId,
+}: any) {
+  const rawCredentials = await getCryptoCredentials(userId, exchange);
+
+  const credentials = Array.isArray(rawCredentials)
+    ? rawCredentials[0]
+    : rawCredentials;
+
+  if (!credentials) {
+    throw new Error("Credentials not found");
+  }
+
+  switch (exchange) {
+    case CryptoExchange.BINANCE:
+      return type === CryptoTradeType.SPOT
+        ? cancelBinanceSpotOrder(credentials, symbol, userId, orderId)
+        : cancelBinanceFuturesOrder(credentials, symbol, orderId, userId);
+
+    case CryptoExchange.KUCOIN:
+      return type === CryptoTradeType.SPOT
+        ? cancelKucoinSpotOrder(
+            {
+              apiKey: credentials.apiKey,
+              apiSecret: credentials.apiSecret,
+              apiPassphrase: credentials.apiPassphrase,
+              apiKeyVersion: credentials.apiKeyVersion,
+            },
+            orderId,
+            symbol,
+            userId
+          )
+        : cancelKucoinFuturesOrder(credentials, orderId, userId);
+
+    default:
+      throw { code: "UNSUPPORTED_EXCHANGE", message: "Unsupported exchange" };
+  }
+}
+
+export async function getCryptoOrdersService({
+  userId,
+  exchange,
+  type,
+  symbol,
+  orderId,
+}: any) {
+  const rawCredentials = await getCryptoCredentials(userId, exchange);
+
+  const credentials = Array.isArray(rawCredentials)
+    ? rawCredentials[0]
+    : rawCredentials;
+
+  if (!credentials) {
+    throw new Error("Credentials not found");
+  }
+  switch (exchange) {
+    case CryptoExchange.BINANCE:
+      if (type === CryptoTradeType.SPOT) {
+        return orderId
+          ? fetchBinanceSpotOrderById(credentials, symbol, orderId)
+          : fetchBinanceOpenSpotOrders(credentials, symbol);
+      }
+      return orderId
+        ? fetchBinanceFuturesOrderById(credentials, symbol, orderId)
+        : fetchBinanceFuturesOrders(credentials, symbol);
+
+    case CryptoExchange.KUCOIN:
+      if (type === CryptoTradeType.SPOT) {
+        return orderId
+          ? fetchKucoinSpotOrderById(credentials, orderId, symbol)
+          : fetchKucoinOpenSpotOrders(credentials, symbol);
+      }
+      return orderId
+        ? fetchKucoinFuturesOrderById(credentials, orderId, symbol)
+        : fetchKucoinFuturesOrders(credentials, symbol);
+
+    default:
+      throw { code: "UNSUPPORTED_EXCHANGE", message: "Unsupported exchange" };
+  }
+}
+
+export async function getCryptoTradesService({
+  userId,
+  exchange,
+  type,
+  symbol,
+}: any) {
+  const rawCredentials = await getCryptoCredentials(userId, exchange);
+
+  const credentials = Array.isArray(rawCredentials)
+    ? rawCredentials[0]
+    : rawCredentials;
+
+  if (!credentials) {
+    throw new Error("Credentials not found");
+  }
+  switch (exchange) {
+    case CryptoExchange.BINANCE:
+      return type === CryptoTradeType.SPOT
+        ? fetchBinanceSpotTrades(credentials, symbol)
+        : fetchBinanceFuturesTrades(credentials, { symbol });
+
+    case CryptoExchange.KUCOIN:
+      return type === CryptoTradeType.SPOT
+        ? fetchKucoinSpotTrades(credentials)
+        : fetchKucoinFuturesTrades(credentials, symbol);
+
+    default:
+      throw { code: "UNSUPPORTED_EXCHANGE", message: "Unsupported exchange" };
+  }
+}

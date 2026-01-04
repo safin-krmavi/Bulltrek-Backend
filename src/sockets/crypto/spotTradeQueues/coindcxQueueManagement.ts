@@ -1,15 +1,13 @@
 type CoinDCXTradeKey = string;
-type CoinDCXTradeMessage = { message: any; clientId: string };
+type CoinDCXTradeMessage = { message: any; userId: string };
 
 const coindcxTradeQueues: Map<CoinDCXTradeKey, CoinDCXTradeMessage[]> =
   new Map();
 const coindcxProcessing: Set<CoinDCXTradeKey> = new Set();
 
-function getCoinDCXTradeKey(message: any, clientId: string): string {
-  // Use clientId + orderId + market symbol as the unique key
-  return `${clientId}-${message.id || message.order_id}-${
-    message.market || ""
-  }`;
+function getCoinDCXTradeKey(message: any, userId: string): string {
+  // Use userId + orderId + market symbol as the unique key
+  return `${userId}-${message.id || message.order_id}-${message.market || ""}`;
 }
 
 /**
@@ -17,26 +15,27 @@ function getCoinDCXTradeKey(message: any, clientId: string): string {
  */
 export function enqueueCoinDCXTradeUpdate(
   message: any,
-  clientId: string,
+  userId: string,
   handler: (msg: any, uid: string) => Promise<void>
 ) {
-  const key = getCoinDCXTradeKey(message, clientId);
+  const key = getCoinDCXTradeKey(message, userId);
 
   if (!coindcxTradeQueues.has(key)) {
     coindcxTradeQueues.set(key, []);
   }
 
-  coindcxTradeQueues.get(key)!.push({ message, clientId });
+  coindcxTradeQueues.get(key)!.push({ message, userId });
   console.log("COINDCX_MESSAGE_ENQUEUED", { queueKey: key });
   console.log("COINDCX_QUEUE_STATUS", {
     queueKey: key,
     queueData: coindcxTradeQueues.get(key)?.map((entry, index) => ({
       index,
-      clientId: entry.clientId,
+      userId: entry.userId,
       id: entry.message?.id || entry.message?.order_id,
       market: entry.message?.market,
     })),
   });
+
   if (!coindcxProcessing.has(key)) {
     processCoinDCXQueue(key, handler);
   }
@@ -54,11 +53,12 @@ async function processCoinDCXQueue(
 
   console.log("PROCESSING_COINDCX_QUEUE", { queueKey: key });
   coindcxProcessing.add(key);
-
+  console.log("HI");
   while (queue.length > 0) {
-    const { message, clientId } = queue.shift()!;
+    console.log("HELLO");
+    const { message, userId } = queue.shift()!;
     try {
-      await handler(message, clientId);
+      await handler(message, userId);
     } catch (err) {
       console.log("ERROR_PROCESSING_COINDCX_TRADE", {
         queueKey: key,

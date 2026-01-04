@@ -13,7 +13,7 @@ type ZerodhaCredentials = {
 };
 
 export const ZerodhaOrderHandler = {
-  connect(userId: string, credentials: ZerodhaCredentials): any {
+  async connect(userId: string, credentials: ZerodhaCredentials) {
     const { apiKey, accessToken } = credentials;
 
     const ticker = new KiteTicker({

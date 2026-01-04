@@ -14,6 +14,8 @@ import { mapKucoinSpotOrderSocketStatus } from "../../constants/crypto/exchange/
 import { handleKucoinFuturesWebsocketMessage } from "../../services/crypto/exchangeSocketServices/kucoinSocketServices";
 import { tradeStatusPriority } from "../../constants/crypto";
 import { applySpotTradeExecution } from "../../utils/crypto/pnlCalc/spotPnlEngine";
+import { fetchKucoinSpotOrderById } from "../../services/crypto/exchange/kucoinService";
+import { getCryptoCredentials } from "../../services/crypto/credentialsService";
 
 // Interface to track token refresh timers
 interface TokenRefreshTimer {
@@ -34,7 +36,6 @@ export async function getToken(
       ? "https://api-futures.kucoin.com"
       : "https://api.kucoin.com";
 
-  
   console.log("GENERATING_KUCOIN_TOKEN", {
     market,
     url: `${baseUrl}${endpoint}`,
@@ -566,12 +567,62 @@ export const KuCoinHandler = {
         orderBy: { createdAt: "desc" },
       });
 
-      if (
-        !existingTrade &&
-        tradeStatus === TradeStatus.EXECUTED
-        // ||
-        // tradeStatus === TradeStatus.PARTIALLY_FILLED
-      ) {
+      // let quantity = parseFloat(data.filledSize || "0");
+      // let price = parseFloat(data.price || "0");
+      // let fee = parseFloat(data.fee || "0");
+
+      // // Fetch user credentials from DB
+      // const rawCredentials = await getCryptoCredentials(
+      //   userId,
+      //   CryptoExchange.KUCOIN
+      // );
+
+      // const credentials = Array.isArray(rawCredentials)
+      //   ? rawCredentials[0]
+      //   : rawCredentials;
+
+      // if (!credentials) {
+      //   console.warn("Credentials not found");
+      // } else {
+      //   if (orderType === "MARKET" && (!price || price === 0)) {
+      //     const kucoinOrder = await fetchKucoinSpotOrderById(
+      //       credentials,
+      //       orderId
+      //     );
+
+      //     console.log("KUCOIN_ORDER_FETCHED_BY_ID", {
+      //       userId,
+      //       orderId,
+      //       kucoinOrder,
+      //     });
+
+      //     if (kucoinOrder) {
+      //       quantity = kucoinOrder.filledSize || quantity;
+      //       fee = kucoinOrder.fee || fee;
+
+      //       // Compute avg price if missing
+      //       if (!kucoinOrder.price || kucoinOrder.price === 0) {
+      //         if (kucoinOrder.funds && kucoinOrder.filledSize) {
+      //           price = kucoinOrder.funds / kucoinOrder.filledSize;
+      //         }
+      //       } else {
+      //         price = kucoinOrder.price;
+      //       }
+
+      //       console.log("KUCOIN_MARKET_ORDER_RESOLVED", {
+      //         userId,
+      //         resolvedQuantity: quantity,
+      //         resolvedPrice: price,
+      //         resolvedFee: fee,
+      //       });
+      //     }
+      //   }
+      // }
+      const isExecutable = tradeStatus === TradeStatus.EXECUTED;
+      // ||
+      // tradeStatus === TradeStatus.PARTIALLY_FILLED;
+
+      if (!existingTrade && isExecutable) {
         const newTrade = await prisma.cryptoTrades.create({
           data: {
             userId,

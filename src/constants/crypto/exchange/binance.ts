@@ -47,7 +47,7 @@ export function mapBinanceFutureOrderStatus(status: string): TradeStatus {
     case "FILLED":
       return TradeStatus.EXECUTED;
     case "PARTIALLY_FILLED":
-      return TradeStatus.OPEN;
+      return TradeStatus.PARTIALLY_FILLED;
     case "CANCELED":
       return TradeStatus.CANCELLED;
     case "EXPIRED":
@@ -67,7 +67,7 @@ export function mapBinanceStatusToTradeStatus(status: string): TradeStatus {
     case "NEW":
       return TradeStatus.OPEN;
     case "PARTIALLY_FILLED":
-      return TradeStatus.OPEN;
+      return TradeStatus.PARTIALLY_FILLED;
     case "CANCELED":
       return TradeStatus.CANCELLED;
     case "REJECTED":
@@ -78,4 +78,3 @@ export function mapBinanceStatusToTradeStatus(status: string): TradeStatus {
       return TradeStatus.OPEN;
   }
 }
-

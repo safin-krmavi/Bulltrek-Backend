@@ -25,10 +25,15 @@ export type TradeIntent = {
 
 export const tradeDispatcher = {
   async dispatch(intent: TradeIntent) {
+    console.log(`[Dispatcher] Dispatching trade intent:`, intent);
+
     if (intent.segment === "CRYPTO") {
       const raw = await getCryptoCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
       if (!credentials) throw new Error("No crypto credentials");
+      console.log(
+        `[Dispatcher] Enqueuing crypto trade for symbol: ${intent.symbol}`
+      );
 
       tradeExecutionEngine.enqueue({
         ...intent,
@@ -42,14 +47,27 @@ export const tradeDispatcher = {
       const credentials = Array.isArray(raw) ? raw[0] : raw;
       if (!credentials) throw new Error("No stock credentials");
       try {
+        console.log(
+          `[Dispatcher] Ensuring valid stock session for user: ${intent.userId}`
+        );
+
         await ensureValidStocksSession({
           userId: intent.userId,
           exchange: intent.exchange,
         });
       } catch (err) {
+        console.warn(
+          `[Dispatcher] Stocks session expired, handling for user: ${intent.userId}`,
+          err
+        );
+
         await handleExpiredSession(intent, err);
         return;
       }
+      console.log(
+        `[Dispatcher] Enqueuing stock trade for symbol: ${intent.symbol}`
+      );
+
       tradeExecutionEngine.enqueue({
         ...intent,
         credentials,

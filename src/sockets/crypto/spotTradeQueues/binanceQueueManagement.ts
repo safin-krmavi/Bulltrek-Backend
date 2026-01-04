@@ -1,22 +1,22 @@
 type BinanceTradeKey = string;
-type BinanceTradeMessage = { message: any; clientId: string };
+type BinanceTradeMessage = { message: any; userId: string };
 
 const binanceTradeQueues: Map<BinanceTradeKey, BinanceTradeMessage[]> =
   new Map();
 const binanceProcessing: Set<BinanceTradeKey> = new Set();
 
-function getBinanceTradeKey(message: any, clientId: string): string {
-  return `${clientId}-${message.i}-${message.s}`;
+function getBinanceTradeKey(message: any, userId: string): string {
+  return `${userId}-${message.i}-${message.s}`;
 }
 
 export function enqueueBinanceTradeUpdate(
   message: any,
-  clientId: string,
+  userId: string,
   handler: (msg: any, uid: string) => Promise<void>
 ) {
-  const key = getBinanceTradeKey(message, clientId);
+  const key = getBinanceTradeKey(message, userId);
   if (!binanceTradeQueues.has(key)) binanceTradeQueues.set(key, []);
-  binanceTradeQueues.get(key)!.push({ message, clientId });
+  binanceTradeQueues.get(key)!.push({ message, userId });
 
   if (!binanceProcessing.has(key)) {
     processBinanceTradeQueue(key, handler);
@@ -33,9 +33,9 @@ async function processBinanceTradeQueue(
   binanceProcessing.add(key);
 
   while (queue.length > 0) {
-    const { message, clientId } = queue.shift()!;
+    const { message, userId } = queue.shift()!;
     try {
-      await handler(message, clientId);
+      await handler(message, userId);
     } catch (err) {
       console.log("ERROR_PROCESSING_BINANCE_TRADE", {
         queueKey: key,

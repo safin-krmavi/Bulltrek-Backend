@@ -4,6 +4,15 @@ import { StocksExchange } from "@prisma/client";
 import { ZerodhaMarketDataHandler } from "./zerodhaMarketDataHandler";
 import { getStocksCredentials } from "../../../services/stocks/credentialsService";
 import { KotakMarketDataHandler } from "./kotakMarketDataHandler";
+import { fetchZerodhaMarketPrice } from "../../../services/stocks/exchange/zerodhaService";
+import { fetchKotakMarketPrice } from "../../../services/stocks/exchange/kotakService";
+const stockLastPrices: {
+  [exchange: string]: {
+    [userId: string]: {
+      [symbol: string]: number;
+    };
+  };
+} = {};
 
 export const StockMarketDataManager = {
   /**
@@ -47,11 +56,11 @@ export const StockMarketDataManager = {
 
         // Connect exchange-specific handler
         if (exchange === "ZERODHA") {
-          await ZerodhaMarketDataHandler.connect({
-            userId,
-            apiKey: credentials.apiKey,
-            accessToken: credentials.accessToken!,
-          });
+          // await ZerodhaMarketDataHandler.connect({
+          //   userId,
+          //   apiKey: credentials.apiKey,
+          //   accessToken: credentials.accessToken!,
+          // });
         } else if (exchange === "KOTAK") {
           await KotakMarketDataHandler.connect(userId, {
             tradingToken: credentials.accessToken,
@@ -193,6 +202,10 @@ export const StockMarketDataManager = {
     symbol: string,
     price: number
   ) {
+    stockLastPrices[exchange] ??= {};
+    stockLastPrices[exchange][userId] ??= {};
+    stockLastPrices[exchange][userId][symbol] = price;
+
     const conn = stockMarketDataRegistry[exchange]?.[userId];
     if (!conn) {
       console.warn("[STOCK_PRICE_UPDATE_SKIPPED] No connection", {
@@ -284,6 +297,47 @@ export const StockMarketDataManager = {
     });
   },
 
+  getLastPrice(
+    exchange: StocksExchange,
+    userId: string,
+    symbol: string
+  ): number | null {
+    return stockLastPrices[exchange]?.[userId]?.[symbol] ?? null;
+  },
+  async fetchMarketPrice(
+    exchange: StocksExchange,
+    userId: string,
+    symbol: string
+  ): Promise<number | null> {
+    const cached = this.getLastPrice(exchange, userId, symbol);
+    if (cached) return cached;
+
+    // 🔥 Fallback: fetch from API if no cached tick
+    try {
+      if (exchange === "ZERODHA") {
+        return await fetchZerodhaMarketPrice({
+          tradingSymbol: symbol,
+          exchange: "NSE",
+          userId,
+        });
+      } else if (exchange === "KOTAK") {
+        return await fetchKotakMarketPrice({
+          userId, 
+          symbol,
+        });
+      }
+    } catch (err) {
+      console.error("[STOCK_FETCH_PRICE_ERROR]", {
+        exchange,
+        userId,
+        symbol,
+        err,
+      });
+      return null;
+    }
+
+    return null;
+  },
   /**
    * Get all active connections for monitoring/debugging
    */

@@ -1635,14 +1635,6 @@
     "quantityStep": "1",
     "priceTick": "0.0000100"
   },
-  "BTCUSDT_251226": {
-    "quantityStep": "0.001",
-    "priceTick": "0.1"
-  },
-  "ETHUSDT_251226": {
-    "quantityStep": "0.001",
-    "priceTick": "0.01"
-  },
   "ICNTUSDT": {
     "quantityStep": "1",
     "priceTick": "0.0001000"
@@ -2154,5 +2146,17 @@
   "IRUSDT": {
     "quantityStep": "1",
     "priceTick": "0.0000100"
+  },
+  "LITUSDT": {
+    "quantityStep": "0.1",
+    "priceTick": "0.001000"
+  },
+  "BTCUSDT_260626": {
+    "quantityStep": "0.001",
+    "priceTick": "0.1"
+  },
+  "ETHUSDT_260626": {
+    "quantityStep": "0.001",
+    "priceTick": "0.01"
   }
 }

@@ -1,15 +1,21 @@
 import axios from "axios";
 import {
+  COINDCX_ACTIVE_ORDERS_ENDPOINT,
   COINDCX_BASE_URL,
   COINDCX_FUTURE_BALANCE_ENDPOINT,
+  COINDCX_FUTURE_LIST_ORDERS_ENDPOINT,
   COINDCX_FUTURE_LIST_POSITIONS_ENDPOINT,
+  COINDCX_FUTURE_ORDER_CANCEL_ENDPOINT,
   COINDCX_FUTURE_ORDER_CREATE_ENDPOINT,
   COINDCX_FUTURES_TICKER_URL,
   COINDCX_FUTURES_URL,
   COINDCX_GET_FUTURES_CURRENT_PRICES_REALTIME_URL,
+  COINDCX_ORDER_CANCEL_ENDPOINT,
   COINDCX_ORDER_CREATE_ENDPOINT,
+  COINDCX_ORDER_STATUS_ENDPOINT,
   COINDCX_SPOT_BALANCE_ENDPOINT,
   COINDCX_SPOT_URL,
+  COINDCX_TRADE_HISTORY_ENDPOINT,
   COINDCX_USER_INFO_ENDPOINT,
 } from "../../../constants/crypto/externalUrls";
 import {
@@ -154,7 +160,7 @@ export const createCoinDCXSpotTrade = async (
 
   const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
   console.log(body);
-  console.log(`${COINDCX_BASE_URL}${COINDCX_ORDER_CREATE_ENDPOINT}`)
+  console.log(`${COINDCX_BASE_URL}${COINDCX_ORDER_CREATE_ENDPOINT}`);
   try {
     const response = await axios.post(
       `${COINDCX_BASE_URL}${COINDCX_ORDER_CREATE_ENDPOINT}`,
@@ -173,6 +179,141 @@ export const createCoinDCXSpotTrade = async (
     // logger.error("ERROR_CREATING_SPOT_ORDER_COINDCX", {
     //   error: error?.response?.data || error?.message,
     // });
+    handleCoinDCXError(error);
+  }
+};
+
+export const cancelCoinDCXSpotOrder = async (
+  credentials: any,
+  orderId: string
+) => {
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  const body = {
+    id: orderId,
+    timestamp,
+  };
+
+  const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_ORDER_CANCEL_ENDPOINT}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    handleCoinDCXError(error);
+  }
+};
+
+export const fetchCoinDCXSpotOrderById = async (
+  credentials: any,
+  orderId: string
+) => {
+  const timestamp = Date.now();
+  const body: any = {
+    timestamp,
+    id: orderId,
+  };
+
+  const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_ORDER_STATUS_ENDPOINT}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+    if (response.data && response.data.status) {
+      // CoinDCX returns a status key if successful
+      return response.data;
+    } else {
+      throw new Error("Invalid response structure from CoinDCX");
+    }
+  } catch (error: any) {
+    handleCoinDCXError(error);
+  }
+};
+
+export const fetchCoinDCXOpenSpotOrders = async (
+  credentials: any,
+  symbol: string,
+  side?: TradeSide
+) => {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const payload: any = { timestamp, market: symbol };
+  if (side) payload.side = side.toLowerCase();
+
+  const signature = generateSignatureCoinDCX(payload, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_ACTIVE_ORDERS_ENDPOINT}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    handleCoinDCXError(error);
+  }
+};
+
+export const fetchCoinDCXSpotTrades = async (
+  credentials: any,
+  fromTimestamp?: number,
+  toTimestamp?: number,
+  limit: number = 500,
+  sort: string = "desc",
+  symbol?: string
+) => {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const body: any = {
+    timestamp,
+    from_timestamp: fromTimestamp,
+    to_timestamp: toTimestamp,
+    limit,
+    sort,
+    symbol,
+  };
+  const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_TRADE_HISTORY_ENDPOINT}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    return response.data || [];
+  } catch (error: any) {
     handleCoinDCXError(error);
   }
 };
@@ -358,6 +499,147 @@ export const createCoinDCXFutureTrade = async (
     // logger.error("ERROR_CREATING_FUTURE_ORDER_COINDCX", {
     //   error: error?.response?.data || error?.message,
     // });
+    handleCoinDCXError(error);
+  }
+};
+
+export const cancelCoinDCXFuturesOrder = async (
+  credentials: any,
+  orderId: string
+) => {
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  const body = {
+    timestamp,
+    id: orderId,
+  };
+
+  const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_FUTURE_ORDER_CANCEL_ENDPOINT}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    handleCoinDCXError(error);
+  }
+};
+
+export const fetchCoinDCXFuturesOrders = async (
+  credentials: any,
+  isOpen: boolean = false // default to all orders
+) => {
+  const page = "1";
+  const size = "50";
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const OPEN_STATUSES = ["open", "partially_filled"];
+  const ALL_STATUSES = [
+    "open",
+    "filled",
+    "partially_filled",
+    "partially_cancelled",
+    "cancelled",
+    "rejected",
+    "untriggered",
+  ];
+  const statusString = isOpen
+    ? OPEN_STATUSES.join(",")
+    : ALL_STATUSES.filter((s) => !OPEN_STATUSES.includes(s)).join(",");
+  const body: any = {
+    timestamp,
+    page,
+    size,
+    margin_currency_short_name: ["INR", "USDT"],
+    status: statusString,
+  };
+  const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}${COINDCX_FUTURE_LIST_ORDERS_ENDPOINT}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    return response.data || [];
+  } catch (error: any) {
+    handleCoinDCXError(error);
+  }
+};
+
+export const fetchCoinDCXFuturesOrderById = async (
+  credentials: any,
+  orderId: string
+) => {
+  const orders = await fetchCoinDCXFuturesOrders(credentials);
+
+  return orders.find((o: any) => o.id === orderId) || null;
+};
+
+export const fetchCoinDCXFuturesTrades = async (
+  credentials: any,
+  {
+    pair,
+    fromTimestamp, // YYYY-MM-DD
+    toTimestamp, // YYYY-MM-DD
+    page = 1,
+    limit = 100,
+    margin_currency_short_name = "USDT",
+  }: {
+    pair?: string;
+    fromTimestamp?: number;
+    toTimestamp?: number;
+    page?: number;
+    limit?: number;
+    margin_currency_short_name?: string;
+  } = {}
+) => {
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  const body: any = {
+    timestamp,
+    limit,
+    margin_currency_short_name,
+  };
+
+  if (pair) body.pair = pair;
+  if (fromTimestamp) body.from_timestamp = fromTimestamp;
+  if (toTimestamp) body.to_timestamp = toTimestamp;
+
+  const signature = generateSignatureCoinDCX(body, credentials.apiSecret);
+
+  try {
+    const response = await axios.post(
+      `${COINDCX_BASE_URL}/exchange/v1/derivatives/futures/trades`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-AUTH-APIKEY": credentials.apiKey,
+          "X-AUTH-SIGNATURE": signature,
+        },
+      }
+    );
+
+    return response.data || [];
+  } catch (error: any) {
     handleCoinDCXError(error);
   }
 };
@@ -566,4 +848,54 @@ export async function getCoindcxFuturesSymbols(
   const url = `https://api.coindcx.com/exchange/v1/derivatives/futures/data/active_instruments?margin_currency_short_name[]=${margin}`;
   const res = await axios.get(url);
   return res.data; // e.g., ["B-BTC_USDT", "B-ETH_USDT", ...]
+}
+
+export async function fetchCoinDCXMarketPrice(params: {
+  symbol: string;
+  assetType: "SPOT" | "FUTURES";
+}) {
+  try {
+    const { symbol, assetType } = params;
+
+    if (!symbol) {
+      throw new Error("Symbol must be provided");
+    }
+
+    if (assetType === "SPOT") {
+      // Spot: Get last traded price from ticker
+      const url = `https://api.coindcx.com/exchange/ticker`;
+      const response = await axios.get(url);
+
+      const ticker = response.data.find(
+        (item: any) => item.market.toUpperCase() === symbol.toUpperCase()
+      );
+
+      if (!ticker) {
+        throw new Error(`CoinDCX Spot API returned no data for symbol ${symbol}`);
+      }
+
+      return parseFloat(ticker.last_price); // Last traded price
+    } else if (assetType === "FUTURES") {
+      // Futures: Get mark price from real-time endpoint
+      const url = `https://public.coindcx.com/market_data/v3/current_prices/futures/rt`;
+      const response = await axios.get(url);
+
+      const priceData = response.data.prices?.[symbol.toUpperCase()];
+
+      if (!priceData) {
+        throw new Error(`CoinDCX Futures API returned no data for symbol ${symbol}`);
+      }
+
+      return parseFloat(priceData.mp); // Mark price
+    } else {
+      throw new Error("Invalid assetType, must be SPOT or FUTURES");
+    }
+  } catch (error: any) {
+    console.error("[COINDCX][MARKET_PRICE] Failed", {
+      symbol: params.symbol,
+      assetType: params.assetType,
+      error: error?.response?.data || error.message,
+    });
+    handleCoinDCXError(error);
+  }
 }

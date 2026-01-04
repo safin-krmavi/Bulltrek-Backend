@@ -13,7 +13,6 @@ import { enqueueBinanceFuturesUpdate } from "../../../sockets/crypto/futureTrade
 import { applySpotTradeExecution } from "../../../utils/crypto/pnlCalc/spotPnlEngine";
 import { applyFuturesTradeExecution } from "../../../utils/crypto/pnlCalc/futuresPnlEngine";
 import { tradeStatusPriority } from "../../../constants/crypto";
- 
 
 export async function handleBinanceSpotOrderUpdate(
   message: any,
@@ -78,11 +77,11 @@ export async function handleBinanceSpotOrderUpdate(
       },
       orderBy: { createdAt: "desc" },
     });
+    const isExecutable =
+      tradeStatus === TradeStatus.EXECUTED ||
+      tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (
-      !existingTrade &&
-      (orderStatus === "FILLED" || orderStatus === "PARTIALLY_FILLED")
-    ) {
+    if (!existingTrade && isExecutable) {
       const newTrade = await prisma.cryptoTrades.create({
         data: {
           userId,
@@ -127,7 +126,7 @@ export async function handleBinanceSpotOrderUpdate(
       message,
     });
   }
-} 
+}
 
 export async function updateBinanceFuturesTradeStatus(
   userId: string,
@@ -204,8 +203,11 @@ export async function updateBinanceFuturesTradeStatus(
 
     let shouldApplyPnL = false;
     const executedStatuses = ["EXECUTED", "PARTIALLY_FILLED"] as const;
+    const isExecutable =
+      tradeStatus === TradeStatus.EXECUTED ||
+      tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade) {
+    if (!existingTrade && isExecutable) {
       // Create new trade
       existingTrade = await prisma.cryptoTrades.create({
         data: {
@@ -360,8 +362,11 @@ export async function handleFilledBinanceFuturesOrder(
 
     let shouldApplyPnL = false;
     const executedStatuses = ["EXECUTED", "PARTIALLY_FILLED"] as const;
+    const isExecutable =
+      tradeStatus === TradeStatus.EXECUTED ||
+      tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade) {
+    if (!existingTrade && isExecutable) {
       // Create new trade
       existingTrade = await prisma.cryptoTrades.create({
         data: {

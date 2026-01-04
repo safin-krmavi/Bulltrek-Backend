@@ -95,8 +95,8 @@ export class StrategyRuntime<
   onMarketTick(price: number, timestamp: number) {
     // **REMOVED**: if (!this.active) return;
     // The scheduling is now handled INSIDE each strategy handler
-
     if (this.state.status !== "ACTIVE") return;
+    // console.log("THIS");
 
     switch (this.strategy.type) {
       case "GROWTH_DCA":
@@ -111,7 +111,7 @@ export class StrategyRuntime<
     this.active = true;
 
     if (this.strategy.type === "GROWTH_DCA") {
-      await this.handleGrowthDCA(price, Date.now());
+      this.handleGrowthDCA(price, Date.now());
     }
 
     this.state.lastExecutionAt = Date.now();
@@ -129,7 +129,7 @@ export class StrategyRuntime<
   private async handleGrowthDCA(price: number, timestamp: number) {
     const config = this.strategy.config as any;
     const state = this.state as GrowthDCAState;
-
+    // console.log("CHECK THIS", state, this.strategy);
     // 1️⃣ Pending order guard
     if (state.pendingOrder) return;
 
@@ -177,6 +177,10 @@ export class StrategyRuntime<
       });
       return;
     }
+    if (!price || price <= 0) {
+      console.log("INVALID PRICE", price);
+      return;
+    }
 
     // 4️⃣ Evaluate decision
     const decision = evaluateGrowthDCA(this.strategy, state, price, timestamp);
@@ -192,6 +196,13 @@ export class StrategyRuntime<
     if (decision === "BUY") {
       const perOrder = config.capital.perOrderAmount;
       const qty = await formatQuantity({
+        exchange: this.strategy.exchange,
+        tradeType: this.strategy.segment,
+        symbol: this.strategy.symbol,
+        rawQty: perOrder / price,
+      });
+
+      console.log("BUY", qty, {
         exchange: this.strategy.exchange,
         tradeType: this.strategy.segment,
         symbol: this.strategy.symbol,

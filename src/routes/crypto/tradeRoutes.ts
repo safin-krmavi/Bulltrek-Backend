@@ -11,11 +11,26 @@ tradeRouter.post(
   cryptoTradeController.createTradeController
 );
 tradeRouter.post(
+  "/cancel",
+  verifyCryptoUser,
+  cryptoTradeController.cancelCryptoOrderController
+);
+tradeRouter.get(
+  "/orders",
+  verifyCryptoUser,
+  cryptoTradeController.getCryptoOrdersController
+);
+tradeRouter.get(
+  "/trades",
+  verifyCryptoUser,
+  cryptoTradeController.getCryptoTradesController
+);
+
+tradeRouter.post(
   "/futures/active-positions",
   verifyCryptoUser,
   cryptoTradeController.getActiveFuturesPositionsController
 );
-
 
 tradeRouter.get(
   "/history",

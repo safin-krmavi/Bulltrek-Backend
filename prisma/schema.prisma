@@ -72,6 +72,8 @@ model StocksUser {
   role          Role     @relation(fields: [roleId], references: [id])
   credentials   StocksCredentials[]
   kyc           StocksKYC[] 
+  stocksTrades  StocksTrades[]
+
 }
 
 enum Website {
@@ -179,6 +181,32 @@ model CryptoTrades {
 }
 
 
+model StocksTrades {
+  id           String      @id @default(uuid())
+  userId       String        
+  exchange     StocksExchange
+  type         String
+  orderType    String  // "LIMIT" or "MARKET"
+  symbol       String
+  side         TradeSide
+  orderId      String       
+  quantity     Float
+  price        Float
+  triggerPrice Float?
+  status       TradeStatus
+  fee          Float       @default(0)
+  leverage     Float?
+  
+  realizedPnl   Float           @default(0) // REQUIRED
+  executedAt    DateTime        @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         StocksUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order        StocksOrder? @relation(fields: [orderId], references: [id])
+
+}
+
+
 model FuturesPosition {
   id             String   @id @default(uuid())
   userId         String
@@ -232,6 +260,33 @@ model CryptoOrder {
   updatedAt        DateTime            @updatedAt
 
   trades           CryptoTrades[]
+
+  @@unique([exchangeOrderId])
+}
+
+model StocksOrder {
+  id               String   @id @default(uuid())
+  userId           String
+  exchange         StocksExchange
+  type             String
+  symbol           String
+  side             TradeSide          // BUY | SELL
+
+  exchangeOrderId  String?
+  clientOrderId    String?
+
+  requestedQty     Float
+  requestedPrice   Float?
+  leverage         Float?
+  orderType        String             // MARKET / LIMIT
+
+  status           TradeStatus         // NEW / PARTIALLY_FILLED / FILLED / CANCELLED
+  filledQty        Float               @default(0)
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  trades           StocksTrades[]
 
   @@unique([exchangeOrderId])
 }
@@ -336,5 +391,6 @@ enum TradeStatus {
   OPEN
   CANCELLED
   PARTIALLY_FILLED
+  REJECTED
 }
  

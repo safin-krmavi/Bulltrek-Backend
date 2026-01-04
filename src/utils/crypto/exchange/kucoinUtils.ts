@@ -132,6 +132,7 @@ export const handleKucoinError = (error: any) => {
     error.response?.data?.msg ||
     error.response?.data?.message ||
     error.message ||
+    error?.response?.data ||
     "Unknown exchange error";
   // console.log(error);
 

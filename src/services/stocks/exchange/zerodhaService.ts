@@ -14,7 +14,10 @@ import {
   ZerodhaOrderPayload,
 } from "../../../utils/stocks/exchange/zerodhaUtils";
 import { StocksExchange } from "@prisma/client";
-import { addOrUpdateStocksCredentials } from "../credentialsService";
+import {
+  addOrUpdateStocksCredentials,
+  getStocksCredentials,
+} from "../credentialsService";
 import path from "path";
 import fs from "fs";
 import { STOCKS_FILE_PATH } from "../../../constants/stocks";
@@ -334,5 +337,59 @@ export function getZerodhaInstrumentBySymbol(symbol: string) {
   } catch (error) {
     console.error("ERROR_GETTING_ZERODHA_INSTRUMENT_BY_SYMBOL", error);
     throw error;
+  }
+}
+
+export async function fetchZerodhaMarketPrice(params: {
+  tradingSymbol: string; // e.g. INFY
+  exchange?: "NSE" | "BSE";
+  userId: string;
+}) {
+  try {
+    const { tradingSymbol, userId } = params;
+    const rawCredentials = await getStocksCredentials(
+      userId,
+      StocksExchange.ZERODHA
+    );
+    const credentials = Array.isArray(rawCredentials)
+      ? rawCredentials[0]
+      : rawCredentials;
+
+    if (!credentials) {
+      throw new Error("Credentiala not found");
+    }
+
+    
+    const exchange = params.exchange ?? "NSE";
+
+    if (!tradingSymbol) {
+      throw new Error("Trading symbol must be provided");
+    }
+
+    const instrumentKey = `${exchange}:${tradingSymbol.toUpperCase()}`;
+
+    const response = await axios.get(`${ZERODHA_BASE_URL}/quote/ltp`, {
+      params: {
+        i: instrumentKey,
+      },
+      headers: {
+        "X-Kite-Version": "3",
+        Authorization: `token ${credentials.apiKey}:${credentials.accessToken}`,
+      },
+    });
+
+    const data = response.data?.data?.[instrumentKey];
+
+    if (!data || typeof data.last_price !== "number") {
+      throw new Error(`LTP not available for ${instrumentKey}`);
+    }
+
+    return data.last_price;
+  } catch (error: any) {
+    console.error("[ZERODHA][MARKET_PRICE] Failed", {
+      symbol: params.tradingSymbol,
+      error: error?.response?.data || error.message,
+    });
+    handleZerodhaError(error);
   }
 }

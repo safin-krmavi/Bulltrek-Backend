@@ -5,14 +5,20 @@ import {
   sendUnauthorized,
   sendServerError,
 } from "../../../utils/response";
-import { CryptoExchange, CryptoTradeType, TradeSide, TradeStatus } from "@prisma/client";
+import {
+  CryptoExchange,
+  CryptoTradeType,
+  TradeSide,
+  TradeStatus,
+} from "@prisma/client";
 import { getCryptoCredentials } from "../../../services/crypto/credentialsService";
 import {
+  cancelCryptoOrderService,
   createFuturesTrade,
   createSpotTrade,
+  getCryptoOrdersService,
   getCryptoTradeHistoryService,
-  getFuturesOrdersFromExchangeService,
-  getSpotOrdersFromExchangeService,
+  getCryptoTradesService,
 } from "../../../services/crypto/exchange/tradeService";
 import { validateSpotTrade } from "../../../utils/crypto/exchange/spotTradeValidation";
 import { validateFuturesTrade } from "../../../utils/crypto/exchange/futuresTradeValidation";
@@ -68,54 +74,6 @@ export const createTradeController = async (req: any, res: Response) => {
   }
 };
 
-export const getSpotOrdersFromExchange = async (req: any, res: Response) => {
-  try {
-    const { exchange, symbol, startTime, endTime, limit } = req.body;
-    const userId = req.user.userId;
-
-    if (!exchange) return sendBadRequest(res, "exchange is required");
-
-    // Fetch user credentials from DB
-    const rawCredentials = await getCryptoCredentials(userId, exchange);
-
-    const credentials = Array.isArray(rawCredentials)
-      ? rawCredentials[0]
-      : rawCredentials;
-
-    if (!credentials) {
-      sendBadRequest(res, "Credentials not found");
-    }
-
-    // Fetch trades
-    const trades = await getSpotOrdersFromExchangeService(
-      exchange,
-      credentials,
-      symbol,
-      startTime,
-      endTime,
-      limit
-    );
-
-    return res.status(200).json({ success: true, trades });
-  } catch (error: any) {
-    switch (error.code) {
-      case "AUTH_INVALID":
-        return sendUnauthorized(res, error.message);
-      case "BAD_REQUEST":
-      case "UNSUPPORTED_EXCHANGE":
-      case "RATE_LIMITED":
-        return sendBadRequest(res, error.message);
-      case "EXCHANGE_UNAVAILABLE":
-        return sendServerError(res, error.message);
-      default:
-        return sendServerError(
-          res,
-          error?.message || "Spot trade fetch failed"
-        );
-    }
-  }
-};
-
 // FUTURES
 export const getActiveFuturesPositionsController = async (
   req: any,
@@ -152,51 +110,6 @@ export const getActiveFuturesPositionsController = async (
         return sendServerError(
           res,
           error?.message || "Failed to fetch active positions"
-        );
-    }
-  }
-};
-
-export const getFuturesOrdersFromExchange = async (req: any, res: Response) => {
-  try {
-    const { exchange, symbol, startTime, endTime, limit } = req.body;
-    const userId = req.user.userId;
-
-    if (!exchange) return sendBadRequest(res, "exchange is required");
-
-    // Fetch user credentials from DB
-    const rawCredentials = await getCryptoCredentials(userId, exchange);
-
-    const credentials = Array.isArray(rawCredentials)
-      ? rawCredentials[0]
-      : rawCredentials;
-
-    if (!credentials) {
-      sendBadRequest(res, "Credentials not found");
-    }
-
-    // Fetch trades
-    const trades = await getFuturesOrdersFromExchangeService(
-      exchange,
-      credentials,
-      symbol
-    );
-
-    return res.status(200).json({ success: true, trades });
-  } catch (error: any) {
-    switch (error.code) {
-      case "AUTH_INVALID":
-        return sendUnauthorized(res, error.message);
-      case "BAD_REQUEST":
-      case "UNSUPPORTED_EXCHANGE":
-      case "RATE_LIMITED":
-        return sendBadRequest(res, error.message);
-      case "EXCHANGE_UNAVAILABLE":
-        return sendServerError(res, error.message);
-      default:
-        return sendServerError(
-          res,
-          error?.message || "Spot trade fetch failed"
         );
     }
   }
@@ -248,5 +161,69 @@ export const getCryptoTradeHistoryController = async (
       res,
       error?.message || "Failed to fetch trade history"
     );
+  }
+};
+
+export const cancelCryptoOrderController = async (req: any, res: Response) => {
+  const { exchange, type, symbol, orderId } = req.body;
+
+  if (!exchange || !type || !orderId) {
+    return sendBadRequest(res, "exchange, type and orderId are required");
+  }
+
+  try {
+    const data = await cancelCryptoOrderService({
+      userId: req.user.id,
+      exchange,
+      type,
+      symbol,
+      orderId,
+    });
+
+    return sendSuccess(res, "Order cancelled successfully", data);
+  } catch (error: any) {
+    return sendServerError(res, error.message || "Failed to cancel order");
+  }
+};
+
+export const getCryptoOrdersController = async (req: any, res: Response) => {
+  const { exchange, type, symbol, orderId } = req.query as any;
+
+  if (!exchange || !type) {
+    return sendBadRequest(res, "exchange and type are required");
+  }
+
+  try {
+    const data = await getCryptoOrdersService({
+      userId: req.user.id,
+      exchange,
+      type,
+      symbol,
+      orderId,
+    });
+
+    return sendSuccess(res, "Orders fetched successfully", data);
+  } catch (error: any) {
+    return sendServerError(res, error.message || "Failed to fetch orders");
+  }
+};
+export const getCryptoTradesController = async (req: any, res: Response) => {
+  const { exchange, type, symbol } = req.query as any;
+
+  if (!exchange || !type) {
+    return sendBadRequest(res, "exchange and type are required");
+  }
+
+  try {
+    const data = await getCryptoTradesService({
+      userId: req.user.id,
+      exchange,
+      type,
+      symbol,
+    });
+
+    return sendSuccess(res, "Trades fetched successfully", data);
+  } catch (error: any) {
+    return sendServerError(res, error.message || "Failed to fetch trades");
   }
 };

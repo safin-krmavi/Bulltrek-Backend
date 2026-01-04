@@ -12,4 +12,5 @@ export const tradeStatusPriority: Record<TradeStatus, number> = {
   PARTIALLY_FILLED: 3,
   EXECUTED: 4,
   FAILED: 5,
+  REJECTED: 5,
 };

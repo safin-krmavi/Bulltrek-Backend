@@ -361,7 +361,7 @@ export async function calcQty(orderData: any, isForStatusUpdate: boolean) {
   const symbol = orderData.symbol;
   if (!symbol) {
     console.log("NO_SYMBOL_FOUND_IN_ORDER_DATA", {
-      clientId: orderData.clientId,
+      userId: orderData.userId,
       exchange: orderData.exchange,
     });
   }
@@ -376,14 +376,14 @@ export async function calcQty(orderData: any, isForStatusUpdate: boolean) {
         console.log("SYMBOL_MULTIPLIER_FOUND", {
           symbol: symbol,
           multiplier: multiplier,
-          clientId: orderData.clientId,
+          userId: orderData.userId,
           exchange: orderData.exchange,
         });
       } else {
         console.log("NO_MULTIPLIER_FOUND_USING_DEFAULT", {
           symbol: symbol,
           defaultMultiplier: 1,
-          clientId: orderData.clientId,
+          userId: orderData.userId,
           exchange: orderData.exchange,
         });
       }
@@ -391,12 +391,12 @@ export async function calcQty(orderData: any, isForStatusUpdate: boolean) {
       console.log("ERROR_FETCHING_SYMBOL_DATA", {
         error: error?.data || error?.response?.data || error.message,
         symbol: symbol,
-        clientId: orderData.clientId,
+        userId: orderData.userId,
         exchange: orderData.exchange,
       });
       console.log("USING_DEFAULT_MULTIPLIER", {
         defaultMultiplier: 1,
-        clientId: orderData.clientId,
+        userId: orderData.userId,
         exchange: orderData.exchange,
       });
     }
@@ -411,12 +411,12 @@ export async function calcQty(orderData: any, isForStatusUpdate: boolean) {
     qty = new Decimal(size).times(new Decimal(multiplier)).toNumber();
     console.log("FINAL_QTY_WITH_MULTIPLIER", {
       qty: qty,
-      clientId: orderData.clientId,
+      userId: orderData.userId,
       exchange: orderData.exchange,
     });
   } else {
     console.log("QTY_ZERO_INVALID_PRICE", {
-      clientId: orderData.clientId,
+      userId: orderData.userId,
       exchange: orderData.exchange,
     });
   }
@@ -438,8 +438,9 @@ export const mapKucoinSpotOrderSocketStatus = (orderData: any) => {
   } else if (type === "canceled" && status === "done") {
     return TradeStatus.CANCELLED;
   } else if (type === "") return TradeStatus.OPEN;
-
-  // const type;
+  else {
+    return TradeStatus.OPEN;
+  }
 };
 
 export function mapKuCoinFuturesOrderStatus(orderData: any): TradeStatus {

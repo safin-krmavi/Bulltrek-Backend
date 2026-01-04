@@ -93,7 +93,7 @@ export const BinanceHandler = {
 
   // Connect to Binance user data stream WebSocket and handle execution reports
   async connect(
-    clientId: string,
+    userId: string,
     credentials: CryptoExchangeCredentials,
     market: MarketType = "SPOT"
   ): Promise<BinanceUserDataStreamConnection> {
@@ -119,7 +119,7 @@ export const BinanceHandler = {
 
     socket.on("open", () => {
       logEvent("CONNECTED", {
-        clientId,
+        userId,
         market,
         exchange: CryptoExchange.BINANCE,
       });
@@ -130,7 +130,7 @@ export const BinanceHandler = {
         const event = JSON.parse(data.toString());
         if (event.e === "ORDER_TRADE_UPDATE") {
           console.log("BINANCE_FUTURES_ORDER_UPDATE", { event });
-          handleBinanceFutureOrderUpdate(event.o, clientId, {
+          handleBinanceFutureOrderUpdate(event.o, userId, {
             apiKey,
             apiSecret,
           });
@@ -141,7 +141,7 @@ export const BinanceHandler = {
 
           enqueueBinanceTradeUpdate(
             event,
-            clientId,
+            userId,
             handleBinanceSpotOrderUpdate
           );
         }
@@ -166,7 +166,7 @@ export const BinanceHandler = {
 
     socket.on("close", (code, reason) => {
       logEvent("CLOSED", {
-        clientId,
+        userId,
         market,
         exchange: CryptoExchange.BINANCE,
         code,

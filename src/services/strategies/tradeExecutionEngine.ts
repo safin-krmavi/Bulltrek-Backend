@@ -17,6 +17,7 @@ class TradeExecutionEngine {
 
     if (!this.queues[key]) this.queues[key] = [];
     if (!this.processing[key]) this.processing[key] = false;
+    console.log(`[Engine] Enqueuing order:`, intent);
 
     this.queues[key].push(intent);
     this.processQueue(key);
@@ -34,6 +35,10 @@ class TradeExecutionEngine {
 
     while (queue.length > 0) {
       const order = queue.shift()!;
+      console.log(
+        `[Engine] Processing order (attempt ${order.attempt}):`,
+        order
+      );
 
       try {
         if (!order.credentials) {
@@ -45,12 +50,21 @@ class TradeExecutionEngine {
         } else {
           await this.executeStock(order);
         }
+        console.log(`[Engine] Order executed successfully:`, order);
 
         order.onComplete?.();
       } catch (err) {
+        console.error(`[Engine] Order execution failed:`, order, err);
+
         if ((order.attempt ?? 0) < this.maxRetries) {
           order.attempt = (order.attempt ?? 0) + 1;
+          console.log(
+            `[Engine] Retrying order (attempt ${order.attempt}):`,
+            order
+          );
           queue.push(order);
+        } else {
+          console.warn(`[Engine] Max retries reached for order:`, order);
         }
       }
     }
@@ -63,6 +77,7 @@ class TradeExecutionEngine {
   }
 
   private async executeCrypto(order: TradeIntent) {
+    console.log(`[Engine] Executing crypto order:`, order);
     if (order.tradeType === "SPOT") {
       await createSpotTrade(
         order.userId,
@@ -81,6 +96,7 @@ class TradeExecutionEngine {
   }
 
   private async executeStock(order: TradeIntent) {
+    console.log(`[Engine] Executing stock order:`, order);
     await placeStockOrder(order.exchange, order.credentials, {
       symbol: order.symbol,
       side: order.side,

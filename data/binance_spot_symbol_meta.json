@@ -2183,5 +2183,10 @@
     "quantityStep": "0.10000000",
     "priceTick": "0.00010000",
     "minNotional": "0"
+  },
+  "KGSTUSDT": {
+    "quantityStep": "1.00000000",
+    "priceTick": "0.00001000",
+    "minNotional": "0"
   }
 }

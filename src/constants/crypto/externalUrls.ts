@@ -3,16 +3,25 @@
 export const BINANCE_SPOT_URL = "https://api.binance.com/api/v3/exchangeInfo";
 export const BINANCE_SPOT_BASE_URL = "https://api.binance.com";
 export const BINANCE_SPOT_BALANCE_ENDPOINT = "/api/v3/account";
+export const BINANCE_SPOT_GET_OPEN_ORDERS_ENDPOINT = "/api/v3/openOrders";
+export const BINANCE_SPOT_CREATE_ORDER_ENDPOINT = "/api/v3/order";
+export const BINANCE_SPOT_CANCEL_ORDER_ENDPOINT = "/api/v3/order";
+export const BINANCE_SPOT_GET_ORDER_BY_ID_ENDPOINT = "/api/v3/order";
 export const BINANCE_SPOT_GET_ORDERS_ENDPOINT = "/api/v3/allOrders";
 export const BINANCE_SPOT_GET_TRADES_ENDPOINT = "/api/v3/myTrades";
+
 // FUTURES
 export const BINANCE_FUTURES_URL =
   "https://www.binance.com/fapi/v1/exchangeInfo";
 export const BINANCE_FUTURES_BASE_URL = "https://fapi.binance.com";
 export const BINANCE_FUTURES_BALANCE_ENDPOINT = "/fapi/v3/balance";
 export const BINANCE_FUTURES_POSITIONS_ENDPOINT = "/fapi/v2/positionRisk";
-export const BINANCE_CREATE_ORDER_ENDPOINT = "/fapi/v1/order";
-export const BINANCE_FUTURES_GET_TRADES_ENDPOINT = "/fapi/v1/allOrders";
+export const BINANCE_FUTURES_CREATE_ORDER_ENDPOINT = "/fapi/v1/order";
+export const BINANCE_FUTURES_CANCEL_ORDER_ENDPOINT = "/fapi/v1/order";
+export const BINANCE_FUTURES_GET_ORDER_BY_ID_ENDPOINT = "/fapi/v1/order";
+export const BINANCE_FUTURES_GET_ORDERS_ENDPOINT = "/fapi/v1/allOrders";
+export const BINANCE_FUTURES_GET_TRADES_ENDPOINT = "/fapi/v1/userTrades";
+
 // -------------------------KUCOIN------------------------------------
 export const KUCOIN_SPOT_BASE_URL = "https://api.kucoin.com";
 export const KUCOIN_VERIFY_API_KEY_ENDPOINT = "/api/v1/user/api-key";
@@ -27,6 +36,7 @@ export const KUCOIN_SPOT_BALANCE_ENDPOINT = "/api/v1/accounts";
 export const KUCOIN_SPOT_CREATE_ORDER_ENDPOINT = "/api/v1/hf/orders/sync";
 export const KUCOIN_SPOT_CANCEL_ORDER_ENDPOINT = "/api/v1/hf/orders/sync";
 export const KUCOIN_SPOT_GET_ORDER_BY_ID_ENDPOINT = "/api/v1/hf/orders";
+export const KUCOIN_SPOT_GET_OPEN_ORDERS_ENDPOINT = "/api/v1/hf/orders/active";
 export const KUCOIN_SPOT_TRADE_HISTORY_ENDPOINT = "/api/v1/hf/fills";
 export const KUCOIN_SPOT_GET_TOKEN_SOCKET_ENDPOINT = "/api/v1/bullet-private";
 
@@ -37,6 +47,9 @@ export const KUCOIN_FUTURE_BALANCE_ENDPOINT = "/api/v1/account-overview";
 export const KUCOIN_FUTURE_CREATE_ORDER_ENDPOINT = "/api/v1/orders";
 export const KUCOIN_FUTURE_CANCEL_ORDER_ENDPOINT = "/api/v1/orders";
 export const KUCOIN_FUTURE_GET_ORDER_BY_ID_ENDPOINT = "/api/v1/orders";
+export const KUCOIN_FUTURE_GET_ORDERS_ENDPOINT = "/api/v1/orders";
+export const KUCOIN_FUTURE_GET_TRADES_ENDPOINT = "/api/v1/fills";
+export const KUCOIN_FUTURE_GET_STOP_ORDERS_ENDPOINT = "/api/v1/stopOrders";
 export const KUCOIN_FUTURE_GET_POSITIONS_ENDPOINT = "/api/v1/positions";
 export const KUCOIN_FUTURE_GET_SYMBOL_POSITION_ENDPOINT = "/api/v1/position";
 

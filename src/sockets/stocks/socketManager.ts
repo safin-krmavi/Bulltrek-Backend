@@ -61,23 +61,21 @@ export const StockSocketManager = {
   },
 
   getActiveConnections(): {
-    clientId: string;
+    userId: string;
     exchange: string;
     market: string;
   }[] {
     const connections: {
-      clientId: string;
+      userId: string;
       exchange: string;
       market: string;
     }[] = [];
 
-    Object.keys(stockSocketRegistry).forEach((clientId) => {
-      Object.keys(stockSocketRegistry[clientId]).forEach((exchange) => {
-        Object.keys(stockSocketRegistry[clientId][exchange]).forEach(
-          (market) => {
-            connections.push({ clientId, exchange, market });
-          }
-        );
+    Object.keys(stockSocketRegistry).forEach((userId) => {
+      Object.keys(stockSocketRegistry[userId]).forEach((exchange) => {
+        Object.keys(stockSocketRegistry[userId][exchange]).forEach((market) => {
+          connections.push({ userId, exchange, market });
+        });
       });
     });
 

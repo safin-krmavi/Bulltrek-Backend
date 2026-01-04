@@ -1,6 +1,4 @@
-import { CryptoExchange, CryptoTradeType } from "@prisma/client";
 import prisma from "../../config/db.config";
-import { MarketDataManager } from "../../sockets/crypto/marketData/marketDataManager";
 import { strategyRuntimeRegistry } from "./strategyRuntimeRegistry";
 import { subscribeStrategyToMarketData } from "../../sockets/marketDataRouter";
 
@@ -31,4 +29,3 @@ export const resubscribeAllStrategies = async () => {
     console.error("[MARKET] Failed to resubscribe strategies:", err);
   }
 };
-

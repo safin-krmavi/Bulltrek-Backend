@@ -1,6 +1,5 @@
 import Decimal from "decimal.js";
 import { getSymbolPrecision } from "./precisionResolver";
-import { CryptoExchange, CryptoTradeType } from "@prisma/client";
 
 export async function formatQuantity(params: {
   exchange: string;

@@ -1,5 +1,5 @@
 type CoinDCXFuturesKey = string;
-type CoinDCXFuturesMessage = { message: any; clientId: string };
+type CoinDCXFuturesMessage = { message: any; userId: string };
 
 const coindcxFuturesQueues: Map<CoinDCXFuturesKey, CoinDCXFuturesMessage[]> =
   new Map();
@@ -13,15 +13,15 @@ function logFullQueueState() {
       queueKey: key,
       queueData: queue.map((q, i) => ({
         index: i,
-        clientId: q.clientId,
+        userId: q.userId,
         id: q.message?.id || q.message?.order_id,
         pair: q.message?.pair,
       })),
     });
   }
 }
-function getCoinDCXFuturesKey(message: any, clientId: string): string {
-  return `${clientId}-COINDCX-${message.id || message.order_id}-${
+function getCoinDCXFuturesKey(message: any, userId: string): string {
+  return `${userId}-COINDCX-${message.id || message.order_id}-${
     message.pair || ""
   }`;
 }
@@ -36,10 +36,10 @@ async function processCoinDCXFuturesQueue(
   coindcxFuturesProcessing.add(key);
 
   while (queue.length > 0) {
-    const { message, clientId } = queue.shift()!;
+    const { message, userId } = queue.shift()!;
     logFullQueueState();
     try {
-      await handler(message, clientId);
+      await handler(message, userId);
     } catch (err) {
       console.log("ERROR_PROCESSING_COINDCX_FUTURES_TRADE", {
         queueKey: key,
@@ -61,16 +61,16 @@ async function processCoinDCXFuturesQueue(
 
 export function enqueueCoinDCXFuturesUpdate(
   message: any,
-  clientId: string,
+  userId: string,
   handler: (msg: any, uid: string) => Promise<void>
 ) {
-  const key = getCoinDCXFuturesKey(message, clientId);
+  const key = getCoinDCXFuturesKey(message, userId);
 
   if (!coindcxFuturesQueues.has(key)) {
     coindcxFuturesQueues.set(key, []);
   }
 
-  coindcxFuturesQueues.get(key)!.push({ message, clientId });
+  coindcxFuturesQueues.get(key)!.push({ message, userId });
 
   if (!coindcxFuturesProcessing.has(key)) {
     processCoinDCXFuturesQueue(key, handler);

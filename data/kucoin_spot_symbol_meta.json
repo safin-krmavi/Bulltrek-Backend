@@ -1,0 +1,4812 @@
+{
+  "AVA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MTV-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "KMD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TEL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AERGO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XMR-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "ATOM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ETN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WAN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "VSYS-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CHR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "COTI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BNB-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ALGO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XEM-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XTZ-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ZEC-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ADA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ARPA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CHZ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WIN-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BTT-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ONE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LUNA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SXP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DAG-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "KPOL-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NWC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BEPRO-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VRA-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KSM-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "DASH-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SENSO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XDB-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SYLO-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DGB-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "STX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "COMP-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CRO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WAVES-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MLK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "JST-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SUKU-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DIA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LINK-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DOT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "EWT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CKB-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "UMA-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ALEPH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VELO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SUN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "YFI-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.000001",
+    "minFunds": "0.1"
+  },
+  "UNI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "UOS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NIM-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DEGO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FIL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AAVE-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "KCS-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LTC-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "BCHSV-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "QTUM-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XLM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ETC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.000001",
+    "minFunds": "0.1"
+  },
+  "ETH-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0000001",
+    "minFunds": "0.1"
+  },
+  "SNX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BTC-USDT": {
+    "priceTick": "0.1",
+    "quantityStep": "0.00000001",
+    "minFunds": "0.1"
+  },
+  "XRP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TRX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ONT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "VET-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NEO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.000001",
+    "minFunds": "0.1"
+  },
+  "BCH-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SHR-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ROSE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "USDC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PLU-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "GRT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "1INCH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "API3-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HTR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HYDRA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CRV-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SUSHI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ZEN-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LRC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KLV-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "THETA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "QNT-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BAT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DOGE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DAO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CAKE-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ORAI-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MASK-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PHA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GAS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AVAX-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "KRL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ENJ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MANA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SKEY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TARA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "IOST-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DYP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ORBS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ANKR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SAND-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "VAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FLUX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ZIL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DODO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MAN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BAX-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BOSON-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PUNDIX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WAX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HAI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "FORTH-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GHX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TOWER-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CWS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XDC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SHIB-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ICP-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CELO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ELA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OGN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TLOS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GLQ-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PYR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PROM-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XCAD-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ELON-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "POLS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ZCX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GMEE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SFUND-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XAVA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NFT-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AIOZ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LPT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SOUL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NEAR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DFYN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CFG-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AXS-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ROUTE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ERG-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SOL-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "SLP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XCH-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MTL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "IOTX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GALAX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "REQ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "QI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XPR-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MOVR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WOO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WILD-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "OXT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BAL-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "STORJ-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "YGG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SKL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NMR-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TRB-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DYDX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XYO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GTC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "RLC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XPRT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "EGLD-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HBAR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FLOW-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NKN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PBX-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DMTR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CTSI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ALICE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "OPUL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ILV-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BAND-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FTT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "P2P-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TLM-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DEXE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "RUNE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "C98-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "BLOK-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PUSH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FLAME-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "AGLD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NAKA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "REEF-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "INJ-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ALPHA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "AR-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "JASMY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PERP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SUPER-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CPOOL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MTRG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DREAMS-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "QUICK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TRU-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DATA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ISP-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CERE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PAXG-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AUDIO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ENS-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XTM-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FXS-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ATA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DPR-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TWT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ADX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "GLM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NUM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TRADE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MONI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LIKE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KAVA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SFP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "RSR-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "IMX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GODS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XTAG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HARD-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "POND-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "VR-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "EPIK-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CREDI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TRVL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XEC-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HEART-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GAFI-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PEOPLE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TIME-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CWEB-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "IOTA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HNT-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "REVU-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GLMR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CTC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GARI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ASTR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CVX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AMP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XNO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MARS4-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TFUEL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "METIS-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "APE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GMT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BICO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "STG-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BNC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CFX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XCN-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "UPO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ALPINE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "T-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NYM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VOXEL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PSTAKE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SPA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MV-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RACA-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SWFTC-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CELR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AURORA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "KNC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OVR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SYS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BRISE-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GST-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BSW-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FITFI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AKT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SIN-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BOBA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BFC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BIFI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MBL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DUSK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "USDD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ACH-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SCRT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CCD-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LUNC-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "USTC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "EVER-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ICX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WELL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FORT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "USDP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CSPR-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WEMIX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LDO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FIDA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DC-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RVN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SWEAT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PIX-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MPLX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ETHW-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ACQ-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GMX-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "POKT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "APT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "EUL-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TON-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HFT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AZERO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NAVI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OAS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BDX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FLR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OSMO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MAGIC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "RPL-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "HIGH-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TRAC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BLUR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "WAXL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FLOKI-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SSV-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "ACS-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CSIX-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "FET-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SIDUS-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "AIPAD-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "RDNT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SYN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "GNS-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BLZ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NXRA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MINA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "XRD-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LQTY-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ID-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ARB-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HMND-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "HIFI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MYRIA-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CGPT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "STRAX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AGI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OTK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BABYDOGE-USDT": {
+    "priceTick": "0.000000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PZP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LOCUS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ZPAY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "IZI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SUI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KAS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PEPE-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CETUS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TURBOS-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LMWR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BOBMEME-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LADYS-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "OBI-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "EDU-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ORDI-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "VOLT-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MAV-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XEN-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PENDLE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "EGO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PEPE2-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DCK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LYX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WLD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SEI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PYUSD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ISLM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BIGTIME-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NTRN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ARKM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "OFN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TIA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "CYBER-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MEME-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TOKEN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "SHRAP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "POL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SATS-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PYTH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "RATS-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ROOT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WBTC-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ELF-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DCR-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ZRX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "FLIP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "UQC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LSK-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DENT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "QKC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BONK-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MNT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "INSP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AUCTION-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "JTO-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SEAM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "VANRY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MNDE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "COQ-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "POLYX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SCPT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TAO-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ARTY-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MUBI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MYRO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "MOBILE-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RAY-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ALEX-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NFP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ORCA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "KACE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "APP-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NEON-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MANTA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ONDO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "WIF-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SAROS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GTAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KALT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DMAIL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WEN-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZETA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "DEFI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "JUP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "BMX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MAVIA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "DYM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NETVR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NAVX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "PIXEL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "STRK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BCUT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TADA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PORTAL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "QORPO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "TUSD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "SCA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "NIBI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "AEVO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "HTX-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AITECH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BOME-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ETHFI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MPC-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZKJ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BEFI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GMRX-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VENOM-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ENA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "USDE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "W-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "MEW-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZEUS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AERO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TRUF-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "G3-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TNSR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ESE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MASA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SQR-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "FOXY-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PRCL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MAPO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MERL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "DEGEN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KARRAT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VINU-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SAFE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "RIO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "REZ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KMNO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZBCN-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MANEKI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZERO-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WSDM-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BB-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CTA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DRIFT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "FURY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NLK-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NOT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SQD-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MONPRO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "WLTH-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TAIKO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "LKI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BRETT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "IO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "UNA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ATH-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "COOKIE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ARTFI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "OORT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ZRO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "LISTA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "NRN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BLAST-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TST-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZEX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "NATIX-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MOG-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XR-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MOCA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "UXLINK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ANYONE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BANANA-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "AVAIL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LRDS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SYNT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LSD-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "L3-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CXT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "G-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "RENDER-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CAT-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "POPCAT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DOGS-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ORDER-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SUNDOG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "ROOBEE-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CATI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NOTAI-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TURBO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NEIRO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NEIROCTO-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SKY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LOGX-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "EGP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "HMSTR-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MOODENG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "EIGEN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BABYBNB-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CHO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PONKE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CARV-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "HIPPO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PUFFER-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "WMTX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DEEP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RMV-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DBR-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "X-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SCR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "GOAT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "GRASS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PHIL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KAIA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ARCA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ACTSOL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "COW-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SWELL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CVC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PEAQ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PNUT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "NS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HSK-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MICHI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NPC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BAN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MORPHO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ASI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MEMEFI-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RWA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MIGGLES-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SLERF-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KIMA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HAPPY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WOD-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "READY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SYRUP-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SUPRA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LUMIA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MAJOR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CHILLGUY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MGT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VIRTUAL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TOSHI-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XION-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "E4C-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SPX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "STNK-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "AVAAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "GIGA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "F-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DOGEGOV-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "HYPE-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MOVE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "KIP-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZEREBRO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "U2U-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ME-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BLUE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CHEQ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HOLD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "LINGO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PEN-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KOMA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "USUAL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ISLAND-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MNRY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "STREAM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PENGU-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "FUEL-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ITHACA-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "HPOS10I-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "FARTCOIN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "EYWA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "FOMO-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PURR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "GRIFFAIN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AIXBT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TEVA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "FB-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MILADYCULT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "REKT-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BIO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LAVA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ARCSOL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SWARMS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SERAPH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VANA-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SONIC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "GAMEAI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XTER-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ACX-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CLOUD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PAAL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LOFI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XYRO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TREAT-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LLM-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DUCK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NC-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GPS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SOLV-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "OBT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TRUMP-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "J-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CHIRP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MELANIA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PLUME-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ALU-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ANIME-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ANLOG-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SLC-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VTHO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "S-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "EMYC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VINE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "D-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VVV-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "JELLYJELLY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BERA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BUZZ-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CHEEMS-USDT": {
+    "priceTick": "0.0000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "TSTBSC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "IP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LAYER-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "DIN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XOXO-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RIZ-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RONIN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "KAITO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "B3-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SFI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NVG8-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SHELL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FWOG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ROAM-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "HEI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "REACT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "REDSTONE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "HONEY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LVVA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PAWS-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MUBARAK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BMT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TUT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "EPIC-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SIREN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BUBB-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NIL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PARTI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "WAL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SEED-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KILO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "GUN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ZND-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "STO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KERNEL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "RFC-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BABY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PROMPT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "WCT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DARK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "EPT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "HYPER-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "DOLO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ZORA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "INIT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CLANKER-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TROLL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HAEDAL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SIGN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MILK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "B2-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "GORK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SXT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HOUSE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SHM-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DOOD-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "USELESS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "NXPC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PRAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TGT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GIZA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AWE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AGT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "USD1-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SOON-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HUMA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PFVS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ELDE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SOPH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "A-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "RDO-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LAT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "EDGEN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PRO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "LA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FLOCK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SKATE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HOME-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RESOLV-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BOMB-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GOMINING-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SPK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MAT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "NAM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MOOLAH-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "H-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MGO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "DMC-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NEWT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SAHARA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XAUT-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.0001",
+    "minFunds": "0.1"
+  },
+  "LOT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CESS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VAIX-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MORE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NODE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ECHO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ICNT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CROSS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AIN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BULLA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BOOM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BLUM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "RCADE-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MORI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "VELVET-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "C-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PUMP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VSN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "HAIO-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ES-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "RION-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TRN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ERA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ANI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MANYU-USDT": {
+    "priceTick": "0.00000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZKWASM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "THINK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ASP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XNY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XU3O8-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ELP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "A47-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "URANUS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TREE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "IKA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GAIA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "UNITE-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NOBODY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "A2Z-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "CYC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AIO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SUP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TOWNS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PROVE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "IN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "K-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DSYNC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SLAY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SNEK-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PROPS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ODOS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PUBLIC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "OPAD-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "EGL1-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ALKIMI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SAPIEN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AKE-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ARIA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BAS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "YZY-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XPIN-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BERT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FST-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BTR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AI3-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CAMP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MISSION-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KORI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XLAB-USDT": {
+    "priceTick": "0.000000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "WLFI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "Q-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SOMI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PTB-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "U-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RARI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ART-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "OPEN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "AVNT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SWTCH-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LINEA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KONG-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "POP-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PINGPONG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HOLO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "UB-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZKC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "COLS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "XL1-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VLR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PORTALS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MAIGA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "RUNWAGO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BARD-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "NUMI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SYND-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "0G-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XAN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "GAIN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ASTER-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PIN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XPL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "STBL-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BSU-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "HANA-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MIRA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "LIGHT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "VFY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FF-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "INC-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "EDEN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TRUTH-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "LGCT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "2Z-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "P-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CYPR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MF-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LYN-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "KGEN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KLINK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PIPE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "GIGGLE-USDT": {
+    "priceTick": "0.01",
+    "quantityStep": "0.001",
+    "minFunds": "0.1"
+  },
+  "CLO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "LAB-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FLK-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "ANOME-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ENSO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "NOM-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "WBAI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "RECALL-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "YB-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "XMN-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ZBT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "RVV-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BLUAI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BELIEVE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TURTLE-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "MET-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "LMTS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PING-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "COMMON-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "XNL-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "IAG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "EAT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BOS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "KBEAT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "KITE-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TEA-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "PLAI-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MMT-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TRUST-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "UAI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FOLKS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "CC-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "EQTY-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ELIZAOS-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "APR-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "JCT-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ALLO-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BMB-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "FASTER-USDT": {
+    "priceTick": "0.0000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PLANCK-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PLAYSOLANA-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "PUNDIAI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "SUT-USDT": {
+    "priceTick": "0.001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "BOB-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "PLAY-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "DIGI-USDT": {
+    "priceTick": "0.00000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "MON-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BIT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "IRYS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "USDG-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "TEN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "BEST-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "SEEK-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "STABLE-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "NIGHT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "WET-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ADI-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "KYO-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "BBT-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "US-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "CYS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "UDS-USDT": {
+    "priceTick": "0.0001",
+    "quantityStep": "0.01",
+    "minFunds": "0.1"
+  },
+  "THQ-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "IR-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "SCOR-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "VOOI-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "ZKP-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "MIN-USDT": {
+    "priceTick": "0.000001",
+    "quantityStep": "1",
+    "minFunds": "0.1"
+  },
+  "ZIG-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "HLS-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  },
+  "TTD-USDT": {
+    "priceTick": "0.00001",
+    "quantityStep": "0.1",
+    "minFunds": "0.1"
+  }
+}

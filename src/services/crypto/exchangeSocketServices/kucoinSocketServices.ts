@@ -1,6 +1,6 @@
 // import {
 //   calculateROE,
-//   getKucoinFuturesSymbolPosition,
+//   fetchKucoinFuturesPositionBySymbol,
 // } from "../../services/kucoinService";
 import {
   CryptoExchange,
@@ -145,16 +145,7 @@ export async function updateTradeStatus(userId: string, order: any) {
   }
 }
 
-export async function handleFilledFuturesOrder(
-  order: any,
-  userId: string,
-  credentials: {
-    apiKey: string;
-    apiSecret: string;
-    apiPassphrase: string;
-    apiKeyVersion: string;
-  }
-) {
+export async function handleFilledFuturesOrder(order: any, userId: string) {
   try {
     if (!order.orderId) return;
 
@@ -216,8 +207,11 @@ export async function handleFilledFuturesOrder(
 
     let shouldApplyPnL = false;
     const executedStatuses = ["EXECUTED", "PARTIALLY_FILLED"] as const;
+    const isExecutable =
+      tradeStatus === TradeStatus.EXECUTED ||
+      tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade) {
+    if (!existingTrade && isExecutable) {
       existingTrade = await prisma.cryptoTrades.create({
         data: {
           userId,

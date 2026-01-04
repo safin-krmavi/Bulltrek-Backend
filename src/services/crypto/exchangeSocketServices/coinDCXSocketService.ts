@@ -276,8 +276,11 @@ export async function handleFilledCoinDCXFuturesOrder(
 
     const executedStatuses = ["EXECUTED", "PARTIALLY_FILLED"] as const;
     let shouldApplyPnL = false;
+    const isExecutable =
+      tradeStatus === TradeStatus.EXECUTED ||
+      tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade) {
+    if (!existingTrade && isExecutable) {
       existingTrade = await prisma.cryptoTrades.create({
         data: {
           userId,
@@ -382,8 +385,6 @@ export async function handleCoinDCXFuturesWebsocketMessage(
       console.log("ORDER_STATUS_MISSING_COINDCX", { error: order });
       return;
     }
-
-    const status = order.status?.toLowerCase();
 
     try {
       console.log("PROCESSING_COINDCX_FUTURES_WEBSOCKET_MESSAGE");
