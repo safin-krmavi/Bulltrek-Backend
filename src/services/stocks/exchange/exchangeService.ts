@@ -204,7 +204,6 @@ export async function placeStockOrder(
       );
 
     case StocksExchange.KOTAK:
-
       return createKotakNeoOrder({
         baseUrl: credentials.feedToken,
         tradingToken: credentials.accessToken,
@@ -212,8 +211,15 @@ export async function placeStockOrder(
         symbol: payload.symbol,
         quantity: payload.quantity,
         side: payload.side === TradeSide.BUY ? "B" : "S",
-        orderType: payload.orderType === "MARKET" ? "MKT" : "LMT",
-        price:payload.price
+        orderType:
+          payload.orderType === "MARKET"
+            ? "MKT"
+            : payload.orderType === "LIMIT"
+            ? "LMT"
+            : payload.orderType === "SL"
+            ? "SL"
+            : "SL-M",
+        price: payload.price,
       });
 
     default:

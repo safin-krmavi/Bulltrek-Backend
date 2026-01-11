@@ -1,3 +1,5 @@
+import { KotakOrderType } from "../../../constants/stocks/exchange/kotak";
+
 export function handleKotakError(error: any): never {
   if (error.response) {
     throw {

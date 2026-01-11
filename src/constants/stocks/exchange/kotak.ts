@@ -23,3 +23,10 @@ export function mapKotakOrderStatus(ordSt: string): TradeStatus {
       return TradeStatus.OPEN;
   }
 }
+
+export enum KotakOrderType {
+  MARKET = "MKT",
+  LIMIT = "L",
+  STOP_LIMIT = "SL",
+  STOP_MARKET = "SL-M",
+}

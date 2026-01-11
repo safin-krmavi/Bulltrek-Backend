@@ -15,6 +15,7 @@ import { handleKotakError } from "../../../utils/stocks/exchange/kotakUtils";
 import { kotakHttpsAgent } from "../../../utils/stocks/exchange/kotakHttp";
 import prisma from "../../../config/db.config";
 import { STOCKS_FILE_PATH } from "../../../constants/stocks";
+import { KotakOrderType } from "../../../constants/stocks/exchange/kotak";
 
 /**
  * Fetch all Kotak symbols (NSE CM)
@@ -327,14 +328,26 @@ export async function createKotakNeoOrder(params: {
   symbol: string; // e.g. ITBEES-EQ
   quantity: number;
   side?: "B" | "S";
-  orderType?: string;
+  orderType?: string; // "MKT" | "L" | "SL" | "SL-M"
   price?: number; // required for LIMIT
+
+  triggerPrice?: number;
 }) {
   try {
-    const isMarket = (params.orderType ?? "MARKET") === "MKT";
+    const orderType = params.orderType ?? "MKT";
+    const isMarket = orderType === "MKT";
 
-    if (!isMarket && !params.price) {
+    // validation (simple & correct)
+    if (orderType === "L" && !params.price) {
       throw new Error("Price is required for LIMIT orders");
+    }
+
+    if ((orderType === "SL" || orderType === "SL-M") && !params.triggerPrice) {
+      throw new Error("Trigger price is required for STOP orders");
+    }
+
+    if (orderType === "SL" && !params.price) {
+      throw new Error("Price is required for SL order");
     }
 
     const jData: Record<string, string> = {
@@ -350,13 +363,25 @@ export async function createKotakNeoOrder(params: {
       ts: params.symbol,
     };
 
-    if (isMarket) {
+    if (orderType === "MKT") {
       jData.pt = "MKT";
       jData.pr = "0";
+      jData.tp = "0";
       jData.mp = "0";
-    } else {
+    } else if (orderType === "L") {
       jData.pt = "L";
       jData.pr = params.price!.toString();
+      jData.tp = "0";
+      jData.mp = "0";
+    } else if (orderType === "SL-M") {
+      jData.pt = "SL-M";
+      jData.pr = "0";
+      jData.tp = params.triggerPrice!.toString();
+      jData.mp = "0";
+    } else if (orderType === "SL") {
+      jData.pt = "SL";
+      jData.pr = params.price!.toString();
+      jData.tp = params.triggerPrice!.toString();
       jData.mp = "0";
     }
 
