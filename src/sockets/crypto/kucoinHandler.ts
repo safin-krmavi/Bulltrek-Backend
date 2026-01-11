@@ -622,33 +622,35 @@ export const KuCoinHandler = {
       // ||
       // tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-      if (!existingTrade && isExecutable) {
-        const newTrade = await prisma.cryptoTrades.create({
-          data: {
+      if (!existingTrade) {
+        if (isExecutable) {
+          const newTrade = await prisma.cryptoTrades.create({
+            data: {
+              userId,
+              exchange: CryptoExchange.KUCOIN,
+              type: CryptoTradeType.SPOT,
+              symbol: data.symbol,
+              side: data.side.toUpperCase(),
+              orderType,
+              orderId: localOrder.id,
+              quantity: parseFloat(data.filledSize || "0"),
+              price: parseFloat(data.price || "0"),
+              fee: parseFloat(data.fee || "0"),
+              status: tradeStatus,
+            },
+          });
+
+          await applySpotTradeExecution({
             userId,
             exchange: CryptoExchange.KUCOIN,
-            type: CryptoTradeType.SPOT,
-            symbol: data.symbol,
+            asset: data.symbol,
             side: data.side.toUpperCase(),
-            orderType,
-            orderId: localOrder.id,
             quantity: parseFloat(data.filledSize || "0"),
             price: parseFloat(data.price || "0"),
             fee: parseFloat(data.fee || "0"),
-            status: tradeStatus,
-          },
-        });
-
-        await applySpotTradeExecution({
-          userId,
-          exchange: CryptoExchange.KUCOIN,
-          asset: data.symbol,
-          side: data.side.toUpperCase(),
-          quantity: parseFloat(data.filledSize || "0"),
-          price: parseFloat(data.price || "0"),
-          fee: parseFloat(data.fee || "0"),
-          tradeId: newTrade.id,
-        });
+            tradeId: newTrade.id,
+          });
+        }
       } else if (existingTrade) {
         if (
           tradeStatusPriority[tradeStatus] >

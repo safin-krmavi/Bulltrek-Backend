@@ -42,6 +42,7 @@ export const createStrategyController = async (req: any, res: Response) => {
     hourInterval, // number
     daysOfWeek, // number[]
     datesOfMonth, // number[]
+    executionMode
   } = req.body;
 
   if (
@@ -52,7 +53,8 @@ export const createStrategyController = async (req: any, res: Response) => {
     !symbol ||
     !investmentPerRun ||
     !investmentCap ||
-    !frequency
+    !frequency ||
+    !executionMode
   ) {
     return sendBadRequest(res, "Missing required fields");
   }
@@ -78,15 +80,28 @@ export const createStrategyController = async (req: any, res: Response) => {
       hourInterval,
       daysOfWeek,
       datesOfMonth,
+      executionMode
     });
-    await subscribeStrategyToMarketData({
-      assetType,
-      exchange,
-      segment,
-      symbol,
-      strategyId: strategy.id,
-      userId,
-    });
+
+    if (strategy.executionMode === "LIVE") {
+      await subscribeStrategyToMarketData({
+        assetType,
+        exchange,
+        segment,
+        symbol,
+        strategyId: strategy.id,
+        userId,
+      });
+    }
+
+    if (strategy.executionMode === "BACKTEST") {
+      // enqueue backtest job
+    }
+
+    if (strategy.executionMode === "PUBLISHED") {
+      // no runtime, no sockets
+    }
+
     return sendSuccess(res, "Strategy created", strategy);
   } catch (error: any) {
     console.error("[STRATEGY_CREATE]", error);

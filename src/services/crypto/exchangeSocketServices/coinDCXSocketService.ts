@@ -280,32 +280,34 @@ export async function handleFilledCoinDCXFuturesOrder(
       tradeStatus === TradeStatus.EXECUTED ||
       tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade && isExecutable) {
-      existingTrade = await prisma.cryptoTrades.create({
-        data: {
-          userId,
-          exchange: CryptoExchange.COINDCX,
-          type: CryptoTradeType.FUTURES,
-          symbol: order.pair,
-          side: order.side.toUpperCase(),
-          orderType: resolveOrderTypeKey(order.order_type),
-          orderId: localOrder.id,
-          quantity: requestedQty,
-          price: tradePrice,
-          fee,
+    if (!existingTrade) {
+      if (isExecutable) {
+        existingTrade = await prisma.cryptoTrades.create({
+          data: {
+            userId,
+            exchange: CryptoExchange.COINDCX,
+            type: CryptoTradeType.FUTURES,
+            symbol: order.pair,
+            side: order.side.toUpperCase(),
+            orderType: resolveOrderTypeKey(order.order_type),
+            orderId: localOrder.id,
+            quantity: requestedQty,
+            price: tradePrice,
+            fee,
+            status: tradeStatus,
+            leverage,
+          },
+        });
+
+        shouldApplyPnL = executedStatuses.includes(
+          tradeStatus as (typeof executedStatuses)[number]
+        );
+
+        console.log("[COINDCX_FUTURES] Trade created", {
+          tradeId: existingTrade.id,
           status: tradeStatus,
-          leverage,
-        },
-      });
-
-      shouldApplyPnL = executedStatuses.includes(
-        tradeStatus as (typeof executedStatuses)[number]
-      );
-
-      console.log("[COINDCX_FUTURES] Trade created", {
-        tradeId: existingTrade.id,
-        status: tradeStatus,
-      });
+        });
+      }
     } else if (
       tradeStatusPriority[tradeStatus] >
       tradeStatusPriority[existingTrade.status]
@@ -364,11 +366,7 @@ export async function handleFilledCoinDCXFuturesOrder(
 
 export async function handleCoinDCXFuturesWebsocketMessage(
   response: any,
-  userId: string,
-  credentials: {
-    apiKey: string;
-    apiSecret: string;
-  }
+  userId: string
 ) {
   let orders: any[];
   try {

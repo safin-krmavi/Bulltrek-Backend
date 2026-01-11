@@ -350,21 +350,33 @@ export const getCoinDCXFuturesBalances = async (credentials: any) => {
     handleCoinDCXError(error);
   }
 };
+const STOP_ORDER_TYPES = [
+  CoinDCXFuturesOrderType.STOP_MARKET,
+  CoinDCXFuturesOrderType.STOP_LIMIT,
+  CoinDCXFuturesOrderType.TAKE_PROFIT_MARKET,
+  CoinDCXFuturesOrderType.TAKE_PROFIT_LIMIT,
+];
+
+const LIMIT_STOP_TYPES = [
+  CoinDCXFuturesOrderType.STOP_LIMIT,
+  CoinDCXFuturesOrderType.TAKE_PROFIT_LIMIT,
+];
+
 export const createCoinDCXFutureTrade = async (
   credentials: any,
   payload: CoinDCXFuturesOrderParams
 ) => {
   const timestamp = Math.floor(Date.now() / 1000); // Epoch timestamp in seconds
+
+  const isMarket = payload.orderType === CoinDCXFuturesOrderType.MARKET;
+
+  const isLimit = payload.orderType === CoinDCXFuturesOrderType.LIMIT;
+
+  const isStopOrder = STOP_ORDER_TYPES.includes(payload.orderType);
+
   const positionMarginType =
     payload.positionMarginType?.toLowerCase() ?? "isolated";
   const qty = Number(payload.quantity);
-
-  // For market orders, don't include 'time_in_force', 'price', and 'stopPrice'
-  if (payload.orderType === CoinDCXFuturesOrderType.MARKET) {
-    payload.timeInForce = undefined; // Set to undefined as market orders shouldn't have this
-    payload.price = undefined; // Market orders don't require price
-    payload.stopPrice = undefined; // Market orders don't require stop price
-  }
 
   const body: any = {
     timestamp,
@@ -373,108 +385,51 @@ export const createCoinDCXFutureTrade = async (
       pair: payload.symbol,
       order_type: payload.orderType,
       total_quantity: qty,
-      position_margin_type: positionMarginType,
-      notification: payload.notification,
-      price:
-        payload.orderType === CoinDCXFuturesOrderType.MARKET
-          ? null
-          : payload.price, // Only include for non-market orders
-      stop_price:
-        payload.orderType === CoinDCXFuturesOrderType.MARKET
-          ? null
-          : payload.stopPrice, // Only include for non-market orders
+      notification: payload.notification ?? "no_notification",
       time_in_force: "good_till_cancel", // Only include for non-market orders
       margin_currency_short_name: payload.marginCurrency ?? "USDT",
+      position_margin_type: positionMarginType,
     },
   };
 
-  // Validate price and stopPrice for relevant order types
-  if (payload.orderType !== CoinDCXFuturesOrderType.MARKET) {
-    // Price validation for limit, stop limit, take profit limit
-    if (payload.price === undefined) {
-      throw {
-        code: "BAD_REQUEST",
-        message: `Price is required for ${payload.orderType} orders.`,
-      };
-    }
-    body.price = payload.price;
+  if (payload.leverage !== undefined) {
+    body.order.leverage = payload.leverage;
+  }
 
-    // Stop price validation for stop limit and take profit limit orders
-    if (
-      (payload.orderType === CoinDCXFuturesOrderType.STOP_MARKET ||
-        payload.orderType === CoinDCXFuturesOrderType.STOP_LIMIT ||
-        payload.orderType === CoinDCXFuturesOrderType.TAKE_PROFIT_MARKET ||
-        payload.orderType === CoinDCXFuturesOrderType.TAKE_PROFIT_LIMIT) &&
-      payload.stopPrice === undefined
-    ) {
-      throw {
-        code: "BAD_REQUEST",
-        message: `Stop price is required for ${payload.orderType} orders.`,
-      };
+  if (isMarket || isLimit) {
+    if (isLimit) {
+      if (payload.price === undefined) {
+        throw new Error("price is required for limit_order");
+      }
+
+      body.order.price = payload.price;
+      body.order.time_in_force = payload.timeInForce ?? "good_till_cancel";
     }
 
-    // Add stop price to the body if it's present
-    if (payload.stopPrice) {
-      body.stop_price = payload.stopPrice;
+    // Attached TP / SL (position level)
+    if (payload.takeProfitPrice !== undefined) {
+      body.order.take_profit_price = payload.takeProfitPrice;
     }
 
-    // Additional validation for stop limit and take profit limit
-    if (
-      payload.orderType === CoinDCXFuturesOrderType.STOP_LIMIT ||
-      payload.orderType === CoinDCXFuturesOrderType.TAKE_PROFIT_LIMIT
-    ) {
-      if (
-        payload.side === TradeSide.BUY &&
-        payload.stopPrice !== undefined &&
-        payload.price <= payload.stopPrice
-      ) {
-        throw {
-          code: "BAD_REQUEST",
-          message:
-            "For Buy Stop Limit/Take Profit Limit, price must be greater than stop price.",
-        };
-      }
-      if (
-        payload.side === TradeSide.SELL &&
-        payload.stopPrice !== undefined &&
-        payload.price >= payload.stopPrice
-      ) {
-        throw {
-          code: "BAD_REQUEST",
-          message:
-            "For Sell Stop Limit/Take Profit Limit, price must be less than stop price.",
-        };
-      }
-    }
-
-    // Stop price specific validation
-    if (payload.stopPrice !== undefined) {
-      // Check if stopPrice is defined
-      if (
-        payload.side === TradeSide.BUY &&
-        payload.stopPrice <= payload.price
-      ) {
-        throw {
-          code: "BAD_REQUEST",
-          message:
-            "For Buy Stop Limit/Take Profit Limit, Stop price must be greater than the price.",
-        };
-      }
-      if (
-        payload.side === TradeSide.SELL &&
-        payload.stopPrice >= payload.price
-      ) {
-        throw {
-          code: "BAD_REQUEST",
-          message:
-            "For Sell Stop Limit/Take Profit Limit, Stop price must be less than the price.",
-        };
-      }
+    if (payload.stopLossPrice !== undefined) {
+      body.order.stop_loss_price = payload.stopLossPrice;
     }
   }
-  // Add leverage if provided
-  if (payload.leverage) {
-    body.order.leverage = payload.leverage;
+  if (isStopOrder) {
+    if (payload.stopPrice === undefined) {
+      throw new Error("stopPrice is required for stop/take-profit orders");
+    }
+
+    body.order.stop_price = payload.stopPrice;
+
+    if (LIMIT_STOP_TYPES.includes(payload.orderType)) {
+      if (payload.price === undefined) {
+        throw new Error("price is required for stop_limit/take_profit_limit");
+      }
+
+      body.order.price = payload.price;
+      body.order.time_in_force = payload.timeInForce ?? "good_till_cancel";
+    }
   }
 
   // Generate signature
@@ -871,7 +826,9 @@ export async function fetchCoinDCXMarketPrice(params: {
       );
 
       if (!ticker) {
-        throw new Error(`CoinDCX Spot API returned no data for symbol ${symbol}`);
+        throw new Error(
+          `CoinDCX Spot API returned no data for symbol ${symbol}`
+        );
       }
 
       return parseFloat(ticker.last_price); // Last traded price
@@ -883,7 +840,9 @@ export async function fetchCoinDCXMarketPrice(params: {
       const priceData = response.data.prices?.[symbol.toUpperCase()];
 
       if (!priceData) {
-        throw new Error(`CoinDCX Futures API returned no data for symbol ${symbol}`);
+        throw new Error(
+          `CoinDCX Futures API returned no data for symbol ${symbol}`
+        );
       }
 
       return parseFloat(priceData.mp); // Mark price

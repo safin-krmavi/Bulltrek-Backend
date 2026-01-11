@@ -305,6 +305,7 @@ model Strategy {
   config       Json     // ALL strategy logic lives here
 
   status       String   @default("ACTIVE") // ACTIVE | PAUSED | STOPPED
+  executionMode StrategyExecutionMode @default(LIVE)
 
   nextRunAt      DateTime?   // NEW
   lastExecutedAt DateTime?  // NEW
@@ -365,6 +366,12 @@ model Notification {
 
   @@index([userId, isRead])
   @@index([type])
+}
+
+enum StrategyExecutionMode {
+  LIVE
+  BACKTEST
+  PUBLISHED
 }
 
 enum NotificationType {

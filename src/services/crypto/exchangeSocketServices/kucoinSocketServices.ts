@@ -211,27 +211,29 @@ export async function handleFilledFuturesOrder(order: any, userId: string) {
       tradeStatus === TradeStatus.EXECUTED ||
       tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade && isExecutable) {
-      existingTrade = await prisma.cryptoTrades.create({
-        data: {
-          userId,
-          exchange: CryptoExchange.KUCOIN,
-          type: CryptoTradeType.FUTURES,
-          symbol: order.symbol,
-          side: order.side,
-          orderType: order.orderType,
-          orderId: localOrder.id,
-          quantity: parseFloat(order.size || "0"),
-          price: tradePrice,
-          fee,
-          status: tradeStatus,
-          leverage,
-        },
-      });
+    if (!existingTrade) {
+      if (isExecutable) {
+        existingTrade = await prisma.cryptoTrades.create({
+          data: {
+            userId,
+            exchange: CryptoExchange.KUCOIN,
+            type: CryptoTradeType.FUTURES,
+            symbol: order.symbol,
+            side: order.side,
+            orderType: order.orderType,
+            orderId: localOrder.id,
+            quantity: parseFloat(order.size || "0"),
+            price: tradePrice,
+            fee,
+            status: tradeStatus,
+            leverage,
+          },
+        });
 
-      shouldApplyPnL = executedStatuses.includes(
-        tradeStatus as (typeof executedStatuses)[number]
-      );
+        shouldApplyPnL = executedStatuses.includes(
+          tradeStatus as (typeof executedStatuses)[number]
+        );
+      }
     } else if (
       tradeStatusPriority[tradeStatus] >
       tradeStatusPriority[existingTrade.status]

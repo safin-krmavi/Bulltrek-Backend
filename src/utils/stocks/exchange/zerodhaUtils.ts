@@ -7,7 +7,7 @@ export const handleZerodhaError = (error: any) => {
     error.response?.data?.message ||
     error.message ||
     "Unknown exchange error";
-  console.log(error);
+  // console.log(error);
 
   if (error.response?.status === 401 || error.response?.status === 403) {
     throw {

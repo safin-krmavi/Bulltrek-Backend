@@ -424,16 +424,28 @@ export async function createKucoinFuturesOrder(
     type: payload.orderType.toLowerCase(), // "limit" or "market"
     side: payload.side.toLowerCase(), // "buy" or "sell"
     leverage: payload.leverage,
-    marginMode: marginType, // "cross" or "isolated"
+    marginMode: marginType, // "CROSS" or "ISOLATED"
     qty: payload.quantity.toString(), // Size of the order
   } as any;
-  if (payload.stopPrice) {
-    orderData.stopPrice = payload.stopPrice.toString();
+
+  // ✅ STOP ORDER SUPPORT
+  if (payload.stop) {
+    if (!payload.stopPrice || !payload.stopPriceType) {
+      throw new Error(
+        "stopPrice and stopPriceType are required when stop is provided"
+      );
+    }
+
+    orderData.stop = payload.stop; // up | down
+    orderData.stopPrice = payload.stopPrice;
+    orderData.stopPriceType = payload.stopPriceType; // TP | IP | MP
   }
+
   // Add optional parameters if provided
   if (payload.orderType === "LIMIT" && payload.price) {
     orderData.price = payload.price.toString();
   }
+
   const body = JSON.stringify(orderData);
   const headers = await generateHeadersKucoin(
     config,

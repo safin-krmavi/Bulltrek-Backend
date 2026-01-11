@@ -22,6 +22,7 @@ export const createStrategy = async (data: any) => {
     hourInterval,
     daysOfWeek,
     datesOfMonth,
+    executionMode,
   } = data;
 
   // Map flat fields into structured config
@@ -78,6 +79,7 @@ export const createStrategy = async (data: any) => {
       config, // store structured config
       nextRunAt,
       status: "ACTIVE",
+      executionMode,
     },
   });
 };
@@ -264,7 +266,7 @@ export const buildSchedule = (params: {
           startTime: time,
         },
       };
-    
+
     case "DAILY":
       if (!time) {
         throw new Error("time required for DAILY frequency");

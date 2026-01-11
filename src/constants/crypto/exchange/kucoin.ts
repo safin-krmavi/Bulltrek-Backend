@@ -34,8 +34,10 @@ export interface KucoinFuturesOrderParams {
   orderType: "LIMIT" | "MARKET";
   leverage: number;
   price?: string;
+  positionMarginType?: "ISOLATED" | "CROSS";
+  stop?: "down" | "up";
+  stopPriceType?: "TP" | "IP" | "MP";
   stopPrice?: string;
-  positionMarginType?: "isolated" | "crossed";
 }
 
 // Cache object to store symbol data

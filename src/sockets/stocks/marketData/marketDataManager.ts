@@ -20,6 +20,7 @@ export const StockMarketDataManager = {
    * Creates placeholder first, then connects async
    */
   async ensureConnection(exchange: StocksExchange, userId: string) {
+    console.log("EXCHNAGE HERE:",exchange)
     // 🔥 CREATE EMPTY CONNECTION FIRST (prevents race conditions)
     if (!stockMarketDataRegistry[exchange]) {
       stockMarketDataRegistry[exchange] = {};
@@ -56,11 +57,12 @@ export const StockMarketDataManager = {
 
         // Connect exchange-specific handler
         if (exchange === "ZERODHA") {
-          // await ZerodhaMarketDataHandler.connect({
-          //   userId,
-          //   apiKey: credentials.apiKey,
-          //   accessToken: credentials.accessToken!,
-          // });
+          console.log("HOW");
+          await ZerodhaMarketDataHandler.connect({
+            userId,
+            apiKey: credentials.apiKey,
+            accessToken: credentials.accessToken!,
+          });
         } else if (exchange === "KOTAK") {
           await KotakMarketDataHandler.connect(userId, {
             tradingToken: credentials.accessToken,
@@ -122,7 +124,7 @@ export const StockMarketDataManager = {
     strategyId: string
   ) {
     // Ensure connection exists
-    await this.ensureConnection(exchange, userId);
+    await StockMarketDataManager.ensureConnection(exchange, userId);
 
     const conn = stockMarketDataRegistry[exchange]?.[userId];
     if (!conn) {
@@ -322,7 +324,7 @@ export const StockMarketDataManager = {
         });
       } else if (exchange === "KOTAK") {
         return await fetchKotakMarketPrice({
-          userId, 
+          userId,
           symbol,
         });
       }

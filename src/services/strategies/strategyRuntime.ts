@@ -2,7 +2,6 @@ import { randomUUID } from "crypto";
 import { Strategy } from "@prisma/client";
 import { evaluateGrowthDCA } from "./evaluators/growthDcaEvaluator";
 import { formatQuantity } from "../../utils/crypto/exchange/quantityFormatter";
-import { isStrategyDue } from "../../utils/strategySchedule";
 import { computeNextRunAt } from "../../utils/scheduler/computeNextRunAt";
 import prisma from "../../config/db.config";
 import { tradeDispatcher } from "./tradeDispatcher";

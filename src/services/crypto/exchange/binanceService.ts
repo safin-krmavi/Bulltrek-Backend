@@ -488,8 +488,6 @@ export async function createBinanceFuturesOrder(
   params: BinanceFuturesOrderParams
 ) {
   try {
-    const { apiKey, apiSecret } = credentials;
-
     // Validate quantity
     if (!params.quantity || isNaN(params.quantity) || params.quantity <= 0) {
       throw {

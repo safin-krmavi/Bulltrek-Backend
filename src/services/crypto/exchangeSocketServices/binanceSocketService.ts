@@ -81,33 +81,35 @@ export async function handleBinanceSpotOrderUpdate(
       tradeStatus === TradeStatus.EXECUTED ||
       tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade && isExecutable) {
-      const newTrade = await prisma.cryptoTrades.create({
-        data: {
+    if (!existingTrade) {
+      if (isExecutable) {
+        const newTrade = await prisma.cryptoTrades.create({
+          data: {
+            userId,
+            exchange: CryptoExchange.BINANCE,
+            type: CryptoTradeType.SPOT,
+            symbol: data.s,
+            side: data.S as TradeSide,
+            orderType,
+            orderId: localOrder.id, // reference local order
+            quantity: parseFloat(data.l || "0"),
+            price: parseFloat(data.L || "0"),
+            fee: parseFloat(data.n || "0"),
+            status: tradeStatus,
+          },
+        });
+
+        await applySpotTradeExecution({
           userId,
           exchange: CryptoExchange.BINANCE,
-          type: CryptoTradeType.SPOT,
-          symbol: data.s,
-          side: data.S as TradeSide,
-          orderType,
-          orderId: localOrder.id, // reference local order
+          asset: data.s,
+          side: data.S,
           quantity: parseFloat(data.l || "0"),
           price: parseFloat(data.L || "0"),
           fee: parseFloat(data.n || "0"),
-          status: tradeStatus,
-        },
-      });
-
-      await applySpotTradeExecution({
-        userId,
-        exchange: CryptoExchange.BINANCE,
-        asset: data.s,
-        side: data.S,
-        quantity: parseFloat(data.l || "0"),
-        price: parseFloat(data.L || "0"),
-        fee: parseFloat(data.n || "0"),
-        tradeId: newTrade.id,
-      });
+          tradeId: newTrade.id,
+        });
+      }
     } else if (existingTrade) {
       // Only update trade if new status has higher priority
       if (
@@ -207,32 +209,37 @@ export async function updateBinanceFuturesTradeStatus(
       tradeStatus === TradeStatus.EXECUTED ||
       tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade && isExecutable) {
-      // Create new trade
-      existingTrade = await prisma.cryptoTrades.create({
-        data: {
-          userId,
-          exchange: CryptoExchange.BINANCE,
-          type: CryptoTradeType.FUTURES,
-          symbol: order.s,
-          side: order.S,
-          orderType: order.ot,
-          orderId: localOrder.id,
-          quantity: parseFloat(order.q || "0"),
-          price: tradePrice,
-          fee,
-          status: tradeStatus,
-          leverage,
-        },
-      });
-      shouldApplyPnL = executedStatuses.includes(
-        tradeStatus as (typeof executedStatuses)[number]
-      );
-      console.log(`[BINANCE_FUTURES] Created new trade: ${existingTrade.id}`, {
-        status: tradeStatus,
-        quantity: order.q,
-        price: tradePrice,
-      });
+    if (!existingTrade) {
+      if (isExecutable) {
+        // Create new trade
+        existingTrade = await prisma.cryptoTrades.create({
+          data: {
+            userId,
+            exchange: CryptoExchange.BINANCE,
+            type: CryptoTradeType.FUTURES,
+            symbol: order.s,
+            side: order.S,
+            orderType: order.ot,
+            orderId: localOrder.id,
+            quantity: parseFloat(order.q || "0"),
+            price: tradePrice,
+            fee,
+            status: tradeStatus,
+            leverage,
+          },
+        });
+        shouldApplyPnL = executedStatuses.includes(
+          tradeStatus as (typeof executedStatuses)[number]
+        );
+        console.log(
+          `[BINANCE_FUTURES] Created new trade: ${existingTrade.id}`,
+          {
+            status: tradeStatus,
+            quantity: order.q,
+            price: tradePrice,
+          }
+        );
+      }
     } else if (
       tradeStatusPriority[tradeStatus] >
       tradeStatusPriority[existingTrade.status]
@@ -366,32 +373,37 @@ export async function handleFilledBinanceFuturesOrder(
       tradeStatus === TradeStatus.EXECUTED ||
       tradeStatus === TradeStatus.PARTIALLY_FILLED;
 
-    if (!existingTrade && isExecutable) {
-      // Create new trade
-      existingTrade = await prisma.cryptoTrades.create({
-        data: {
-          userId,
-          exchange: CryptoExchange.BINANCE,
-          type: CryptoTradeType.FUTURES,
-          symbol: order.s,
-          side: order.S,
-          orderType: order.ot,
-          orderId: localOrder.id,
-          quantity: parseFloat(order.q || "0"),
-          price: tradePrice,
-          fee,
-          status: tradeStatus,
-          leverage,
-        },
-      });
-      shouldApplyPnL = executedStatuses.includes(
-        tradeStatus as (typeof executedStatuses)[number]
-      );
-      console.log(`[BINANCE_FUTURES] Created new trade: ${existingTrade.id}`, {
-        status: tradeStatus,
-        quantity: order.q,
-        price: tradePrice,
-      });
+    if (!existingTrade) {
+      if (isExecutable) {
+        // Create new trade
+        existingTrade = await prisma.cryptoTrades.create({
+          data: {
+            userId,
+            exchange: CryptoExchange.BINANCE,
+            type: CryptoTradeType.FUTURES,
+            symbol: order.s,
+            side: order.S,
+            orderType: order.ot,
+            orderId: localOrder.id,
+            quantity: parseFloat(order.q || "0"),
+            price: tradePrice,
+            fee,
+            status: tradeStatus,
+            leverage,
+          },
+        });
+        shouldApplyPnL = executedStatuses.includes(
+          tradeStatus as (typeof executedStatuses)[number]
+        );
+        console.log(
+          `[BINANCE_FUTURES] Created new trade: ${existingTrade.id}`,
+          {
+            status: tradeStatus,
+            quantity: order.q,
+            price: tradePrice,
+          }
+        );
+      }
     } else if (
       tradeStatusPriority[tradeStatus] >
       tradeStatusPriority[existingTrade.status]

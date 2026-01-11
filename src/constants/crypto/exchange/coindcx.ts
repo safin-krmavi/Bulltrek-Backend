@@ -22,16 +22,22 @@ export interface CoinDCXSpotOrderParams {
 }
 export interface CoinDCXFuturesOrderParams {
   side: TradeSide;
-  orderType: string;
+  orderType: CoinDCXFuturesOrderType;
   symbol: string; // e.g., "B-ETH_USDT"
   quantity: number;
-  positionMarginType: "isolated" | "crossed";
-  price?: number; // Required for non-MARKET orders
-  stopPrice?: number; // Required for stop/limit orders
+
+  positionMarginType?: "isolated" | "crossed";
+  marginCurrency?: "USDT" | "INR";
+
   leverage?: number;
-  marginCurrency?: string; // Defaults to something like "USDT"
-  notification?: string; // Default "email_notification"
-  timeInForce?: string; // Optional, e.g., "good_till_cancel"
+  notification?: "no_notification" | "email_notification";
+  timeInForce?: "good_till_cancel" | "fill_or_kill" | "immediate_or_cancel";
+
+  price?: number; // limit, stop_limit, take_profit_limit
+  stopPrice?: number; // stop_*, take_profit_*
+
+  takeProfitPrice?: number; // ONLY for market_order / limit_order
+  stopLossPrice?: number; // ONLY for market_order / limit_order
 }
 
 export function safeISO(date: any) {
