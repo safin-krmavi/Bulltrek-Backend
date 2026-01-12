@@ -16,6 +16,7 @@ export const ZerodhaOrderHandler = {
   async connect(userId: string, credentials: ZerodhaCredentials) {
     const { apiKey, accessToken } = credentials;
 
+    console.log("ZERODHA_CONNECTING", { userId, apiKey, accessToken });
     const ticker = new KiteTicker({
       api_key: apiKey,
       access_token: accessToken,

@@ -133,10 +133,14 @@ export const CoinDCXHandler = {
       try {
         console.log("COINDCX FUTURES TRADE");
 
-        await handleCoinDCXFuturesWebsocketMessage(response, userId, {
-          apiKey: credentials.apiKey,
-          apiSecret: credentials.apiSecret,
-        });
+        await handleCoinDCXFuturesWebsocketMessage(
+          response,
+          userId
+          // {
+          // apiKey: credentials.apiKey,
+          // apiSecret: credentials.apiSecret,
+          // }
+        );
       } catch (error) {
         console.log("ERROR_PROCESSING_COINDCX_FUTURES_UPDATE", {
           error:

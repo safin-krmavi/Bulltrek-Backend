@@ -40,7 +40,7 @@ export async function connectUserExchanges(
       if (exchange === "ZERODHA") {
         await ZerodhaOrderHandler.connect(userId, {
           accessToken: credentials.accessToken,
-          apiKey: process.env.ZERODHA_API_KEY!,
+          apiKey: credentials.apiKey,
         });
       } else if (exchange === "KOTAK") {
         await KotakOrderHandler.connect(userId, {

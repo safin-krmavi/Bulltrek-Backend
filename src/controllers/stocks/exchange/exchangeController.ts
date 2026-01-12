@@ -124,6 +124,9 @@ export const getStockLoginUrlController = async (req, res) => {
     if (error.code === "NOT_REQUIRED") {
       return sendBadRequest(res, error.message);
     }
+    if (error.code === "MISSING_API_KEY") {
+      return sendBadRequest(res, error.message);
+    }
     return sendServerError(res, error.message);
   }
 };

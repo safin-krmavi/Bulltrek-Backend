@@ -176,7 +176,6 @@ export async function loginZerodha(params: {
 export async function getZerodhaBalances(credentials: { accessToken: string }) {
   try {
     const apiKey = process.env.ZERODHA_API_KEY!;
-
     const headers = {
       "X-Kite-Version": "3",
       Authorization: `token ${apiKey}:${credentials.accessToken}`,
@@ -359,7 +358,6 @@ export async function fetchZerodhaMarketPrice(params: {
       throw new Error("Credentiala not found");
     }
 
-    
     const exchange = params.exchange ?? "NSE";
 
     if (!tradingSymbol) {

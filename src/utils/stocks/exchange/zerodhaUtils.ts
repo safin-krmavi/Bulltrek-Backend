@@ -64,13 +64,16 @@ export function mapToZerodhaOrder(
         ? "MIS"
         : "NRML",
     validity: payload.validity ?? "DAY",
+    // price: Number(payload.price),
+    // trigger_price: Number(payload.triggerPrice),
   };
 
   // Only include price for orders that need it
   if (payload.orderType !== "MARKET") {
+    console.log("HELLO")
     order.price = payload.price;
     order.trigger_price = payload.triggerPrice;
   }
-
+console.log("ORDER MAPPED", order)
   return order;
 }
