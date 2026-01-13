@@ -33,11 +33,65 @@ export const fetchStocksSymbolPairsController = async (
   req: Request,
   res: Response
 ) => {
-  //read the file from data/symbol_pairs.json
   try {
+    const { exchange, page = "1", limit = "100" } = req.query;
+
     const data = await fs.readFile(STOCKS_FILE_PATH, "utf-8");
     const parsedData = JSON.parse(data);
-    return sendSuccess(res, "Symbol pairs fetched successfully", parsedData);
+
+    // If no exchange specified, return summary of all exchanges
+    if (!exchange) {
+      const stocksData = parsedData[0].data;
+      const summary = stocksData.map((ex: any) => ({
+        exchange: ex.exchange,
+        totalSymbols: ex.data.length,
+      }));
+      
+      return sendSuccess(res, "Symbol pairs summary fetched", {
+        type: parsedData[0].type,
+        exchanges: summary,
+        totalExchanges: stocksData.length,
+        message: "Use ?exchange=ZERODHA&page=1&limit=100 to fetch paginated data for specific exchange"
+      });
+    }
+
+    // Find the specific exchange data
+    const stocksData = parsedData[0].data;
+    const exchangeData = stocksData.find(
+      (ex: any) => ex.exchange.toUpperCase() === (exchange as string).toUpperCase()
+    );
+
+    if (!exchangeData) {
+      const availableExchanges = stocksData.map((ex: any) => ex.exchange).join(", ");
+      return sendBadRequest(
+        res, 
+        `Exchange ${exchange} not found. Available exchanges: ${availableExchanges}`
+      );
+    }
+
+    // Pagination logic
+    const pageNum = parseInt(page as string);
+    const limitNum = parseInt(limit as string);
+    const startIndex = (pageNum - 1) * limitNum;
+    const endIndex = startIndex + limitNum;
+
+    const symbols = exchangeData.data;
+    const paginatedSymbols = symbols.slice(startIndex, endIndex);
+
+    const totalPages = Math.ceil(symbols.length / limitNum);
+
+    return sendSuccess(res, "Symbol pairs fetched successfully", {
+      exchange: exchangeData.exchange,
+      pagination: {
+        currentPage: pageNum,
+        pageSize: limitNum,
+        totalSymbols: symbols.length,
+        totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPreviousPage: pageNum > 1,
+      },
+      symbols: paginatedSymbols,
+    });
   } catch (error) {
     return sendServerError(res, "Failed to read symbol pairs data");
   }
