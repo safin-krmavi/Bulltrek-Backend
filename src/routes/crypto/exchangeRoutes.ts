@@ -15,6 +15,7 @@ exchangeRouter.put(
   verifyCryptoAdmin,
   cryptoExchangeController.updateSymbolPairsController
 );
+
 exchangeRouter.get(
   "/symbol-precision",
   cryptoExchangeController.getExchangePrecisionController
@@ -25,18 +26,36 @@ exchangeRouter.put(
   cryptoExchangeController.refreshSymbolMetaController
 );
 
-// Verify exchange creds
+// Verify exchange credentials
 exchangeRouter.post(
   "/verify-keys",
   verifyCryptoUser,
   cryptoExchangeController.verifyExchangeCredentialsController
 );
 
-// Verify exchange creds
+// Get balances
 exchangeRouter.post(
   "/get-balances",
   verifyCryptoUser,
   cryptoExchangeController.getBalancesController
+);
+
+/**
+ * Search crypto symbols across all exchanges and segments
+ * Used for dropdown/autocomplete - supports partial matching
+ */
+exchangeRouter.get(
+  "/search",
+  cryptoExchangeController.searchSymbolsController
+);
+
+/**
+ * Get crypto symbol by exact symbol name
+ * Example: BTCUSDT, ETHUSDT, PUMPBTCUSDT
+ */
+exchangeRouter.get(
+  "/symbol",
+  cryptoExchangeController.getSymbolByNameController
 );
 
 export default exchangeRouter;

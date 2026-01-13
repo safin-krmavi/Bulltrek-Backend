@@ -16,6 +16,10 @@ import {
   loginStockExchange,
   placeStockOrder,
   verifyStockCredentials,
+  disconnectStockExchange,
+  searchStockSymbols,
+  searchCryptoSymbols,
+  getStockSymbolBySymbol,
 } from "../../../services/stocks/exchange/exchangeService";
 import {
   getStocksCredentials,
@@ -46,12 +50,12 @@ export const fetchStocksSymbolPairsController = async (
         exchange: ex.exchange,
         totalSymbols: ex.data.length,
       }));
-      
+
       return sendSuccess(res, "Symbol pairs summary fetched", {
         type: parsedData[0].type,
         exchanges: summary,
         totalExchanges: stocksData.length,
-        message: "Use ?exchange=ZERODHA&page=1&limit=100 to fetch paginated data for specific exchange"
+        message: "Use ?exchange=ZERODHA&page=1&limit=100 to fetch paginated data for specific exchange",
       });
     }
 
@@ -64,7 +68,7 @@ export const fetchStocksSymbolPairsController = async (
     if (!exchangeData) {
       const availableExchanges = stocksData.map((ex: any) => ex.exchange).join(", ");
       return sendBadRequest(
-        res, 
+        res,
         `Exchange ${exchange} not found. Available exchanges: ${availableExchanges}`
       );
     }
@@ -413,6 +417,167 @@ export const getConnectedExchangesController = async (
     return sendServerError(
       res,
       error?.message || "Failed to fetch connected exchanges"
+    );
+  }
+};
+export const disconnectExchangeController = async (
+  req: any,
+  res: Response
+) => {
+  try {
+    const { userId, exchange } = req.body;
+
+    if (!userId || !exchange) {
+      return sendBadRequest(res, "userId and exchange are required");
+    }
+
+    // Validate exchange
+    const validExchanges = Object.values(StocksExchange);
+    if (!validExchanges.includes(exchange)) {
+      return sendBadRequest(
+        res,
+        `Invalid exchange. Valid values: ${validExchanges.join(", ")}`
+      );
+    }
+
+    const result = await disconnectStockExchange(userId, exchange);
+
+    return sendSuccess(res, "Exchange disconnected successfully", result);
+  } catch (error: any) {
+    if (error.message?.includes("No credentials found")) {
+      return sendBadRequest(res, error.message);
+    }
+    return sendServerError(
+      res,
+      error?.message || "Failed to disconnect exchange"
+    );
+  }
+};
+
+export const searchSymbolsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { q, assetType = "STOCK" } = req.query;
+
+    if (!q) {
+      return sendBadRequest(res, "Search query (q) is required");
+    }
+
+    if (typeof q !== "string") {
+      return sendBadRequest(res, "Search query must be a string");
+    }
+
+    const trimmedQuery = q.trim();
+
+    if (trimmedQuery.length < 1) {
+      return sendBadRequest(res, "Search query cannot be empty");
+    }
+
+    // Validate assetType
+    if (!["STOCK", "CRYPTO"].includes(assetType as string)) {
+      return sendBadRequest(
+        res,
+        "assetType must be STOCK or CRYPTO"
+      );
+    }
+
+    const results = await searchStockSymbols(trimmedQuery, assetType as "STOCK" | "CRYPTO");
+
+    // Flatten results for better display
+    const flatResults: any[] = [];
+    Object.entries(results).forEach(([exchange, symbols]) => {
+      (symbols as any[]).forEach((symbol) => {
+        flatResults.push({
+          ...symbol,
+          exchange,
+        });
+      });
+    });
+
+    // Sort by relevance (exact match first, then prefix match, then contains)
+    const sortedResults = flatResults.sort((a, b) => {
+      const queryLower = trimmedQuery.toLowerCase();
+      const aSymbol = (a.tradingSymbol || a.symbol)?.toLowerCase() || "";
+      const bSymbol = (b.tradingSymbol || b.symbol)?.toLowerCase() || "";
+
+      // Exact match (highest priority)
+      if (aSymbol === queryLower) return -1;
+      if (bSymbol === queryLower) return 1;
+
+      // Prefix match
+      if (aSymbol.startsWith(queryLower)) return -1;
+      if (bSymbol.startsWith(queryLower)) return 1;
+
+      return 0;
+    });
+
+    const totalResults = sortedResults.length;
+
+    return sendSuccess(res, "Symbols searched successfully", {
+      query: trimmedQuery,
+      assetType,
+      totalResults,
+      results: sortedResults.slice(0, 100), // Limit to 100 for better UX
+    });
+  } catch (error: any) {
+    console.error("ERROR_SEARCHING_SYMBOLS", error);
+    return sendServerError(
+      res,
+      error?.message || "Failed to search symbols"
+    );
+  }
+};
+
+export const getSymbolByNameController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { symbol, exchange } = req.query;
+
+    if (!symbol) {
+      return sendBadRequest(res, "Symbol is required");
+    }
+
+    if (typeof symbol !== "string") {
+      return sendBadRequest(res, "Symbol must be a string");
+    }
+
+    const trimmedSymbol = symbol.trim();
+
+    if (trimmedSymbol.length < 1) {
+      return sendBadRequest(res, "Symbol cannot be empty");
+    }
+
+    const result = await getStockSymbolBySymbol(
+      trimmedSymbol,
+      exchange as StocksExchange | undefined
+    );
+
+    const totalResults = Object.values(result).reduce(
+      (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+      0
+    );
+
+    if (totalResults === 0) {
+      return sendBadRequest(
+        res,
+        `Symbol "${trimmedSymbol}" not found${exchange ? ` in ${exchange}` : " in any exchange"}`
+      );
+    }
+
+    return sendSuccess(res, "Symbol found successfully", {
+      query: trimmedSymbol,
+      totalResults,
+      exchanges: result,
+    });
+  } catch (error: any) {
+    console.error("ERROR_GETTING_STOCK_SYMBOL", error);
+    return sendServerError(
+      res,
+      error?.message || "Failed to get symbol"
     );
   }
 };
