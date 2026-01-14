@@ -48,46 +48,74 @@ export const SocketManager = {
   removeSocket(userId: string, exchange: string, market: string): void {
     const connection = this.getSocket(userId, exchange, market);
 
-    if (connection) {
-      // Clean up ping interval
-      if (connection.pingInterval) {
-        clearInterval(connection.pingInterval);
+    // Idempotent guard
+    if (!connection) return;
+
+    const { socket, pingInterval } = connection;
+
+    // ---- Clear ping interval safely ----
+    if (pingInterval) {
+      try {
+        clearInterval(pingInterval);
+      } catch (err) {
+        console.error("PING_INTERVAL_CLEAR_FAILED", err);
       }
+    }
 
-      // Close socket if it's a WebSocket
-      if (
-        connection.socket instanceof WebSocket &&
-        connection.socket.readyState === WebSocket.OPEN
-      ) {
-        connection.socket.close();
-      }
-
-      // Disconnect if it's a Socket.IO socket
-      if ((connection.socket as Socket).disconnect) {
-        (connection.socket as Socket).disconnect();
-      }
-
-      // Remove from registry
-      if (socketRegistry[userId]?.[exchange]) {
-        delete socketRegistry[userId][exchange][market];
-
-        // Clean up empty objects
-        if (Object.keys(socketRegistry[userId][exchange]).length === 0) {
-          delete socketRegistry[userId][exchange];
-
-          if (Object.keys(socketRegistry[userId]).length === 0) {
-            delete socketRegistry[userId];
-          }
+    // ---- Close WebSocket safely ----
+    try {
+      if (socket instanceof WebSocket) {
+        if (
+          socket.readyState === WebSocket.OPEN ||
+          socket.readyState === WebSocket.CONNECTING
+        ) {
+          socket.close();
         }
       }
-      console.log("REMOVED_SOCKET_CONNECTION", {
-        userId,
-        exchange,
-        market,
-      });
+    } catch (err) {
+      console.error("WEBSOCKET_CLOSE_FAILED", err);
     }
-  },
 
+    // ---- Disconnect Socket.IO safely ----
+    try {
+      const ioSocket = socket as Socket;
+
+      if (typeof ioSocket.disconnect === "function" && ioSocket.connected) {
+        ioSocket.disconnect();
+      }
+    } catch (err) {
+      console.error("SOCKET_IO_DISCONNECT_FAILED", err);
+    }
+
+    // ---- Remove from registry safely ----
+    try {
+      if (socketRegistry[userId]?.[exchange]?.[market]) {
+        delete socketRegistry[userId][exchange][market];
+      }
+
+      if (
+        socketRegistry[userId]?.[exchange] &&
+        Object.keys(socketRegistry[userId][exchange]).length === 0
+      ) {
+        delete socketRegistry[userId][exchange];
+      }
+
+      if (
+        socketRegistry[userId] &&
+        Object.keys(socketRegistry[userId]).length === 0
+      ) {
+        delete socketRegistry[userId];
+      }
+    } catch (err) {
+      console.error("SOCKET_REGISTRY_CLEANUP_FAILED", err);
+    }
+
+    console.log("REMOVED_SOCKET_CONNECTION", {
+      userId,
+      exchange,
+      market,
+    });
+  },
   /**
    * Close all sockets for a user
    */

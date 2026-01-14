@@ -215,7 +215,7 @@ export async function placeStockOrder(
           payload.orderType === "MARKET"
             ? "MKT"
             : payload.orderType === "LIMIT"
-            ? "LMT"
+            ? "L"
             : payload.orderType === "SL"
             ? "SL"
             : "SL-M",

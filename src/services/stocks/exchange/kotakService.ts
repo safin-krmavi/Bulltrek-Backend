@@ -335,7 +335,6 @@ export async function createKotakNeoOrder(params: {
 }) {
   try {
     const orderType = params.orderType ?? "MKT";
-    const isMarket = orderType === "MKT";
 
     // validation (simple & correct)
     if (orderType === "L" && !params.price) {
@@ -389,6 +388,7 @@ export async function createKotakNeoOrder(params: {
       jData: JSON.stringify(jData),
     });
 
+    console.log("ORDER PAYLOAD", jData);
     const res = await axios.post(
       `${params.baseUrl}/quick/order/rule/ms/place`,
       body.toString(),

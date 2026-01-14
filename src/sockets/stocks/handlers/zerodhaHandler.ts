@@ -30,7 +30,8 @@ export const ZerodhaOrderHandler = {
       });
     });
 
-    ticker.on("order_update", (order) => {
+    ticker.on("order_update", (order) => 
+           {
       console.log("ZERODHA_ORDER_UPDATE", { userId, order });
 
       handleZerodhaOrderUpdate(order, userId);
