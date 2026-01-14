@@ -24,6 +24,9 @@ import {
   kotakNeoTotpLogin,
   kotakNeoValidateMpin,
 } from "./kotakService";
+import prisma from "../../../config/db.config";
+import fs from "fs";
+import { STOCKS_FILE_PATH } from "../../../constants/stocks";
 
 /**
  * STEP 1: Get Login URL (only for Zerodha)
@@ -256,5 +259,232 @@ export async function getStockPositions(
         code: "UNSUPPORTED_BROKER",
         message: "Unsupported broker",
       };
+  }
+}
+
+export async function disconnectStockExchange(
+  userId: string,
+  exchange: StocksExchange
+) {
+  try {
+    // Check if credentials exist
+    const credentials = await prisma.stocksCredentials.findUnique({
+      where: {
+        userId_exchange: { userId, exchange },
+      },
+    });
+
+    if (!credentials) {
+      throw new Error(`No credentials found for ${exchange}`);
+    }
+
+    // Delete the credentials
+    await prisma.stocksCredentials.delete({
+      where: {
+        userId_exchange: { userId, exchange },
+      },
+    });
+
+    // Pause all ACTIVE strategies for this exchange
+    const pausedStrategies = await prisma.strategy.updateMany({
+      where: {
+        userId,
+        exchange,
+        assetType: "STOCK",
+        status: "ACTIVE",
+      },
+      data: {
+        status: "PAUSED",
+      },
+    });
+
+    console.log("EXCHANGE_DISCONNECTED", {
+      userId,
+      exchange,
+      strategiesPaused: pausedStrategies.count,
+    });
+
+    return {
+      exchange,
+      disconnectedAt: new Date(),
+      strategiesPaused: pausedStrategies.count,
+    };
+  } catch (error) {
+    console.error("ERROR_DISCONNECTING_EXCHANGE", error);
+    throw error;
+  }
+}
+
+export async function searchStockSymbols(
+  query: string,
+  assetType: "CRYPTO" | "STOCK" = "STOCK"
+) {
+  try {
+    if (!query || query.trim().length < 1) {
+      throw new Error("Search query is required");
+    }
+
+    const searchLower = query.toLowerCase();
+    const results: Record<string, any[]> = {};
+
+    if (assetType === "STOCK") {
+      // Search in stocks file
+      const stocksData = fs.readFileSync(STOCKS_FILE_PATH, "utf-8");
+      const parsed = JSON.parse(stocksData);
+      const stocksBlock = parsed.find((block: any) => block.type === "STOCKS");
+
+      if (stocksBlock) {
+        stocksBlock.data.forEach((exchange: any) => {
+          const matchedSymbols = exchange.data.filter((symbol: any) => {
+            const tradingSymbolLower = symbol.tradingSymbol?.toLowerCase() || "";
+            const companyNameLower = symbol.company_name?.toLowerCase() || "";
+            const isинLower = symbol.isin?.toLowerCase() || "";
+
+            // Exact match for symbol (highest priority)
+            if (tradingSymbolLower === searchLower) return true;
+
+            // Partial matches
+            if (tradingSymbolLower.includes(searchLower)) return true;
+            if (companyNameLower.includes(searchLower)) return true;
+            if (isинLower.includes(searchLower)) return true;
+
+            return false;
+          });
+
+          if (matchedSymbols.length > 0) {
+            results[exchange.exchange] = matchedSymbols;
+          }
+        });
+      }
+    } else if (assetType === "CRYPTO") {
+      // Search in crypto file
+      const cryptoPath = require("../../../constants/crypto").FILE_PATH;
+      const cryptoData = fs.readFileSync(cryptoPath, "utf-8");
+      const parsed = JSON.parse(cryptoData);
+
+      parsed.forEach((segment: any) => {
+        segment.data.forEach((exchange: any) => {
+          const matchedSymbols = exchange.data.filter((symbol: any) => {
+            const symbolLower = symbol.symbol?.toLowerCase() || "";
+            const baseAssetLower = symbol.baseAsset?.toLowerCase() || "";
+            const quoteAssetLower = symbol.quoteAsset?.toLowerCase() || "";
+
+            // Exact match for symbol (highest priority)
+            if (symbolLower === searchLower) return true;
+
+            // Partial matches
+            if (symbolLower.includes(searchLower)) return true;
+            if (baseAssetLower.includes(searchLower)) return true;
+            if (quoteAssetLower.includes(searchLower)) return true;
+
+            return false;
+          });
+
+          if (matchedSymbols.length > 0) {
+            if (!results[exchange.exchange]) {
+              results[exchange.exchange] = [];
+            }
+            results[exchange.exchange].push(...matchedSymbols);
+          }
+        });
+      });
+    }
+
+    return results;
+  } catch (error) {
+    console.error("ERROR_SEARCHING_SYMBOLS", error);
+    throw error;
+  }
+}
+
+export async function searchCryptoSymbols(query: string) {
+  try {
+    if (!query || query.trim().length < 1) {
+      throw new Error("Search query is required");
+    }
+
+    const searchLower = query.toLowerCase();
+    const results: Record<string, any[]> = {};
+
+    const { FILE_PATH } = require("../../../constants/crypto");
+    const cryptoData = fs.readFileSync(FILE_PATH, "utf-8");
+    const parsed = JSON.parse(cryptoData);
+
+    // Search in both SPOT and FUTURES
+    parsed.forEach((segment: any) => {
+      segment.data.forEach((exchange: any) => {
+        const matchedSymbols = exchange.data.filter((symbol: any) => {
+          const symbolLower = symbol.symbol?.toLowerCase() || "";
+          const baseAssetLower = symbol.baseAsset?.toLowerCase() || "";
+          const quoteAssetLower = symbol.quoteAsset?.toLowerCase() || "";
+
+          // Exact match for symbol (highest priority)
+          if (symbolLower === searchLower) return true;
+
+          // Partial matches
+          if (symbolLower.includes(searchLower)) return true;
+          if (baseAssetLower.includes(searchLower)) return true;
+          if (quoteAssetLower.includes(searchLower)) return true;
+
+          return false;
+        });
+
+        if (matchedSymbols.length > 0) {
+          const key = `${exchange.exchange}_${segment.type}`;
+          results[key] = matchedSymbols;
+        }
+      });
+    });
+
+    return results;
+  } catch (error) {
+    console.error("ERROR_SEARCHING_CRYPTO_SYMBOLS", error);
+    throw error;
+  }
+}
+
+/**
+ * Get stock symbol by exact symbol name
+ */
+export async function getStockSymbolBySymbol(
+  symbol: string,
+  exchange?: StocksExchange
+) {
+  try {
+    if (!symbol || symbol.trim().length < 1) {
+      throw new Error("Symbol is required");
+    }
+
+    const symbolUpper = symbol.toUpperCase();
+    const result: Record<string, any[]> = {};
+
+    const stocksData = fs.readFileSync(STOCKS_FILE_PATH, "utf-8");
+    const parsed = JSON.parse(stocksData);
+    const stocksBlock = parsed.find((block: any) => block.type === "STOCKS");
+
+    if (stocksBlock) {
+      stocksBlock.data.forEach((ex: any) => {
+        // If specific exchange is provided, filter by it
+        if (exchange && ex.exchange !== exchange) {
+          return;
+        }
+
+        const foundSymbol = ex.data.find(
+          (s: any) => s.tradingSymbol?.toUpperCase() === symbolUpper
+        );
+
+        if (foundSymbol) {
+          if (!result[ex.exchange]) {
+            result[ex.exchange] = [];
+          }
+          result[ex.exchange].push(foundSymbol);
+        }
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error("ERROR_GETTING_STOCK_SYMBOL", error);
+    throw error;
   }
 }

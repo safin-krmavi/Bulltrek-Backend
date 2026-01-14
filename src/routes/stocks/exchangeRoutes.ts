@@ -30,6 +30,25 @@ exchangeRouter.post(
 );
 
 /**
+ * Search symbols across all stock exchanges
+ * Supports partial and exact matching
+ * Example: ?q=RELIANCE&assetType=STOCK
+ */
+exchangeRouter.get(
+  "/search",
+  stockExchangeController.searchSymbolsController
+);
+
+/**
+ * Get stock symbol by exact symbol name
+ * Example: ?symbol=RELIANCE or ?symbol=RELIANCE&exchange=ZERODHA
+ */
+exchangeRouter.get(
+  "/symbol",
+  stockExchangeController.getSymbolByNameController
+);
+
+/**
  * Login / connect stock exchange using payload (accessToken, requestToken, etc.)
  */
 exchangeRouter.post(
@@ -74,7 +93,6 @@ exchangeRouter.post(
   stockExchangeController.getStockPositionsController
 );
 
-
 exchangeRouter.get(
   "/zerodha/instruments",
   stockExchangeController.getZerodhaInstrumentsController
@@ -102,6 +120,15 @@ exchangeRouter.get(
 exchangeRouter.get(
   "/connected",
   stockExchangeController.getConnectedExchangesController
+);
+
+/**
+ * Disconnect exchange
+ */
+exchangeRouter.post(
+  "/disconnect",
+  verifyStocksUser,
+  stockExchangeController.disconnectExchangeController
 );
 
 export default exchangeRouter;

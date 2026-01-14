@@ -168,3 +168,115 @@ export async function refreshSymbolMeta(formattedData: any) {
     },
   };
 }
+
+/**
+ * Search crypto symbols across all exchanges and segments
+ */
+export async function searchCryptoSymbols(query: string) {
+  try {
+    if (!query || query.trim().length < 1) {
+      throw new Error("Search query is required");
+    }
+
+    const searchLower = query.toLowerCase();
+    const results: Record<string, any[]> = {};
+
+    // Read symbol pairs file
+    const data = await fs.readFile(FILE_PATH, "utf-8");
+    const parsed = JSON.parse(data);
+
+    // Search in both SPOT and FUTURES segments
+    parsed.forEach((segment: any) => {
+      const segmentType = segment.type; // CRYPTO_SPOT or CRYPTO_FUTURES
+
+      segment.data.forEach((exchange: any) => {
+        const exchangeName = exchange.exchange; // BINANCE, KUCOIN, COINDCX
+
+        // Filter symbols based on search query
+        // EXACT MATCH first, then partial matches
+        const matchedSymbols = exchange.data.filter((symbol: any) => {
+          const symbolLower = symbol.symbol?.toLowerCase() || "";
+          const baseLower = symbol.baseAsset?.toLowerCase() || symbol.base?.toLowerCase() || "";
+          const quoteLower = symbol.quoteAsset?.toLowerCase() || symbol.quote?.toLowerCase() || "";
+          
+          // Exact match for symbol (highest priority)
+          if (symbolLower === searchLower) return true;
+          
+          // Partial matches
+          if (symbolLower.includes(searchLower)) return true;
+          if (baseLower.includes(searchLower)) return true;
+          if (quoteLower.includes(searchLower)) return true;
+          
+          return false;
+        });
+
+        if (matchedSymbols.length > 0) {
+          const key = `${exchangeName}_${segmentType}`;
+          results[key] = matchedSymbols.map((symbol: any) => ({
+            symbol: symbol.symbol,
+            baseAsset: symbol.baseAsset || symbol.base,
+            quoteAsset: symbol.quoteAsset || symbol.quote,
+            exchange: exchangeName,
+            segment: segmentType,
+          }));
+        }
+      });
+    });
+
+    return results;
+  } catch (error) {
+    console.error("ERROR_SEARCHING_CRYPTO_SYMBOLS", error);
+    throw error;
+  }
+}
+
+/**
+ * Get crypto symbol by exact symbol name
+ */
+export async function getCryptoSymbolBySymbol(symbol: string) {
+  try {
+    if (!symbol || symbol.trim().length < 1) {
+      throw new Error("Symbol is required");
+    }
+
+    const symbolUpper = symbol.toUpperCase();
+    const result: any = {};
+
+    // Read symbol pairs file
+    const data = await fs.readFile(FILE_PATH, "utf-8");
+    const parsed = JSON.parse(data);
+
+    // Search in both SPOT and FUTURES segments
+    parsed.forEach((segment: any) => {
+      const segmentType = segment.type; // CRYPTO_SPOT or CRYPTO_FUTURES
+
+      segment.data.forEach((exchange: any) => {
+        const exchangeName = exchange.exchange; // BINANCE, KUCOIN, COINDCX
+
+        // Find exact match
+        const foundSymbol = exchange.data.find(
+          (s: any) => s.symbol?.toUpperCase() === symbolUpper
+        );
+
+        if (foundSymbol) {
+          const key = `${exchangeName}_${segmentType}`;
+          if (!result[key]) {
+            result[key] = [];
+          }
+          result[key].push({
+            symbol: foundSymbol.symbol,
+            baseAsset: foundSymbol.baseAsset || foundSymbol.base,
+            quoteAsset: foundSymbol.quoteAsset || foundSymbol.quote,
+            exchange: exchangeName,
+            segment: segmentType,
+          });
+        }
+      });
+    });
+
+    return result;
+  } catch (error) {
+    console.error("ERROR_GETTING_CRYPTO_SYMBOL", error);
+    throw error;
+  }
+}

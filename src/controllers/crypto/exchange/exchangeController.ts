@@ -11,6 +11,8 @@ import {
   getExchangeBalances,
   refreshSymbolMeta,
   verifyExchangeCredentials,
+  searchCryptoSymbols,
+  getCryptoSymbolBySymbol,
 } from "../../../services/crypto/exchange/exchangeService";
 import { getCryptoCredentials } from "../../../services/crypto/credentialsService";
 import { fetchBinanceSymbols } from "../../../services/crypto/exchange/binanceService";
@@ -250,5 +252,120 @@ export const getBalancesController = async (req: any, res: Response) => {
           error?.message || "Error fetching balances "
         );
     }
+  }
+};
+
+export const searchSymbolsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { q } = req.query;
+
+    if (!q) {
+      return sendBadRequest(res, "Search query (q) is required");
+    }
+
+    if (typeof q !== "string") {
+      return sendBadRequest(res, "Search query must be a string");
+    }
+
+    const trimmedQuery = q.trim();
+
+    // Allow single character searches for dropdown
+    if (trimmedQuery.length < 1) {
+      return sendBadRequest(res, "Search query cannot be empty");
+    }
+
+    const results = await searchCryptoSymbols(trimmedQuery);
+
+    // Flatten results for dropdown display
+    const flatResults: any[] = [];
+    Object.entries(results).forEach(([key, symbols]) => {
+      (symbols as any[]).forEach((symbol) => {
+        flatResults.push({
+          ...symbol,
+          exchangeSegment: key,
+        });
+      });
+    });
+
+    // Sort by relevance (exact match first, then prefix match, then contains)
+    const sortedResults = flatResults.sort((a, b) => {
+      const queryLower = trimmedQuery.toLowerCase();
+      
+      // Exact match (highest priority)
+      if (a.symbol?.toLowerCase() === queryLower) return -1;
+      if (b.symbol?.toLowerCase() === queryLower) return 1;
+      
+      // Prefix match
+      if (a.symbol?.toLowerCase().startsWith(queryLower)) return -1;
+      if (b.symbol?.toLowerCase().startsWith(queryLower)) return 1;
+      
+      return 0;
+    });
+
+    const totalResults = flatResults.length;
+
+    return sendSuccess(res, "Crypto symbols searched successfully", {
+      query: trimmedQuery,
+      totalResults,
+      results: sortedResults.slice(0, 50), // Limit to 50 results for dropdown
+    });
+  } catch (error: any) {
+    console.error("ERROR_SEARCHING_CRYPTO_SYMBOLS", error);
+    return sendServerError(
+      res,
+      error?.message || "Failed to search crypto symbols"
+    );
+  }
+};
+
+export const getSymbolByNameController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { symbol } = req.query;
+
+    if (!symbol) {
+      return sendBadRequest(res, "Symbol is required");
+    }
+
+    if (typeof symbol !== "string") {
+      return sendBadRequest(res, "Symbol must be a string");
+    }
+
+    const trimmedSymbol = symbol.trim();
+
+    if (trimmedSymbol.length < 1) {
+      return sendBadRequest(res, "Symbol cannot be empty");
+    }
+
+    const result = await getCryptoSymbolBySymbol(trimmedSymbol);
+
+const totalResults = Object.values(result).reduce<number>(
+  (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+  0
+);
+
+    if (totalResults === 0) {
+      return sendBadRequest(
+        res,
+        `Symbol "${trimmedSymbol}" not found in any exchange`
+      );
+    }
+
+    return sendSuccess(res, "Symbol found successfully", {
+      query: trimmedSymbol,
+      totalResults,
+      exchanges: result,
+    });
+  } catch (error: any) {
+    console.error("ERROR_GETTING_CRYPTO_SYMBOL", error);
+    return sendServerError(
+      res,
+      error?.message || "Failed to get symbol"
+    );
   }
 };
