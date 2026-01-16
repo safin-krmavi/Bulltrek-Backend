@@ -488,11 +488,17 @@ export async function createBinanceFuturesOrder(
   params: BinanceFuturesOrderParams
 ) {
   try {
-    // Validate quantity
-    if (!params.quantity || isNaN(params.quantity) || params.quantity <= 0) {
+    // // Validate quantity
+    // if (!params.quantity || isNaN(params.quantity) || params.quantity <= 0) {
+    //   throw {
+    //     code: "BAD_REQUEST",
+    //     message: "Quantity must be a positive number",
+    //   };
+    // }
+    if (params.closePosition && params.quantity) {
       throw {
         code: "BAD_REQUEST",
-        message: "Quantity must be a positive number",
+        message: "Quantity must not be sent when closePosition is true",
       };
     }
 
@@ -503,10 +509,15 @@ export async function createBinanceFuturesOrder(
       symbol: params.symbol,
       side: params.side,
       type: params.orderType,
-      quantity: params.quantity,
+      // quantity: params.quantity,
       timestamp,
-      closePosition: params.closePosition ?? false,
+      // closePosition: params.closePosition ?? false,
     };
+    if (params.closePosition) {
+      requestParams.closePosition = true;
+    } else {
+      requestParams.quantity = params.quantity;
+    }
 
     if (["LIMIT", "STOP", "TAKE_PROFIT"].includes(params.orderType)) {
       if (
@@ -522,12 +533,12 @@ export async function createBinanceFuturesOrder(
     }
 
     // Add conditional parameters based on order type
-    if (
-      ["LIMIT", "STOP", "TAKE_PROFIT"].includes(params.orderType) &&
-      params.price
-    ) {
+    if (["LIMIT", "TAKE_PROFIT"].includes(params.orderType) && params.price) {
       requestParams.price = params.price;
       requestParams.timeInForce = params?.timeInForce || "GTC";
+    }
+    if (["STOP"].includes(params.orderType) && params.price) {
+      requestParams.price = params.price;
     }
 
     if (
@@ -550,7 +561,7 @@ export async function createBinanceFuturesOrder(
       queryString,
       credentials.apiSecret
     );
-
+    console.log("PAYLOAD:", requestParams);
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_CREATE_ORDER_ENDPOINT}?${queryString}&signature=${signature}`;
 
     const { data } = await axios.post(url, null, {
