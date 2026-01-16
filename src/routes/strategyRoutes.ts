@@ -8,6 +8,12 @@ import {
   deleteStrategyController,
   updateStrategyStatusController,
 } from "../controllers/strategyController";
+import {
+  subscribeToCopyStrategy,
+  unsubscribeFromCopyStrategy,
+  getUserCopySubscriptions,
+  getPublishedStrategies,
+} from "../controllers/copyTadingController";
 import { verifyUser } from "../middleware/verifyUser";
 
 const router = Router();
@@ -34,4 +40,29 @@ router.patch(
 // Delete strategy
 router.delete("/strategies/:strategyId", verifyUser, deleteStrategyController);
 
+/* ===================== COPY TRADING ===================== */
+
+// Get all published strategies (Explore)
+router.get("/strategies/published", verifyUser, getPublishedStrategies);
+
+// Subscribe to a published strategy
+router.post(
+  "/strategies/:strategyId/subscribe",
+  verifyUser,
+  subscribeToCopyStrategy
+);
+
+// Unsubscribe from a strategy
+router.delete(
+  "/strategies/subscription/:subscriptionId",
+  verifyUser,
+  unsubscribeFromCopyStrategy
+);
+
+// Get logged-in user's copy subscriptions
+router.get(
+  "/strategies/subscriptions/me",
+  verifyUser,
+  getUserCopySubscriptions
+);
 export default router;

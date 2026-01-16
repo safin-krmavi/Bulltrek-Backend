@@ -53,9 +53,7 @@ async function processCoinDCXQueue(
 
   console.log("PROCESSING_COINDCX_QUEUE", { queueKey: key });
   coindcxProcessing.add(key);
-  console.log("HI");
   while (queue.length > 0) {
-    console.log("HELLO");
     const { message, userId } = queue.shift()!;
     try {
       await handler(message, userId);

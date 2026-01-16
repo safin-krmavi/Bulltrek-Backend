@@ -42,21 +42,32 @@ export const createStrategyController = async (req: any, res: Response) => {
     hourInterval, // number
     daysOfWeek, // number[]
     datesOfMonth, // number[]
-    executionMode
+    executionMode,
   } = req.body;
+  const requiredFields = {
+    name,
+    strategyType,
+    exchange,
+    segment,
+    symbol,
+    investmentPerRun,
+    investmentCap,
+    frequency,
+    executionMode,
+  };
 
-  if (
-    !name ||
-    !strategyType ||
-    !exchange ||
-    !segment ||
-    !symbol ||
-    !investmentPerRun ||
-    !investmentCap ||
-    !frequency ||
-    !executionMode
-  ) {
-    return sendBadRequest(res, "Missing required fields");
+  const missingFields = Object.entries(requiredFields)
+    .filter(
+      ([_, value]) => value === undefined || value === null || value === ""
+    )
+    .map(([key]) => key);
+
+  if (missingFields.length > 0) {
+    console.error("Missing required fields:", missingFields);
+    return sendBadRequest(
+      res,
+      `Missing required fields: ${missingFields.join(", ")}`
+    );
   }
 
   try {
@@ -80,10 +91,14 @@ export const createStrategyController = async (req: any, res: Response) => {
       hourInterval,
       daysOfWeek,
       datesOfMonth,
-      executionMode
+      executionMode,
     });
 
-    if (strategy.executionMode === "LIVE") {
+    if (
+      strategy.executionMode === "LIVE" ||
+      strategy.executionMode === "PUBLISHED"
+    ) {
+      console.log("HELLO");
       await subscribeStrategyToMarketData({
         assetType,
         exchange,
@@ -98,16 +113,13 @@ export const createStrategyController = async (req: any, res: Response) => {
       // enqueue backtest job
     }
 
-    if (strategy.executionMode === "PUBLISHED") {
-      // no runtime, no sockets
-    }
-
     return sendSuccess(res, "Strategy created", strategy);
   } catch (error: any) {
     console.error("[STRATEGY_CREATE]", error);
     return sendServerError(res, error.message);
   }
 };
+
 export const getStrategyByIdController = async (req: any, res: Response) => {
   try {
     const strategy = await getStrategyById(req.params.strategyId);

@@ -135,7 +135,7 @@ export async function createFuturesTrade(
             ? "CROSS"
             : "ISOLATED";
 
-        console.log("HI", payload.positionMarginType);
+        console.log("positionMarginType", payload.positionMarginType);
 
         // await ensureKucoinMarginMode(
         //   {

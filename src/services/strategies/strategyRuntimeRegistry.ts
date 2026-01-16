@@ -59,10 +59,17 @@ class StrategyRuntimeRegistry {
   }) {
     const runtime = this.runtimes.get(strategyId);
     if (!runtime) {
-      console.warn("[STRATEGY_RUNTIME_NOT_FOUND]", {
-        strategyId,
+         console.warn("[STRATEGY_RUNTIME_MISSING_AUTO_REGISTER]", { strategyId });
+
+    // Fetch from DB and register
+    prisma.strategy.findUnique({ where: { id: strategyId } })
+      .then(strategy => {
+        if (!strategy) return;
+        this.register(strategy);
       });
-      return;
+
+
+      // return;
     }
 
     // console.log("[STRATEGY_TICK_DISPATCH]", {

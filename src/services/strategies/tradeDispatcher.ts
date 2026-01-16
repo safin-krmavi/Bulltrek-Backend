@@ -24,6 +24,7 @@ export type TradeIntent = {
   onComplete?: () => void;
 
   // internal
+  executionType?: "LIVE" | "PAPER";
   isCopyTrade?: boolean;
 };
 
@@ -65,6 +66,21 @@ export const tradeDispatcher = {
 
   async dispatchForUser(intent: TradeIntent) {
     if (intent.segment === "CRYPTO") {
+      const user = await prisma.cryptoUser.findUnique({
+        where: { id: intent.userId },
+        select: { role: true },
+      });
+
+      let executionType = intent.executionType;
+      if (intent.isCopyTrade) {
+        executionType = user?.role?.name === "SLAVE_PRO" ? "LIVE" : "PAPER";
+      }
+      // if (executionType === "PAPER") {
+      //   // Log paper trade instead of executing
+      //   await this.recordPaperTrade(intent);
+      //   return;
+      // }
+
       const raw = await getCryptoCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
       if (!credentials) return;
@@ -77,6 +93,21 @@ export const tradeDispatcher = {
     }
 
     if (intent.segment === "STOCK") {
+      const user = await prisma.stocksUser.findUnique({
+        where: { id: intent.userId },
+        select: { role: true },
+      });
+
+      let executionType = intent.executionType;
+      if (intent.isCopyTrade) {
+        executionType = user?.role?.name === "SLAVE_PRO" ? "LIVE" : "PAPER";
+      }
+      // if (executionType === "PAPER") {
+      //   // Log paper trade instead of executing
+      //   await this.recordPaperTrade(intent);
+      //   return;
+      // }
+
       const raw = await getStocksCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
       if (!credentials) return;

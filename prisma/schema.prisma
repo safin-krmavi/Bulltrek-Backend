@@ -313,7 +313,10 @@ model Strategy {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  copyFollowers StrategyCopySubscription[]
+  
   @@index([userId])
+  @@index([executionMode])
   @@index([exchange, segment, symbol])
   @@index([nextRunAt])
 }
@@ -342,8 +345,10 @@ model StrategyCopySubscription {
   isActive       Boolean  @default(true)
 
   createdAt      DateTime @default(now())
+  strategy       Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
 
   @@unique([strategyId, followerUserId])
+  @@index([followerUserId])
 }
 
 

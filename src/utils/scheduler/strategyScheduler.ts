@@ -7,6 +7,7 @@ export async function runStrategyScheduler() {
     where: { status: "ACTIVE" },
   });
 
+
   strategies.forEach((strategy) => {
     const runtime = strategyRuntimeRegistry.getRuntime(strategy.id);
     if (!runtime) return;
