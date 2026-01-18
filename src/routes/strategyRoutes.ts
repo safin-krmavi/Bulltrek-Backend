@@ -15,8 +15,11 @@ import {
   getPublishedStrategies,
 } from "../controllers/copyTadingController";
 import { verifyUser } from "../middleware/verifyUser";
+import { runStrategyController } from "../controllers/runStrategyController";
 
 const router = Router();
+
+router.post("/run", runStrategyController);
 
 // Create a new strategy
 router.post("/strategies", verifyUser, createStrategyController);
@@ -34,7 +37,7 @@ router.put("/strategies/:strategyId", verifyUser, updateStrategyController);
 router.patch(
   "/strategies/:strategyId/status",
   verifyUser,
-  updateStrategyStatusController
+  updateStrategyStatusController,
 );
 
 // Delete strategy
@@ -49,20 +52,20 @@ router.get("/strategies/published", verifyUser, getPublishedStrategies);
 router.post(
   "/strategies/:strategyId/subscribe",
   verifyUser,
-  subscribeToCopyStrategy
+  subscribeToCopyStrategy,
 );
 
 // Unsubscribe from a strategy
 router.delete(
   "/strategies/subscription/:subscriptionId",
   verifyUser,
-  unsubscribeFromCopyStrategy
+  unsubscribeFromCopyStrategy,
 );
 
 // Get logged-in user's copy subscriptions
 router.get(
   "/strategies/subscriptions/me",
   verifyUser,
-  getUserCopySubscriptions
+  getUserCopySubscriptions,
 );
 export default router;

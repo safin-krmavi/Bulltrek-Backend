@@ -14,6 +14,7 @@ import {
   bootstrapStockAll,
 } from "./sockets/stocks/marketData/marketDataBootstrap";
 import { resubscribeAllStrategies } from "./services/strategies/resubscribeStrategies";
+import { bootstrapStrategies } from "./strategies/bootstrapStrategies";
 
 dotenv.config();
 
@@ -41,7 +42,9 @@ server.listen(PORT, async () => {
     console.log("Market data bootstrapped");
 
     // 2️⃣ Load all strategies into runtime
-    await resubscribeAllStrategies();
+    // await resubscribeAllStrategies();
+    await bootstrapStrategies();
+
     console.log("Strategies loaded into runtime");
 
     // 3️⃣ Initialize all sockets (crypto + stock)
@@ -49,7 +52,7 @@ server.listen(PORT, async () => {
     console.log("Sockets initialized");
 
     // 4️⃣ Start strategy scheduler
-    setInterval(runStrategyScheduler, 60 * 1000);
+    // setInterval(runStrategyScheduler, 60 * 1000);
     console.log("Strategy scheduler running");
   } catch (err) {
     console.error("Error during server startup:", err);

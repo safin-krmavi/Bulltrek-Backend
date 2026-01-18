@@ -33,6 +33,7 @@ export interface BinanceFuturesOrderParams {
   quantity: number;
   price?: number;
   stopPrice?: number;
+  leverage?: number;
   timeInForce?: FuturesTimeInForce; // Defaults to "GTC"
   closePosition?: boolean;
   positionSide?: "BOTH" | "LONG" | "SHORT";

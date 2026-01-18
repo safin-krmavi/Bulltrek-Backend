@@ -89,9 +89,9 @@ export const getPublishedStrategies = async (req: any, res: Response) => {
         status: "ACTIVE",
       },
       include: {
-        user: {
-          select: { id: true, username: true }, // Don't expose sensitive data
-        },
+        // user: {
+        //   select: { id: true, username: true }, // Don't expose sensitive data
+        // },
         _count: {
           select: { copyFollowers: true }, // Show popularity
         },

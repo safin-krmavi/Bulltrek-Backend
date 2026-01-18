@@ -26,19 +26,6 @@ export function evaluateGrowthDCA(
     return null;
   }
 
-  // 2️⃣ Schedule check
-  // if (state.lastExecutionAt) {
-  //   const diff = timestamp - state.lastExecutionAt;
-  //   const intervalMs = getIntervalMs(config.schedule);
-  //   if (diff < intervalMs) {
-  //     console.log("[GROWTH_DCA_EVALUATE] Skipping due to schedule interval", {
-  //       diff,
-  //       intervalMs,
-  //     });
-  //     return null;
-  //   }
-  // }
-
   // 3️⃣ Capital check
   const nextCapital = state.investedCapital + config.capital?.perOrderAmount;
   if (nextCapital > config.capital?.maxCapital) {

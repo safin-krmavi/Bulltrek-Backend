@@ -16,6 +16,8 @@ export type TradeIntent = {
   price: number;
   orderType: "MARKET" | "LIMIT";
   strategyId?: string;
+  takeProfit?: number;
+  stopLoss?: number;
 
   // injected by dispatcher
   credentials?: any;

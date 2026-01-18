@@ -19,6 +19,9 @@ import {
 } from "../sockets/marketDataRouter";
 import { strategyRuntimeRegistry } from "../services/strategies/strategyRuntimeRegistry";
 import { CryptoExchange, StocksExchange } from "@prisma/client";
+import { registerStrategy, unregisterStrategy } from "../strategies/dispatcher";
+import { scheduleStrategy } from "../utils/scheduleStrategy";
+import { deleteSchedule } from "../utils/awsScheduler";
 
 export const createStrategyController = async (req: any, res: Response) => {
   const userId = req.user.userId;
@@ -37,6 +40,7 @@ export const createStrategyController = async (req: any, res: Response) => {
     stopLossPct,
     priceStart,
     priceStop,
+
     // schedule-related (optional per frequency)
     time, // "HH:mm"
     hourInterval, // number
@@ -58,7 +62,7 @@ export const createStrategyController = async (req: any, res: Response) => {
 
   const missingFields = Object.entries(requiredFields)
     .filter(
-      ([_, value]) => value === undefined || value === null || value === ""
+      ([_, value]) => value === undefined || value === null || value === "",
     )
     .map(([key]) => key);
 
@@ -66,7 +70,7 @@ export const createStrategyController = async (req: any, res: Response) => {
     console.error("Missing required fields:", missingFields);
     return sendBadRequest(
       res,
-      `Missing required fields: ${missingFields.join(", ")}`
+      `Missing required fields: ${missingFields.join(", ")}`,
     );
   }
 
@@ -98,15 +102,11 @@ export const createStrategyController = async (req: any, res: Response) => {
       strategy.executionMode === "LIVE" ||
       strategy.executionMode === "PUBLISHED"
     ) {
-      console.log("HELLO");
-      await subscribeStrategyToMarketData({
-        assetType,
-        exchange,
-        segment,
-        symbol,
-        strategyId: strategy.id,
-        userId,
-      });
+      await registerStrategy(strategy.id);
+
+      const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
+      const schedule = await scheduleStrategy({ strategy, lambdaArn });
+      console.log("SCHEDULE", schedule);
     }
 
     if (strategy.executionMode === "BACKTEST") {
@@ -161,19 +161,22 @@ export const updateStrategyController = async (req: any, res: Response) => {
     });
 
     // 2. Reset runtime
-    strategyRuntimeRegistry.remove(strategyId);
-    strategyRuntimeRegistry.register(updated);
+    await unregisterStrategy(strategyId);
 
     // 3. Resubscribe new
     if (updated.status === "ACTIVE") {
-      await subscribeStrategyToMarketData({
-        assetType: updated.assetType as "CRYPTO" | "STOCK",
-        exchange: updated.exchange as CryptoExchange | StocksExchange,
-        segment: updated.segment,
-        symbol: updated.symbol,
-        strategyId: updated.id,
-        userId,
-      });
+      // await subscribeStrategyToMarketData({
+      //   assetType: updated.assetType as "CRYPTO" | "STOCK",
+      //   exchange: updated.exchange as CryptoExchange | StocksExchange,
+      //   segment: updated.segment,
+      //   symbol: updated.symbol,
+      //   strategyId: updated.id,
+      //   userId,
+      // });
+      await registerStrategy(strategyId);
+
+      const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
+      await scheduleStrategy({ strategy: updated, lambdaArn });
     }
     return sendSuccess(res, "Strategy updated", updated);
   } catch (error: any) {
@@ -198,10 +201,12 @@ export const deleteStrategyController = async (req: any, res: Response) => {
       userId: strategy.userId,
     });
 
-    strategyRuntimeRegistry.remove(strategyId);
+    // strategyRuntimeRegistry.remove(strategyId);
 
     await deleteStrategy(strategyId, userId);
 
+    const scheduleName = `strategy-${strategy.id}`;
+    await deleteSchedule(scheduleName);
     return sendSuccess(res, "Strategy deleted");
   } catch (error: any) {
     console.error("[STRATEGY_DELETE]", error);
@@ -211,7 +216,7 @@ export const deleteStrategyController = async (req: any, res: Response) => {
 
 export const updateStrategyStatusController = async (
   req: any,
-  res: Response
+  res: Response,
 ) => {
   const userId = req.user.userId;
   const { strategyId } = req.params;
@@ -224,36 +229,20 @@ export const updateStrategyStatusController = async (
   try {
     const strategy = await getStrategyById(strategyId);
 
-    // 1️⃣ If leaving ACTIVE → unsubscribe market data
+    // 1️⃣ Leaving ACTIVE → teardown
     if (strategy.status === "ACTIVE" && status !== "ACTIVE") {
-      await unsubscribeStrategyFromMarketData({
-        assetType: strategy.assetType as "CRYPTO" | "STOCK",
-        exchange: strategy.exchange as any,
-        segment: strategy.segment,
-        symbol: strategy.symbol,
-        strategyId: strategy.id,
-        userId: strategy.userId,
-      });
+      await unregisterStrategy(strategyId);
+      await deleteSchedule(`strategy-${strategyId}`);
     }
 
-    const updated = await changeStrategyStatus(strategyId, userId, status); // 3️⃣ Runtime handling
-    if (status === "STOPPED") {
-      strategyRuntimeRegistry.remove(strategyId);
-    }
+    // 2️⃣ Persist status
+    const updated = await changeStrategyStatus(strategyId, userId, status);
+    // 3️⃣ Entering ACTIVE → setup
+    if (updated.status === "ACTIVE") {
+      await registerStrategy(strategyId);
 
-    if (status === "ACTIVE") {
-      // ensure clean runtime
-      strategyRuntimeRegistry.remove(strategyId);
-      strategyRuntimeRegistry.register(updated);
-
-      await subscribeStrategyToMarketData({
-        assetType: updated.assetType as "CRYPTO" | "STOCK",
-        exchange: updated.exchange as any,
-        segment: updated.segment,
-        symbol: updated.symbol,
-        strategyId: updated.id,
-        userId: updated.userId,
-      });
+      const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
+      await scheduleStrategy({ strategy: updated, lambdaArn });
     }
 
     return sendSuccess(res, "Strategy status updated", updated);

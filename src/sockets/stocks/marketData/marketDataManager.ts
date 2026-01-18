@@ -6,6 +6,8 @@ import { getStocksCredentials } from "../../../services/stocks/credentialsServic
 import { KotakMarketDataHandler } from "./kotakMarketDataHandler";
 import { fetchZerodhaMarketPrice } from "../../../services/stocks/exchange/zerodhaService";
 import { fetchKotakMarketPrice } from "../../../services/stocks/exchange/kotakService";
+import { signalEngine } from "../../../strategies/engines/signalEngine";
+import { exitMonitor } from "../../../strategies/monitors/exitMonitor";
 const stockLastPrices: {
   [exchange: string]: {
     [userId: string]: {
@@ -251,11 +253,13 @@ export const StockMarketDataManager = {
 
     // Notify all subscribed strategies
     for (const strategyId of subscribers) {
-      strategyRuntimeRegistry.onMarketTick({
+      signalEngine.onMarketTick(
         strategyId,
         price,
         timestamp,
-      });
+      );
+      exitMonitor.evaluate(strategyId, price);
+
     }
   },
 

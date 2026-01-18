@@ -46,7 +46,7 @@ class StrategyRuntimeRegistry {
     return Array.from(this.runtimes.values());
   }
 
-  onMarketTick({
+  async onMarketTick({
     strategyId,
 
     price,
@@ -59,17 +59,14 @@ class StrategyRuntimeRegistry {
   }) {
     const runtime = this.runtimes.get(strategyId);
     if (!runtime) {
-         console.warn("[STRATEGY_RUNTIME_MISSING_AUTO_REGISTER]", { strategyId });
-
-    // Fetch from DB and register
-    prisma.strategy.findUnique({ where: { id: strategyId } })
-      .then(strategy => {
-        if (!strategy) return;
-        this.register(strategy);
+      console.warn("[STRATEGY_RUNTIME_MISSING_AUTO_REGISTER]", { strategyId });
+      const strategy = await prisma.strategy.findUnique({
+        where: { id: strategyId },
       });
-
-
-      // return;
+      if (!strategy) return;
+      this.register(strategy);
+      this.runtimes.get(strategyId)?.onMarketTick(price, timestamp); // forward current tick
+      return;
     }
 
     // console.log("[STRATEGY_TICK_DISPATCH]", {

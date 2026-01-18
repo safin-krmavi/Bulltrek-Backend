@@ -550,11 +550,11 @@ export async function createBinanceFuturesOrder(
       requestParams.stopPrice = params.stopPrice; // Mandatory
     }
 
-    if (params.orderType === "TRAILING_STOP_MARKET") {
-      if (params.callbackRate) requestParams.callbackRate = params.callbackRate;
-      if (params.activationPrice)
-        requestParams.activationPrice = params.activationPrice;
-    }
+    // if (params.orderType === "TRAILING_STOP_MARKET") {
+    //   if (params.callbackRate) requestParams.callbackRate = params.callbackRate;
+    //   if (params.activationPrice)
+    //     requestParams.activationPrice = params.activationPrice;
+    // }
 
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(

@@ -8,6 +8,8 @@ import { CoinDCXHandler } from "./coindcxMarketDataHandler";
 import { fetchBinanceMarketPrice } from "../../../services/crypto/exchange/binanceService";
 import { fetchKucoinMarketPrice } from "../../../services/crypto/exchange/kucoinService";
 import { fetchCoinDCXMarketPrice } from "../../../services/crypto/exchange/coindcxService";
+import { signalEngine } from "../../../strategies/engines/signalEngine";
+import { exitMonitor } from "../../../strategies/monitors/exitMonitor";
 const cryptoLastPrices: {
   [exchange: string]: {
     [segment: string]: {
@@ -166,22 +168,24 @@ export const MarketDataManager = {
     // console.log("HERE");
     const subscribers = connection.subscribers.get(symbol);
     if (!subscribers || subscribers.size === 0) return;
-    // console.log("[MARKET_TICK]", {
-    //   exchange,
-    //   segment,
-    //   symbol,
-    //   price,
-    //   subscribers: subscribers.size,
-    // });
+    console.log("[MARKET_TICK]", {
+      exchange,
+      segment,
+      symbol,
+      price,
+      subscribers: subscribers.size,
+    });
     const timestamp = Date.now();
 
     for (const strategyId of subscribers) {
       // console.log("STRATEGY", strategyId);
-      strategyRuntimeRegistry.onMarketTick({
+      signalEngine.onMarketTick(
         strategyId,
         price,
         timestamp,
-      });
+      );
+      exitMonitor.evaluate(strategyId, price);
+
     }
   },
 

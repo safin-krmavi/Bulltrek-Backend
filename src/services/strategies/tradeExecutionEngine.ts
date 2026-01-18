@@ -1,3 +1,4 @@
+import { exitMonitor } from "../../strategies/monitors/exitMonitor";
 import {
   createSpotTrade,
   createFuturesTrade,
