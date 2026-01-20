@@ -168,13 +168,13 @@ export const MarketDataManager = {
     // console.log("HERE");
     const subscribers = connection.subscribers.get(symbol);
     if (!subscribers || subscribers.size === 0) return;
-    console.log("[MARKET_TICK]", {
-      exchange,
-      segment,
-      symbol,
-      price,
-      subscribers: subscribers.size,
-    });
+    // console.log("[MARKET_TICK]", {
+    //   exchange,
+    //   segment,
+    //   symbol,
+    //   price,
+    //   subscribers: subscribers.size,
+    // });
     const timestamp = Date.now();
 
     for (const strategyId of subscribers) {

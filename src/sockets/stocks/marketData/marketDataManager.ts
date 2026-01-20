@@ -242,14 +242,14 @@ export const StockMarketDataManager = {
     const timestamp = Date.now();
 
     // Log price update with details
-    console.log("[STOCK_MARKET_TICK]", {
-      exchange,
-      userId,
-      symbol,
-      price,
-      subscribers: subscribers.size,
-      time: new Date(timestamp).toISOString(),
-    });
+    // console.log("[STOCK_MARKET_TICK]", {
+    //   exchange,
+    //   userId,
+    //   symbol,
+    //   price,
+    //   subscribers: subscribers.size,
+    //   time: new Date(timestamp).toISOString(),
+    // });
 
     // Notify all subscribed strategies
     for (const strategyId of subscribers) {

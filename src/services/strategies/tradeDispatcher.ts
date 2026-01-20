@@ -39,6 +39,10 @@ export const tradeDispatcher = {
 
     // 2️⃣ Copy trading only if strategyId exists
     if (!originalIntent.strategyId) return;
+    const strategy = await prisma.strategy.findUnique({
+      where: { id: originalIntent.strategyId },
+      select: { executionMode: true },
+    });
 
     const followers = await prisma.strategyCopySubscription.findMany({
       where: {
@@ -46,6 +50,15 @@ export const tradeDispatcher = {
         isActive: true,
       },
     });
+
+    // if (strategy?.executionMode !== "PUBLISHED") {
+    //   console.log(
+    //     "Cannot execute strategy as the executionMode is:",
+    //     strategy?.executionMode,
+    //   );
+
+    //   return;
+    // }
 
     for (const follower of followers) {
       // ❗ Skip owner to prevent double execution
