@@ -80,7 +80,7 @@ export async function verifyBinanceCredentials(credentials: any) {
     const queryString = createQueryString({ timestamp });
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const fullUrl = `${BINANCE_SPOT_BASE_URL}${BINANCE_SPOT_BALANCE_ENDPOINT}`;
@@ -132,7 +132,7 @@ export async function fetchBinanceSpotBalances(credentials: any) {
 
 export async function createBinanceSpotOrder(
   credentials: any,
-  params: BinanceSpotOrderParams
+  params: BinanceSpotOrderParams,
 ) {
   try {
     const timestamp = Date.now();
@@ -170,7 +170,7 @@ export async function createBinanceSpotOrder(
 
         if (!params.price || !params.stopPrice) {
           throw new Error(
-            `${params.orderType} order requires price and stopPrice`
+            `${params.orderType} order requires price and stopPrice`,
           );
         }
         baseParams.timeInForce = params.timeInForce || "GTC";
@@ -182,7 +182,7 @@ export async function createBinanceSpotOrder(
     const queryString = createQueryString(baseParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_SPOT_BASE_URL}${BINANCE_SPOT_CREATE_ORDER_ENDPOINT}`;
@@ -194,7 +194,7 @@ export async function createBinanceSpotOrder(
         headers: {
           "X-MBX-APIKEY": credentials.apiKey,
         },
-      }
+      },
     );
 
     return response.data;
@@ -210,7 +210,7 @@ export async function cancelBinanceSpotOrder(
   credentials: any,
   symbol: string, // Trading pair symbol (e.g., 'BTCUSDT')
   userId: string,
-  orderId: number
+  orderId: number,
 ) {
   try {
     const timestamp = Date.now();
@@ -227,7 +227,7 @@ export async function cancelBinanceSpotOrder(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_SPOT_BASE_URL}${BINANCE_SPOT_CANCEL_ORDER_ENDPOINT}`;
@@ -238,7 +238,7 @@ export async function cancelBinanceSpotOrder(
         headers: {
           "X-MBX-APIKEY": credentials.apiKey,
         },
-      }
+      },
     );
 
     return response.data;
@@ -286,7 +286,7 @@ export async function cancelBinanceSpotOrder(
 export async function fetchBinanceSpotOrderById(
   credentials: any,
   symbol: string,
-  orderId: number
+  orderId: number,
 ) {
   try {
     const timestamp = Date.now();
@@ -304,7 +304,7 @@ export async function fetchBinanceSpotOrderById(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_SPOT_BASE_URL}${BINANCE_SPOT_GET_ORDER_BY_ID_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -323,14 +323,14 @@ export async function fetchBinanceSpotOrderById(
     throw new Error(
       (error as any)?.response?.data?.msg ||
         (error as any)?.message ||
-        "Failed to get spot order from Binance"
+        "Failed to get spot order from Binance",
     );
   }
 }
 
 export async function fetchBinanceOpenSpotOrders(
   credentials: any,
-  symbol?: string
+  symbol?: string,
 ) {
   try {
     const timestamp = Date.now();
@@ -347,7 +347,7 @@ export async function fetchBinanceOpenSpotOrders(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_SPOT_BASE_URL}${BINANCE_SPOT_GET_OPEN_ORDERS_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -366,7 +366,7 @@ export async function fetchBinanceOpenSpotOrders(
     throw new Error(
       (error as any)?.response?.data?.msg ||
         (error as any)?.message ||
-        "Failed to get open spot orders from Binance"
+        "Failed to get open spot orders from Binance",
     );
   }
 }
@@ -374,7 +374,7 @@ export async function fetchBinanceOpenSpotOrders(
 export async function fetchBinanceSpotOrders(
   apiKey: string,
   apiSecret: string,
-  symbol?: string
+  symbol?: string,
 ) {
   try {
     const timestamp = Date.now();
@@ -414,7 +414,7 @@ export async function fetchBinanceSpotTrades(
   symbol: string,
   startTime?: number,
   endTime?: number,
-  limit?: number
+  limit?: number,
 ) {
   try {
     const timestamp = Date.now();
@@ -433,7 +433,7 @@ export async function fetchBinanceSpotTrades(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_SPOT_BASE_URL}${BINANCE_SPOT_GET_TRADES_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -460,7 +460,7 @@ export async function fetchBinanceFuturesBalances(credentials: any) {
     const queryString = createQueryString({ timestamp });
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_BALANCE_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -482,10 +482,65 @@ export async function fetchBinanceFuturesBalances(credentials: any) {
     handleBinanceError(error);
   }
 }
+export async function changeLeverage(
+  apiKey: string,
+  apiSecret: string,
+  symbol: string,
+  leverage: number,
+) {
+  try {
+    const endpoint = "/fapi/v1/leverage";
+    const timestamp = Date.now();
+
+    const params = {
+      symbol,
+      leverage,
+      timestamp,
+    };
+
+    const queryString = createQueryString(params);
+    const signature = generateSignatureBinance(queryString, apiSecret);
+    const url = `${BINANCE_FUTURES_BASE_URL}${endpoint}?${queryString}&signature=${signature}`;
+
+    const response = await axios.post(url, null, {
+      headers: { "X-MBX-APIKEY": apiKey },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error("ERROR_CHANGING_BINANCE_LEVERAGE", {
+      error:
+        (error as any)?.response?.data?.msg || (error as any)?.message || error,
+    });
+    return (error as any)?.response?.data || { msg: (error as any)?.message };
+  }
+}
+export async function ensureBinanceLeverage(
+  apiKey: string,
+  apiSecret: string,
+  symbol: string,
+  leverage: number,
+) {
+  const result = await changeLeverage(apiKey, apiSecret, symbol, leverage);
+
+  if (result?.msg?.includes("No need to change leverage")) {
+    return { ok: true, changed: false };
+  }
+
+  if (result?.leverage === leverage) {
+    return { ok: true, changed: true };
+  }
+
+  if (result?.msg) {
+    throw new Error(result.msg);
+  }
+
+  return { ok: true, changed: true };
+}
 
 export async function createBinanceFuturesOrder(
   credentials: any,
-  params: BinanceFuturesOrderParams
+  params: BinanceFuturesOrderParams,
 ) {
   try {
     // // Validate quantity
@@ -495,13 +550,21 @@ export async function createBinanceFuturesOrder(
     //     message: "Quantity must be a positive number",
     //   };
     // }
-    if (params.closePosition && params.quantity) {
-      throw {
-        code: "BAD_REQUEST",
-        message: "Quantity must not be sent when closePosition is true",
-      };
-    }
 
+    // if (params.closePosition && params.quantity) {
+    //   throw {
+    //     code: "BAD_REQUEST",
+    //     message: "Quantity must not be sent when closePosition is true",
+    //   };
+    // }
+    if (params.leverage) {
+      await ensureBinanceLeverage(
+        credentials.apiKey,
+        credentials.apiSecret,
+        params.symbol,
+        params.leverage,
+      );
+    }
     const timestamp = Date.now();
 
     // Create params object with required parameters
@@ -543,7 +606,7 @@ export async function createBinanceFuturesOrder(
 
     if (
       ["STOP", "STOP_MARKET", "TAKE_PROFIT", "TAKE_PROFIT_MARKET"].includes(
-        params.orderType
+        params.orderType,
       ) &&
       params.stopPrice
     ) {
@@ -559,7 +622,7 @@ export async function createBinanceFuturesOrder(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
     console.log("PAYLOAD:", requestParams);
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_CREATE_ORDER_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -588,7 +651,7 @@ export async function cancelBinanceFuturesOrder(
   credentials: any,
   symbol: string,
   orderId: number,
-  userId: string
+  userId: string,
 ) {
   try {
     const timestamp = Date.now();
@@ -602,7 +665,7 @@ export async function cancelBinanceFuturesOrder(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_CANCEL_ORDER_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -656,7 +719,7 @@ export async function cancelBinanceFuturesOrder(
 export async function fetchBinanceFuturesOrderById(
   credentials: any,
   symbol: string,
-  orderId: number
+  orderId: number,
 ) {
   try {
     const timestamp = Date.now();
@@ -669,7 +732,7 @@ export async function fetchBinanceFuturesOrderById(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_GET_ORDER_BY_ID_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -686,7 +749,7 @@ export async function fetchBinanceFuturesOrderById(
     throw new Error(
       (error as any)?.response?.data?.msg ||
         (error as any)?.message ||
-        "Failed to get futures order"
+        "Failed to get futures order",
     );
   }
 }
@@ -699,7 +762,7 @@ export async function fetchBinanceCurrentOpenOrder(
     orderId?: number;
     origClientOrderId?: string;
     recvWindow?: number;
-  }
+  },
 ) {
   try {
     // Binance rule enforcement
@@ -746,7 +809,7 @@ export async function fetchBinanceFuturesOpenOrdersAll(
   params?: {
     symbol?: string;
     recvWindow?: number;
-  }
+  },
 ) {
   try {
     const timestamp = Date.now();
@@ -791,7 +854,7 @@ export async function fetchBinanceFuturesOpenOrdersAll(
  */
 export async function fetchBinanceFuturesOrders(
   credentials: any,
-  symbol: string
+  symbol: string,
 ) {
   try {
     const timestamp = Date.now();
@@ -800,7 +863,7 @@ export async function fetchBinanceFuturesOrders(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_GET_ORDERS_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -828,7 +891,7 @@ export async function fetchBinanceFuturesTrades(
     fromId?: number; // optional (cannot be used with startTime/endTime)
     limit?: number; // optional (default 500, max 1000)
     recvWindow?: number; // optional
-  }
+  },
 ) {
   try {
     const timestamp = Date.now();
@@ -841,7 +904,7 @@ export async function fetchBinanceFuturesTrades(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_GET_TRADES_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -863,7 +926,7 @@ export async function fetchBinanceFuturesTrades(
 
 export async function fetchBinanceFuturesActivePositions(
   credentials: any,
-  symbol?: string
+  symbol?: string,
 ) {
   try {
     const timestamp = Date.now();
@@ -874,7 +937,7 @@ export async function fetchBinanceFuturesActivePositions(
     const queryString = createQueryString(requestParams);
     const signature = generateSignatureBinance(
       queryString,
-      credentials.apiSecret
+      credentials.apiSecret,
     );
 
     const url = `${BINANCE_FUTURES_BASE_URL}${BINANCE_FUTURES_POSITIONS_ENDPOINT}?${queryString}&signature=${signature}`;
@@ -902,7 +965,7 @@ export async function fetchBinanceFuturesActivePositions(
               : "ISOLATED",
           margin:
             Math.abs(
-              position.positionAmt * parseFloat(position.entryPrice || "0")
+              position.positionAmt * parseFloat(position.entryPrice || "0"),
             ) / parseFloat(position.leverage || "0"),
           unrealized_pnl: parseFloat(position.unRealizedProfit || "0"),
           positionSide: position.positionSide,
@@ -922,7 +985,7 @@ export async function fetchBinanceFuturesActivePositions(
 export async function fetchBinanceFuturesPositionsBySymbol(
   apiKey: string,
   apiSecret: string,
-  symbol: string
+  symbol: string,
 ) {
   try {
     const timestamp = Date.now();
@@ -967,7 +1030,7 @@ export async function fetchBinanceFuturesPositionsBySymbol(
     throw new Error(
       (error as any)?.response?.data?.msg ||
         (error as any)?.message ||
-        "Failed to get active futures positions"
+        "Failed to get active futures positions",
     );
   }
 }
