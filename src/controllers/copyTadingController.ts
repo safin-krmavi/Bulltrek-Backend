@@ -32,7 +32,7 @@ export const subscribeToCopyStrategy = async (req: any, res: Response) => {
         followerUserId,
         multiplier,
         isActive: true,
-      },
+      }
     });
 
     return sendSuccess(
@@ -62,7 +62,7 @@ export const unsubscribeFromCopyStrategy = async (req: any, res: Response) => {
   } catch (error: any) {
     console.error("[COPY_UNSUBSCRIBE]", error);
     return sendServerError(res, error.message);
-  }
+  } 
 };
 
 export const getUserCopySubscriptions = async (req: any, res: Response) => {
@@ -103,3 +103,4 @@ export const getPublishedStrategies = async (req: any, res: Response) => {
     return sendServerError(res, error.message);
   }
 };
+
