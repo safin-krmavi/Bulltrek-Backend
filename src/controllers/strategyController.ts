@@ -25,7 +25,7 @@ import { deleteSchedule } from "../utils/awsScheduler";
 
 export const createStrategyController = async (req: any, res: Response) => {
   const userId = req.user.userId;
-  console.log(req.user);
+  
   const {
     name,
     strategyType,
@@ -40,15 +40,21 @@ export const createStrategyController = async (req: any, res: Response) => {
     stopLossPct,
     priceStart,
     priceStop,
-
-    // schedule-related (optional per frequency)
-    time, // "HH:mm"
-    hourInterval, // number
-    daysOfWeek, // number[]
-    datesOfMonth, // number[]
+    time,
+    hourInterval,
+    daysOfWeek,
+    datesOfMonth,
     executionMode,
+    lowerLimit,
+    upperLimit,
+    entryInterval,
+    bookProfitBy,
+    leverage,
+    direction,
   } = req.body;
-  const requiredFields = {
+
+  // Validate required fields based on strategy type
+  const baseRequiredFields = {
     name,
     strategyType,
     exchange,
@@ -56,22 +62,53 @@ export const createStrategyController = async (req: any, res: Response) => {
     symbol,
     investmentPerRun,
     investmentCap,
-    frequency,
     executionMode,
   };
 
-  const missingFields = Object.entries(requiredFields)
-    .filter(
-      ([_, value]) => value === undefined || value === null || value === "",
-    )
-    .map(([key]) => key);
+  if (strategyType === "HUMAN_GRID") {
+    const gridRequiredFields = {
+      ...baseRequiredFields,
+      lowerLimit,
+      upperLimit,
+      entryInterval,
+      bookProfitBy,
+    };
 
-  if (missingFields.length > 0) {
-    console.error("Missing required fields:", missingFields);
-    return sendBadRequest(
-      res,
-      `Missing required fields: ${missingFields.join(", ")}`,
-    );
+    const missingFields = Object.entries(gridRequiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return sendBadRequest(
+        res,
+        `Missing required fields: ${missingFields.join(", ")}`
+      );
+    }
+
+    if (segment === "FUTURES") {
+      if (!leverage || !direction) {
+        return sendBadRequest(
+          res,
+          "Leverage and Direction are required for Futures trading"
+        );
+      }
+    }
+  } else {
+    const requiredFields = {
+      ...baseRequiredFields,
+      frequency,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return sendBadRequest(
+        res,
+        `Missing required fields: ${missingFields.join(", ")}`
+      );
+    }
   }
 
   try {
@@ -90,12 +127,17 @@ export const createStrategyController = async (req: any, res: Response) => {
       stopLossPct,
       priceStart,
       priceStop,
-      // schedule inputs (already coming from controller)
       time,
       hourInterval,
       daysOfWeek,
       datesOfMonth,
       executionMode,
+      lowerLimit,
+      upperLimit,
+      entryInterval,
+      bookProfitBy,
+      leverage,
+      direction,
     });
 
     if (
@@ -104,18 +146,26 @@ export const createStrategyController = async (req: any, res: Response) => {
     ) {
       await registerStrategy(strategy.id);
 
-      const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
-      const schedule = await scheduleStrategy({ strategy, lambdaArn });
-      console.log("SCHEDULE", schedule);
+      // ✅ ONLY schedule TIME-BASED strategies
+      if (strategy.type !== "HUMAN_GRID" && strategy.nextRunAt) {
+        const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
+        const schedule = await scheduleStrategy({ strategy, lambdaArn });
+        console.log("[STRATEGY_SCHEDULED]", schedule);
+      } else {
+        console.log("[STRATEGY_SIGNAL_BASED_NO_SCHEDULE]", {
+          strategyId: strategy.id,
+          type: strategy.type,
+        });
+      }
     }
 
     if (strategy.executionMode === "BACKTEST") {
-      // enqueue backtest job
+      console.log("[BACKTEST] Enqueue job for strategy:", strategy.id);
     }
 
     return sendSuccess(res, "Strategy created", strategy);
   } catch (error: any) {
-    console.error("[STRATEGY_CREATE]", error);
+    console.error("[CREATE_STRATEGY_ERROR]", error);
     return sendServerError(res, error.message);
   }
 };
@@ -165,14 +215,6 @@ export const updateStrategyController = async (req: any, res: Response) => {
 
     // 3. Resubscribe new
     if (updated.status === "ACTIVE") {
-      // await subscribeStrategyToMarketData({
-      //   assetType: updated.assetType as "CRYPTO" | "STOCK",
-      //   exchange: updated.exchange as CryptoExchange | StocksExchange,
-      //   segment: updated.segment,
-      //   symbol: updated.symbol,
-      //   strategyId: updated.id,
-      //   userId,
-      // });
       await registerStrategy(strategyId);
 
       const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
@@ -201,12 +243,13 @@ export const deleteStrategyController = async (req: any, res: Response) => {
       userId: strategy.userId,
     });
 
-    // strategyRuntimeRegistry.remove(strategyId);
+    await unregisterStrategy(strategyId);
 
     await deleteStrategy(strategyId, userId);
 
     const scheduleName = `strategy-${strategy.id}`;
     await deleteSchedule(scheduleName);
+    
     return sendSuccess(res, "Strategy deleted");
   } catch (error: any) {
     console.error("[STRATEGY_DELETE]", error);
@@ -237,6 +280,7 @@ export const updateStrategyStatusController = async (
 
     // 2️⃣ Persist status
     const updated = await changeStrategyStatus(strategyId, userId, status);
+    
     // 3️⃣ Entering ACTIVE → setup
     if (updated.status === "ACTIVE") {
       await registerStrategy(strategyId);

@@ -241,9 +241,9 @@ model CryptoOrder {
   id               String   @id @default(uuid())
   userId           String
   exchange         CryptoExchange
-  type             CryptoTradeType   // SPOT | FUTURES
+  type             CryptoTradeType
   symbol           String
-  side             TradeSide          // BUY | SELL
+  side             TradeSide
 
   exchangeOrderId  String?
   clientOrderId    String?
@@ -251,17 +251,18 @@ model CryptoOrder {
   requestedQty     Float
   requestedPrice   Float?
   leverage         Float?
-  orderType        String             // MARKET / LIMIT
+  orderType        String
 
-  status           TradeStatus         // NEW / PARTIALLY_FILLED / FILLED / CANCELLED
-  filledQty        Float               @default(0)
+  status           TradeStatus
+  filledQty        Float @default(0)
 
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   trades           CryptoTrades[]
 
-  @@unique([exchangeOrderId])
+  // Composite unique key for safe upsert
+  @@unique([userId, exchange, symbol, side, clientOrderId])
 }
 
 model StocksOrder {

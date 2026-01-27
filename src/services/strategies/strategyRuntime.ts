@@ -5,7 +5,8 @@ import { formatQuantity } from "../../utils/crypto/exchange/quantityFormatter";
 import { computeNextRunAt } from "../../utils/scheduler/computeNextRunAt";
 import prisma from "../../config/db.config";
 import { tradeDispatcher } from "./tradeDispatcher";
-// import other strategy evaluators here when ready
+import { evaluateHumanGrid } from "./evaluators/humanGridEvaluator";
+import { HumanGridState } from "../../types/strategies/humanGrid.types";
 
 // Base runtime state
 type BaseStrategyRuntimeState = {
@@ -37,6 +38,7 @@ type GrowthDCAState = {
 // Map strategy type to state type
 type StrategyStateMap = {
   GROWTH_DCA: GrowthDCAState;
+  HUMAN_GRID: HumanGridState;
   SCALPING: BaseStrategyRuntimeState;
   GRID: BaseStrategyRuntimeState;
   // Add future strategies here
@@ -79,8 +81,28 @@ export class StrategyRuntime<
         });
         break;
 
-      // ... other cases
+      case "HUMAN_GRID":
+        const gridConfig = strategy.config as any;
+        this.state = {
+          grids: gridConfig.grids || [],
+          investedCapital: 0,
+          lastExecutionAt: null,
+          status: "ACTIVE",
+          pendingOrders: new Set<string>(),
+        } as StrategyStateMap[T];
+        break;
+
+      default:
+        this.state = {
+          investedCapital: 0,
+          positionQty: 0,
+          avgEntryPrice: null,
+          lastExecutionAt: null,
+          nextRunAt: null,
+          status: "ACTIVE",
+        } as StrategyStateMap[T];
     }
+
     console.log("[STRATEGY_RUNTIME_INIT]", {
       strategyId: strategy.id,
       symbol: strategy.symbol,
@@ -101,7 +123,10 @@ export class StrategyRuntime<
       case "GROWTH_DCA":
         this.handleGrowthDCA(price, timestamp);
         break;
-      // ... other cases
+
+      case "HUMAN_GRID":
+        this.handleHumanGrid(price, timestamp);
+        break;
     }
   }
 
@@ -111,13 +136,16 @@ export class StrategyRuntime<
 
     if (this.strategy.type === "GROWTH_DCA") {
       this.handleGrowthDCA(price, Date.now());
+      
+      // ✅ Only update nextRunAt for Growth DCA
+      const growthState = this.state as GrowthDCAState;
+      growthState.lastExecutionAt = Date.now();
+      growthState.nextRunAt = computeNextRunAt(
+        (this.strategy.config as any).schedule,
+        new Date()
+      );
     }
 
-    this.state.lastExecutionAt = Date.now();
-    this.state.nextRunAt = computeNextRunAt(
-      (this.strategy.config as any).schedule,
-      new Date()
-    );
     this.active = false;
   }
 
@@ -337,10 +365,101 @@ export class StrategyRuntime<
   }
 
   /**
+   * Handles Human-Grid logic
+   */
+
+  private async handleHumanGrid(price: number, timestamp: number) {
+    const decision = evaluateHumanGrid(
+      this.strategy,
+      this.state as HumanGridState,
+      price
+    );
+
+    if (decision.action === "HOLD") {
+      return;
+    }
+
+    const state = this.state as HumanGridState;
+    const config = this.strategy.config as any;
+
+    if (decision.action === "BUY" && decision.gridId) {
+      // Check investment cap
+      const potentialInvestment = state.investedCapital + config.capital.perGridAmount;
+      if (potentialInvestment > config.capital.maxCapital) {
+        console.log("[HUMAN_GRID] Investment cap reached");
+        return;
+      }
+
+      // Mark as pending to avoid duplicate orders
+      state.pendingOrders.add(decision.gridId);
+
+      // Calculate stop loss if enabled
+      const stopLossPrice = config.stopLossPercentage
+        ? price * (1 - config.stopLossPercentage / 100)
+        : undefined;
+
+      await tradeDispatcher.dispatch({
+        userId: this.strategy.userId,
+        exchange: this.strategy.exchange,
+        segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+        tradeType: this.strategy.segment as "SPOT" | "FUTURES",
+        symbol: this.strategy.symbol,
+        side: "BUY",
+        quantity: decision.quantity!,
+        price: decision.price!,
+        takeProfit: decision.price! + config.bookProfitBy,
+        stopLoss: stopLossPrice,
+        orderType: "LIMIT",
+        strategyId: this.strategy.id,
+        onComplete: () => {
+          // Update grid state after successful buy
+          const grid = state.grids.find((g) => g.id === decision.gridId);
+          if (grid) {
+            grid.status = "BOUGHT";
+            grid.quantity = decision.quantity!;
+            state.investedCapital += config.capital.perGridAmount;
+          }
+          state.pendingOrders.delete(decision.gridId!);
+          state.lastExecutionAt = timestamp;
+        },
+      });
+    }
+
+    if (decision.action === "SELL" && decision.gridId) {
+      state.pendingOrders.add(decision.gridId);
+
+      await tradeDispatcher.dispatch({
+        userId: this.strategy.userId,
+        exchange: this.strategy.exchange,
+        segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+        tradeType: this.strategy.segment as "SPOT" | "FUTURES",
+        symbol: this.strategy.symbol,
+        side: "SELL",
+        quantity: decision.quantity!,
+        price: decision.price!,
+        orderType: "LIMIT",
+        strategyId: this.strategy.id,
+        onComplete: () => {
+          // Update grid state after successful sell
+          const grid = state.grids.find((g) => g.id === decision.gridId);
+          if (grid) {
+            grid.status = "EMPTY";
+            grid.quantity = 0;
+            state.investedCapital -= config.capital.perGridAmount;
+          }
+          state.pendingOrders.delete(decision.gridId!);
+          state.lastExecutionAt = timestamp;
+        },
+      });
+    }
+  }
+
+  /**
    * Stop strategy
    */
   stop() {
     this.state.status = "STOPPED";
+    this.active = false;
     console.log("[STRATEGY_STOPPED]", this.strategy.id);
   }
 

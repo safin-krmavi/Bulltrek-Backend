@@ -1,6 +1,8 @@
 // services/strategyService.ts
 import prisma from "../config/db.config";
 import { computeNextRunAt } from "../utils/scheduler/computeNextRunAt";
+import { generateGridLevels, validateGridConfig } from "../utils/strategies/gridCalculations";
+
 export const createStrategy = async (data: any) => {
   const {
     userId,
@@ -17,54 +19,92 @@ export const createStrategy = async (data: any) => {
     stopLossPct,
     priceStart,
     priceStop,
-    // schedule inputs (already coming from controller)
     time,
     hourInterval,
     daysOfWeek,
     datesOfMonth,
     executionMode,
+    // Human Grid specific
+    lowerLimit,
+    upperLimit,
+    entryInterval,
+    bookProfitBy,
+    leverage,
+    direction,
   } = data;
 
-  // Map flat fields into structured config
-  const config = {
-    capital: {
-      perOrderAmount: investmentPerRun,
-      maxCapital: investmentCap,
-    },
-    schedule: buildSchedule({
-      frequency,
-      time,
-      hourInterval,
-      daysOfWeek,
-      datesOfMonth,
-    }),
+  let config: any;
+  let nextRunAt: Date | null = null;
 
-    entry: {
-      priceTrigger: {
-        enabled: priceStart !== undefined && priceStop !== undefined,
-        startPrice: priceStart,
-        stopPrice: priceStop,
+  if (strategyType === "HUMAN_GRID") {
+    // Validate grid configuration
+    const gridConfig = {
+      lowerLimit,
+      upperLimit,
+      entryInterval,
+      bookProfitBy,
+      stopLossPercentage: stopLossPct,
+      capital: {
+        perGridAmount: investmentPerRun,
+        maxCapital: investmentCap,
       },
-    },
-    exit: {
-      bookProfit: {
-        enabled: takeProfitPct !== undefined,
-        percentage: takeProfitPct,
-      },
-    },
-    risk: {
-      stopLoss: {
-        enabled: stopLossPct !== undefined,
-        percentage: stopLossPct,
-      },
-    },
-  };
+      leverage: segment === "FUTURES" ? leverage : undefined,
+      direction: segment === "FUTURES" ? direction : undefined,
+    };
 
-  // Optional validation
-  if (config.capital.perOrderAmount > config.capital.maxCapital) {
-    throw new Error("Per order amount cannot exceed max capital");
+    const validation = validateGridConfig(gridConfig);
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
+
+    // Generate grid levels
+    const grids = generateGridLevels(gridConfig);
+
+    config = {
+      ...gridConfig,
+      grids,
+    };
+
+    // ✅ Human Grid has NO nextRunAt - it's signal-based
+    nextRunAt = null;
+  } else {
+    // Existing Growth DCA logic
+    config = {
+      capital: {
+        perOrderAmount: investmentPerRun,
+        maxCapital: investmentCap,
+      },
+      schedule: buildSchedule({
+        frequency,
+        time,
+        hourInterval,
+        daysOfWeek,
+        datesOfMonth,
+      }),
+      entry: {
+        priceTrigger: {
+          enabled: priceStart !== undefined && priceStop !== undefined,
+          startPrice: priceStart,
+          stopPrice: priceStop,
+        },
+      },
+      exit: {
+        bookProfit: {
+          enabled: takeProfitPct !== undefined,
+          percentage: takeProfitPct,
+        },
+      },
+      risk: {
+        stopLoss: {
+          enabled: stopLossPct !== undefined,
+          percentage: stopLossPct,
+        },
+      },
+    };
+
+    // ✅ Growth DCA has nextRunAt - it's time-based
+    nextRunAt = computeNextRunAt(config.schedule);
   }
-  const nextRunAt = computeNextRunAt(config.schedule);
 
   // Create strategy in DB
   return prisma.strategy.create({

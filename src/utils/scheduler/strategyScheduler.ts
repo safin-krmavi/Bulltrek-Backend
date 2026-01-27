@@ -4,29 +4,35 @@ import { computeNextRunAt } from "./computeNextRunAt";
 
 export async function runStrategyScheduler() {
   const strategies = await prisma.strategy.findMany({
-    where: { status: "ACTIVE" },
+    where: { 
+      status: "ACTIVE",
+      type: "GROWTH_DCA" // ✅ Only schedule time-based strategies
+    },
   });
-
 
   strategies.forEach((strategy) => {
     const runtime = strategyRuntimeRegistry.getRuntime(strategy.id);
     if (!runtime) return;
 
-    // Initialize nextRunAt if not present
-    if (!runtime.state.nextRunAt) {
-      const lastRun = runtime.state.lastExecutionAt
-        ? new Date(runtime.state.lastExecutionAt)
-        : new Date(0);
+    // ✅ Type guard: Only Growth DCA has nextRunAt
+    if (strategy.type === "GROWTH_DCA") {
+      const state = runtime.state as any; // Cast to access nextRunAt
 
-      runtime.state.nextRunAt = computeNextRunAt(
-        (strategy.config as any).schedule,
-        lastRun
-      );
+      if (!state.nextRunAt) {
+        const lastRun = state.lastExecutionAt
+          ? new Date(state.lastExecutionAt)
+          : new Date(0);
 
-      console.log(`[SCHEDULER] Initialized nextRunAt for ${strategy.id}:`, {
-        nextRunAt: runtime.state.nextRunAt,
-        lastExecutionAt: runtime.state.lastExecutionAt,
-      });
+        state.nextRunAt = computeNextRunAt(
+          (strategy.config as any).schedule,
+          lastRun
+        );
+
+        console.log(`[SCHEDULER] Initialized nextRunAt for ${strategy.id}:`, {
+          nextRunAt: state.nextRunAt,
+          lastExecutionAt: state.lastExecutionAt,
+        });
+      }
     }
   });
 }
