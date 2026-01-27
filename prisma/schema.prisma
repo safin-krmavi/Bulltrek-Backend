@@ -367,9 +367,9 @@ model StrategyCopySubscription {
   strategyId     String
   followerUserId String
 
+  followerExchange String @default("")
   multiplier     Float    @default(1) // quantity scaling
   isActive       Boolean  @default(true)
-
   createdAt      DateTime @default(now())
   strategy       Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
 

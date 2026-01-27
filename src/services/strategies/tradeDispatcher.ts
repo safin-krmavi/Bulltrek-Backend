@@ -51,32 +51,36 @@ export const tradeDispatcher = {
       },
     });
 
-    // if (strategy?.executionMode !== "PUBLISHED") {
-    //   console.log(
-    //     "Cannot execute strategy as the executionMode is:",
-    //     strategy?.executionMode,
-    //   );
+    if (strategy?.executionMode !== "PUBLISHED") {
+      console.log(
+        "Cannot execute strategy as the executionMode is:",
+        strategy?.executionMode,
+      );
 
-    //   return;
-    // }
-
-    for (const follower of followers) {
-      // ❗ Skip owner to prevent double execution
-      if (follower.followerUserId === originalIntent.userId) continue;
-
-      const qty = originalIntent.quantity * follower.multiplier;
-
-      // ❗ Never enqueue invalid quantities
-      if (qty <= 0) continue;
-
-      await this.dispatchForUser({
-        ...originalIntent,
-        userId: follower.followerUserId,
-        quantity: qty,
-        onComplete: undefined, // followers never mutate strategy state
-        isCopyTrade: true,
-      });
+      return;
     }
+
+    await Promise.allSettled(
+      followers.map(async (follower) => {
+        if (follower.followerUserId === originalIntent.userId) return;
+
+        const qty = originalIntent.quantity * follower.multiplier;
+        if (qty <= 0) return;
+
+        const exchange = follower.followerExchange?.trim()
+          ? follower.followerExchange
+          : originalIntent.exchange;
+
+        return this.dispatchForUser({
+          ...originalIntent,
+          userId: follower.followerUserId,
+          exchange,
+          quantity: qty,
+          onComplete: undefined,
+          isCopyTrade: true,
+        });
+      }),
+    );
   },
 
   async dispatchForUser(intent: TradeIntent) {
@@ -102,6 +106,7 @@ export const tradeDispatcher = {
 
       tradeExecutionEngine.enqueue({
         ...intent,
+        executionType,
         credentials,
       });
       return;
@@ -139,6 +144,7 @@ export const tradeDispatcher = {
 
       tradeExecutionEngine.enqueue({
         ...intent,
+        executionType,
         credentials,
       });
       return;
