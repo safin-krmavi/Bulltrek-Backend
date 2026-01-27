@@ -10,7 +10,7 @@ import prisma from "../config/db.config";
 // Subscribe to a published strategy
 export const subscribeToCopyStrategy = async (req: any, res: Response) => {
   const { strategyId } = req.params;
-  const { multiplier = 1 } = req.body;
+  const { multiplier = 1, exchange } = req.body;
   const followerUserId = req.user.userId;
 
   try {
@@ -25,12 +25,15 @@ export const subscribeToCopyStrategy = async (req: any, res: Response) => {
       return sendBadRequest(res, "Cannot subscribe to your own strategy");
     }
 
+    const followerExchange = exchange ?? strategy.exchange;
+
     // Create subscription
     const subscription = await prisma.strategyCopySubscription.create({
       data: {
         strategyId,
         followerUserId,
         multiplier,
+        followerExchange,
         isActive: true,
       },
     });
@@ -38,7 +41,7 @@ export const subscribeToCopyStrategy = async (req: any, res: Response) => {
     return sendSuccess(
       res,
       "Successfully subscribed to strategy",
-      subscription
+      subscription,
     );
   } catch (error: any) {
     console.error("[COPY_SUBSCRIBE]", error);
