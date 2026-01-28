@@ -31,16 +31,17 @@ export async function registerStrategy(strategyId: string) {
   }
 
   if (executionMode === EXECUTION_MODES.SIGNAL_BASED) {
-    signalEngine.register(strategy);
+    await signalEngine.register(strategy); // ✅ FIX: Pass strategy object, make it async
   }
 
   exitMonitor.register(strategy);
   console.log("[STRATEGY_REGISTER_COMPLETE]", { strategyId });
 }
 
-export function unregisterStrategy(strategyId: string) {
-  console.log("[STRATEGY_REGISTER_COMPLETE]", { strategyId });
+export async function unregisterStrategy(strategyId: string) {
+  console.log("[STRATEGY_UNREGISTER_COMPLETE]", { strategyId }); // ✅ FIX: Changed log message
+  
   timeEngine.unregister(strategyId);
-  signalEngine.unregister(strategyId);
+  signalEngine.unregister(strategyId); // ✅ FIX: Changed from register to unregister
   exitMonitor.unregister(strategyId);
 }

@@ -1,7 +1,10 @@
 // services/strategyService.ts
+import { CryptoExchange, StocksExchange } from "@prisma/client";
 import prisma from "../config/db.config";
+import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
+import { StockMarketDataManager } from "../sockets/stocks/marketData/marketDataManager";
 import { computeNextRunAt } from "../utils/scheduler/computeNextRunAt";
-import { generateGridLevels, validateGridConfig } from "../utils/strategies/gridCalculations";
+import { generateGridLevels, validateGridConfig, generateSmartGridLevels, validateSmartGridConfig, calculateBollingerBands, calculateATR } from "../utils/strategies/gridCalculations";
 
 export const createStrategy = async (data: any) => {
   const {
@@ -24,20 +27,90 @@ export const createStrategy = async (data: any) => {
     daysOfWeek,
     datesOfMonth,
     executionMode,
-    // Human Grid specific
     lowerLimit,
     upperLimit,
     entryInterval,
     bookProfitBy,
     leverage,
     direction,
+    levels,
+    profitPercentage,
+    dataSetDays,
+    gridMode,
+    recalculationInterval,
   } = data;
 
   let config: any;
   let nextRunAt: Date | null = null;
 
-  if (strategyType === "HUMAN_GRID") {
-    // Validate grid configuration
+  if (strategyType === "SMART_GRID") {
+    const smartGridConfig = {
+      lowerLimit,
+      upperLimit,
+      levels,
+      profitPercentage,
+      stopLossPercentage: stopLossPct,
+      capital: {
+        perGridAmount: investmentPerRun,
+        maxCapital: investmentCap,
+      },
+      leverage: segment === "FUTURES" ? leverage : undefined,
+      direction: segment === "FUTURES" ? direction : undefined,
+      dataSetDays: dataSetDays || 30,
+      mode: gridMode || "STATIC", // ✅ Default to STATIC for testing
+      recalculationInterval: recalculationInterval || 15,
+    };
+
+    const validation = validateSmartGridConfig(smartGridConfig);
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
+
+    // ✅ Fetch current market price to validate range
+    let currentPrice: number;
+    if (assetType === "CRYPTO") {
+      currentPrice = await MarketDataManager.fetchMarketPrice(
+        exchange as CryptoExchange,
+        segment,
+        symbol
+      );
+    } else {
+      currentPrice = await StockMarketDataManager.fetchMarketPrice(
+        exchange as StocksExchange,
+        userId,
+        symbol
+      );
+    }
+
+    if (!currentPrice || currentPrice <= 0) {
+      throw new Error("Unable to fetch current market price for validation");
+    }
+
+    // ✅ CRITICAL: Validate current price is within grid range
+    if (currentPrice < lowerLimit || currentPrice > upperLimit) {
+      throw new Error(
+        `Current market price (${currentPrice}) is outside grid range (${lowerLimit} - ${upperLimit}). ` +
+        `Adjust your range to include current price or wait for price to enter range.`
+      );
+    }
+
+    // Generate grids
+    const grids = generateSmartGridLevels(smartGridConfig);
+
+    // Placeholder indicators
+    const indicators = {
+      bollingerUpper: upperLimit,
+      bollingerLower: lowerLimit,
+      atr: (upperLimit - lowerLimit) * 0.05,
+    };
+
+    config = {
+      ...smartGridConfig,
+      grids,
+      indicators,
+    };
+    nextRunAt = null;
+  } else if (strategyType === "HUMAN_GRID") {
     const gridConfig = {
       lowerLimit,
       upperLimit,
@@ -57,15 +130,11 @@ export const createStrategy = async (data: any) => {
       throw new Error(validation.error);
     }
 
-    // Generate grid levels
     const grids = generateGridLevels(gridConfig);
-
     config = {
       ...gridConfig,
       grids,
     };
-
-    // ✅ Human Grid has NO nextRunAt - it's signal-based
     nextRunAt = null;
   } else {
     // Existing Growth DCA logic
@@ -101,12 +170,9 @@ export const createStrategy = async (data: any) => {
         },
       },
     };
-
-    // ✅ Growth DCA has nextRunAt - it's time-based
     nextRunAt = computeNextRunAt(config.schedule);
   }
 
-  // Create strategy in DB
   return prisma.strategy.create({
     data: {
       userId,
@@ -116,7 +182,7 @@ export const createStrategy = async (data: any) => {
       exchange,
       segment,
       symbol,
-      config, // store structured config
+      config,
       nextRunAt,
       status: "ACTIVE",
       executionMode,

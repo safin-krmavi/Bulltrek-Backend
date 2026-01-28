@@ -45,15 +45,21 @@ export const createStrategyController = async (req: any, res: Response) => {
     daysOfWeek,
     datesOfMonth,
     executionMode,
+    // Human Grid
     lowerLimit,
     upperLimit,
     entryInterval,
     bookProfitBy,
     leverage,
     direction,
+    // Smart Grid
+    levels,
+    profitPercentage,
+    dataSetDays,
+    gridMode,
+    recalculationInterval,
   } = req.body;
 
-  // Validate required fields based on strategy type
   const baseRequiredFields = {
     name,
     strategyType,
@@ -75,6 +81,35 @@ export const createStrategyController = async (req: any, res: Response) => {
     };
 
     const missingFields = Object.entries(gridRequiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return sendBadRequest(
+        res,
+        `Missing required fields: ${missingFields.join(", ")}`
+      );
+    }
+
+    if (segment === "FUTURES") {
+      if (!leverage || !direction) {
+        return sendBadRequest(
+          res,
+          "Leverage and Direction are required for Futures trading"
+        );
+      }
+    }
+  } else if (strategyType === "SMART_GRID") {
+    // ✅ NEW: Smart Grid validation
+    const smartGridRequiredFields = {
+      ...baseRequiredFields,
+      lowerLimit,
+      upperLimit,
+      levels,
+      profitPercentage,
+    };
+
+    const missingFields = Object.entries(smartGridRequiredFields)
       .filter(([_, value]) => value === undefined || value === null || value === "")
       .map(([key]) => key);
 
@@ -138,6 +173,11 @@ export const createStrategyController = async (req: any, res: Response) => {
       bookProfitBy,
       leverage,
       direction,
+      levels,
+      profitPercentage,
+      dataSetDays,
+      gridMode,
+      recalculationInterval,
     });
 
     if (
@@ -146,8 +186,8 @@ export const createStrategyController = async (req: any, res: Response) => {
     ) {
       await registerStrategy(strategy.id);
 
-      // ✅ ONLY schedule TIME-BASED strategies
-      if (strategy.type !== "HUMAN_GRID" && strategy.nextRunAt) {
+      // Only schedule TIME-BASED strategies
+      if (strategy.type !== "HUMAN_GRID" && strategy.type !== "SMART_GRID" && strategy.nextRunAt) {
         const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
         const schedule = await scheduleStrategy({ strategy, lambdaArn });
         console.log("[STRATEGY_SCHEDULED]", schedule);

@@ -1,78 +1,151 @@
 import { Strategy } from "@prisma/client";
-import { HumanGridState, HumanGridConfig } from "../../../types/strategies/humanGrid.types";
-import { findActiveGridForPrice } from "../../../utils/strategies/gridCalculations";
+import { HumanGridState, SmartGridState, GridDecision } from "../../../types/strategies/humanGrid.types";
 
-type GridDecision = {
-  action: "BUY" | "SELL" | "HOLD";
-  gridId?: string;
-  quantity?: number;
-  price?: number;
-  reason?: string;
-};
-
+// ✅ Existing Human Grid Evaluator
 export function evaluateHumanGrid(
   strategy: Strategy,
   state: HumanGridState,
   currentPrice: number
 ): GridDecision {
-  const config = strategy.config as HumanGridConfig;
+  const config = strategy.config as any;
 
   // Check if price is outside grid range
-  if (currentPrice < config.lowerLimit) {
-    return { action: "HOLD", reason: "PRICE_BELOW_GRID_RANGE" };
+  if (currentPrice < config.lowerLimit || currentPrice > config.upperLimit) {
+    return {
+      action: "HOLD",
+      reason: "Price outside grid range",
+    };
   }
 
-  if (currentPrice > config.upperLimit) {
-    return { action: "HOLD", reason: "PRICE_ABOVE_GRID_RANGE" };
-  }
-
-  // Check investment cap
-  if (state.investedCapital >= config.capital.maxCapital) {
-    return { action: "HOLD", reason: "INVESTMENT_CAP_REACHED" };
-  }
+  // Find the nearest grid level to current price
+  const nearestGrid = state.grids.reduce((prev, curr) => {
+    const prevDiff = Math.abs(prev.buyPrice - currentPrice);
+    const currDiff = Math.abs(curr.buyPrice - currentPrice);
+    return currDiff < prevDiff ? curr : prev;
+  });
 
   // Check for BUY opportunity
-  const buyGrid = findActiveGridForPrice(state.grids, currentPrice, "BUY");
-  if (buyGrid && !state.pendingOrders.has(buyGrid.id)) {
-    const quantity =
-      strategy.assetType === "STOCK"
-        ? config.capital.perGridAmount // Number of shares
-        : config.capital.perGridAmount / currentPrice; // Crypto quantity
-
+  if (
+    nearestGrid.status === "EMPTY" &&
+    !state.pendingOrders.has(nearestGrid.id) &&
+    currentPrice <= nearestGrid.buyPrice
+  ) {
     return {
       action: "BUY",
-      gridId: buyGrid.id,
-      quantity,
-      price: currentPrice,
-      reason: "GRID_BUY_TRIGGERED",
+      price: nearestGrid.buyPrice,
+      quantity: config.capital.perGridAmount,
+      gridId: nearestGrid.id,
+      reason: "Price reached buy level",
     };
   }
 
   // Check for SELL opportunity
-  const sellGrid = findActiveGridForPrice(state.grids, currentPrice, "SELL");
-  if (sellGrid && !state.pendingOrders.has(sellGrid.id)) {
+  if (
+    nearestGrid.status === "BOUGHT" &&
+    !state.pendingOrders.has(nearestGrid.id) &&
+    currentPrice >= nearestGrid.sellPrice
+  ) {
     return {
       action: "SELL",
-      gridId: sellGrid.id,
-      quantity: sellGrid.quantity,
-      price: currentPrice,
-      reason: "GRID_SELL_TRIGGERED",
+      price: nearestGrid.sellPrice,
+      quantity: nearestGrid.quantity,
+      gridId: nearestGrid.id,
+      reason: "Price reached sell level",
     };
   }
 
-  return { action: "HOLD", reason: "NO_GRID_TRIGGER" };
+  return {
+    action: "HOLD",
+    reason: "No grid level triggered",
+  };
 }
 
-export function calculateGridStatistics(state: HumanGridState) {
-  const emptyGrids = state.grids.filter((g) => g.status === "EMPTY").length;
-  const filledGrids = state.grids.filter((g) => g.status === "BOUGHT").length;
+// ✅ NEW: Smart Grid Evaluator
+export function evaluateSmartGrid(
+  strategy: Strategy,
+  state: SmartGridState,
+  currentPrice: number
+): GridDecision {
+  const config = strategy.config as any;
+
+  // Check if price is outside grid range
+  if (currentPrice < config.lowerLimit || currentPrice > config.upperLimit) {
+    return {
+      action: "HOLD",
+      reason: "Price outside smart grid range",
+    };
+  }
+
+  // Find the nearest grid level to current price
+  const sortedGrids = [...state.grids].sort((a, b) => a.buyPrice - b.buyPrice);
+  
+  let nearestBuyGrid = null;
+  let nearestSellGrid = null;
+
+  // Find nearest BUY opportunity (EMPTY grid below current price)
+  for (let i = sortedGrids.length - 1; i >= 0; i--) {
+    const grid = sortedGrids[i];
+    if (
+      grid.status === "EMPTY" &&
+      !state.pendingOrders.has(grid.id) &&
+      currentPrice <= grid.buyPrice * 1.001 // 0.1% tolerance
+    ) {
+      nearestBuyGrid = grid;
+      break;
+    }
+  }
+
+  // Find nearest SELL opportunity (BOUGHT grid above current price)
+  for (let i = 0; i < sortedGrids.length; i++) {
+    const grid = sortedGrids[i];
+    if (
+      grid.status === "BOUGHT" &&
+      !state.pendingOrders.has(grid.id) &&
+      currentPrice >= grid.sellPrice * 0.999 // 0.1% tolerance
+    ) {
+      nearestSellGrid = grid;
+      break;
+    }
+  }
+
+  // Prioritize SELL over BUY (take profits first)
+  if (nearestSellGrid) {
+    return {
+      action: "SELL",
+      price: nearestSellGrid.sellPrice,
+      quantity: nearestSellGrid.quantity,
+      gridId: nearestSellGrid.id,
+      reason: "Smart grid sell level reached",
+    };
+  }
+
+  if (nearestBuyGrid) {
+    return {
+      action: "BUY",
+      price: nearestBuyGrid.buyPrice,
+      quantity: config.capital.perGridAmount,
+      gridId: nearestBuyGrid.id,
+      reason: "Smart grid buy level reached",
+    };
+  }
+
+  return {
+    action: "HOLD",
+    reason: "No smart grid level triggered",
+  };
+}
+
+// ✅ Existing function
+export function calculateGridStatistics(state: HumanGridState | SmartGridState) {
   const totalGrids = state.grids.length;
+  const filledGrids = state.grids.filter((g) => g.status === "BOUGHT").length;
+  const emptyGrids = state.grids.filter((g) => g.status === "EMPTY").length;
 
   return {
     totalGrids,
-    emptyGrids,
     filledGrids,
-    utilizationRate: (filledGrids / totalGrids) * 100,
+    emptyGrids,
+    fillRate: (filledGrids / totalGrids) * 100,
     investedCapital: state.investedCapital,
   };
 }
