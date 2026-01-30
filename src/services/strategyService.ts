@@ -43,74 +43,52 @@ export const createStrategy = async (data: any) => {
   let config: any;
   let nextRunAt: Date | null = null;
 
-  if (strategyType === "SMART_GRID") {
-    const smartGridConfig = {
-      lowerLimit,
-      upperLimit,
-      levels,
-      profitPercentage,
-      stopLossPercentage: stopLossPct,
-      capital: {
-        perGridAmount: investmentPerRun,
-        maxCapital: investmentCap,
-      },
-      leverage: segment === "FUTURES" ? leverage : undefined,
-      direction: segment === "FUTURES" ? direction : undefined,
-      dataSetDays: dataSetDays || 30,
-      mode: gridMode || "STATIC", // ✅ Default to STATIC for testing
-      recalculationInterval: recalculationInterval || 15,
-    };
+if (strategyType === "SMART_GRID") {
+  // ✅ FIX: Auto-generate parameters from indicators
+const { generateSmartGridParams } =
+  await import("./strategies/indicatorCalculator.js");
 
-    const validation = validateSmartGridConfig(smartGridConfig);
-    if (!validation.valid) {
-      throw new Error(validation.error);
-    }
+  const autoParams = await generateSmartGridParams({
+    exchange,
+    symbol,
+    dataSetDays: dataSetDays || 30,
+    userLowerLimit: lowerLimit, // User can override
+    userUpperLimit: upperLimit,
+    userLevels: levels,
+  });
 
-    // ✅ Fetch current market price to validate range
-    let currentPrice: number;
-    if (assetType === "CRYPTO") {
-      currentPrice = await MarketDataManager.fetchMarketPrice(
-        exchange as CryptoExchange,
-        segment,
-        symbol
-      );
-    } else {
-      currentPrice = await StockMarketDataManager.fetchMarketPrice(
-        exchange as StocksExchange,
-        userId,
-        symbol
-      );
-    }
+  const smartGridConfig = {
+    lowerLimit: autoParams.lowerLimit,
+    upperLimit: autoParams.upperLimit,
+    levels: autoParams.levels,
+    profitPercentage,
+    stopLossPercentage: stopLossPct,
+    capital: {
+      perGridAmount: investmentPerRun,
+      maxCapital: investmentCap,
+    },
+    leverage: segment === "FUTURES" ? leverage : undefined,
+    direction: segment === "FUTURES" ? direction : undefined,
+    dataSetDays: autoParams.dataSetDays,
+    mode: gridMode || "STATIC",
+    recalculationInterval: recalculationInterval || 15,
+  };
 
-    if (!currentPrice || currentPrice <= 0) {
-      throw new Error("Unable to fetch current market price for validation");
-    }
+  const validation = validateSmartGridConfig(smartGridConfig);
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
 
-    // ✅ CRITICAL: Validate current price is within grid range
-    if (currentPrice < lowerLimit || currentPrice > upperLimit) {
-      throw new Error(
-        `Current market price (${currentPrice}) is outside grid range (${lowerLimit} - ${upperLimit}). ` +
-        `Adjust your range to include current price or wait for price to enter range.`
-      );
-    }
+  const grids = generateSmartGridLevels(smartGridConfig);
 
-    // Generate grids
-    const grids = generateSmartGridLevels(smartGridConfig);
+  config = {
+    ...smartGridConfig,
+    grids,
+    indicators: autoParams.indicators, // ✅ Real calculated values
+  };
 
-    // Placeholder indicators
-    const indicators = {
-      bollingerUpper: upperLimit,
-      bollingerLower: lowerLimit,
-      atr: (upperLimit - lowerLimit) * 0.05,
-    };
-
-    config = {
-      ...smartGridConfig,
-      grids,
-      indicators,
-    };
-    nextRunAt = null;
-  } else if (strategyType === "HUMAN_GRID") {
+  nextRunAt = null;
+}else if (strategyType === "HUMAN_GRID") {
     const gridConfig = {
       lowerLimit,
       upperLimit,

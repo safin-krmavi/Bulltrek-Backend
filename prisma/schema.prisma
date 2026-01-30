@@ -260,9 +260,6 @@ model CryptoOrder {
   updatedAt        DateTime @updatedAt
 
   trades           CryptoTrades[]
-
-  // Composite unique key for safe upsert
-  @@unique([userId, exchange, symbol, side, clientOrderId])
 }
 
 model StocksOrder {

@@ -1085,3 +1085,33 @@ export async function fetchBinanceMarketPrice(params: {
     handleBinanceError(error);
   }
 }
+
+/**
+ * Fetch historical kline/candlestick data
+ */
+export async function fetchBinanceHistoricalKlines(
+  symbol: string,
+  interval: string = "1d", // 1m, 5m, 1h, 1d, 1w, 1M
+  limit: number = 500 // Max 1000
+): Promise<any[]> {
+  try {
+    const url = `${BINANCE_SPOT_BASE_URL}/api/v3/klines`;
+    
+    const { data } = await axios.get(url, {
+      params: {
+        symbol,
+        interval,
+        limit,
+      },
+    });
+
+    // Returns: [openTime, open, high, low, close, volume, closeTime, ...]
+    return data;
+  } catch (error: any) {
+    console.error("[BINANCE_KLINES_ERROR]", {
+      symbol,
+      error: error?.response?.data || error.message,
+    });
+    throw error;
+  }
+}

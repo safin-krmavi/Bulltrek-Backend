@@ -11,7 +11,6 @@ dotenv.config();
 /* -------------------------------------------------------------------------- */
 /*                                AWS CLIENT                                  */
 /* -------------------------------------------------------------------------- */
-
 if (
   !process.env.S3BUCKET_REGION ||
   !process.env.S3BUCKET_ACCESS_KEY ||
@@ -64,11 +63,15 @@ type ScheduleOptions = OneTimeSchedule | RateSchedule | CronSchedule;
 function formatAtDate(date: Date): string {
   return date.toISOString().replace(/\.\d+Z$/, "");
 }
-
+function subtractSeconds(date: Date, seconds: number): Date {
+  return new Date(date.getTime() - seconds * 1000);
+}
 function buildScheduleExpression(options: ScheduleOptions): string {
   switch (options.type) {
-    case "ONCE":
-      return `at(${formatAtDate(options.runAt)})`;
+    case "ONCE": {
+      const adjustedRunAt = subtractSeconds(options.runAt, 30); // 👈 30s early
+      return `at(${formatAtDate(adjustedRunAt)})`;
+    }
 
     case "RATE":
       return `rate(${options.rateValue} ${options.rateUnit})`;
@@ -80,7 +83,6 @@ function buildScheduleExpression(options: ScheduleOptions): string {
       throw new Error("Invalid schedule type");
   }
 }
-
 /* -------------------------------------------------------------------------- */
 /*                            CREATE / UPSERT SCHEDULE                         */
 /* -------------------------------------------------------------------------- */

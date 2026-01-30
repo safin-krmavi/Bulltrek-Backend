@@ -29,7 +29,7 @@ export function generateSmartGridLevels(config: SmartGridConfig): GridLevel[] {
   const priceRange = upperLimit - lowerLimit;
   const gridInterval = priceRange / levels;
 
-  for (let i = 0; i <= levels; i++) {
+  for (let i = 0; i < levels; i++){
     const buyPrice = lowerLimit + (i * gridInterval);
     const sellPrice = buyPrice * (1 + profitPercentage / 100);
 
@@ -115,14 +115,17 @@ export function validateGridConfig(config: HumanGridConfig): {
     return { valid: false, error: "Book profit value must be positive" };
   }
 
-  const numberOfGrids = Math.floor((config.upperLimit - config.lowerLimit) / config.entryInterval);
-  if (numberOfGrids < 2) {
-    return { valid: false, error: "Grid configuration results in too few levels (minimum 2 required)" };
-  }
+const rawGridCount =
+  (config.upperLimit - config.lowerLimit) / config.entryInterval;
 
-  if (numberOfGrids > 100) {
-    return { valid: false, error: "Grid configuration results in too many levels (maximum 100 allowed)" };
-  }
+const numberOfGrids = Math.floor(rawGridCount + 1e-9) + 1;
+if (numberOfGrids < 2) {
+  return { valid: false, error: "Grid configuration results in too few levels (minimum 2 required)" };
+}
+
+if (numberOfGrids > 500) {
+  return { valid: false, error: "Grid configuration results in too many levels (maximum 100 allowed)" };
+}
 
   return { valid: true };
 }

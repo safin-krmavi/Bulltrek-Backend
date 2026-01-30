@@ -1,3 +1,4 @@
+export type GridLifecycle = "INIT" | "WAITING_FOR_PRICE" | "RUNNING" | "STOPPED";
 export type GridLevel = {
   id: string;
   buyPrice: number;
@@ -19,6 +20,7 @@ export type HumanGridConfig = {
   };
   leverage?: number;
   direction?: "LONG" | "SHORT";
+  maxCycles?: number; // ✅ NEW: Maximum number of complete grid cycles
 };
 
 export type HumanGridState = {
@@ -26,7 +28,9 @@ export type HumanGridState = {
   investedCapital: number;
   lastExecutionAt: number | null;
   status: "ACTIVE" | "PAUSED" | "STOPPED";
+  lifecycle: GridLifecycle;
   pendingOrders: Set<string>;
+  executedCycles: number; // ✅ FIX: Add this property
 };
 
 export type GridDecision = {
@@ -59,7 +63,7 @@ export type SmartGridState = {
     atr: number;
   };
   mode: "STATIC" | "DYNAMIC";
-  lifecycle: SmartGridLifecycle; // ✅ NEW
+  lifecycle: SmartGridLifecycle;
 };
 
 export type SmartGridConfig = {
