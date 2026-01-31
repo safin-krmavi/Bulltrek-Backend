@@ -38,7 +38,7 @@ class TradeExecutionEngine {
       const order = queue.shift()!;
       console.log(
         `[Engine] Processing order (attempt ${order.attempt}):`,
-        order
+        order,
       );
 
       try {
@@ -61,7 +61,7 @@ class TradeExecutionEngine {
           order.attempt = (order.attempt ?? 0) + 1;
           console.log(
             `[Engine] Retrying order (attempt ${order.attempt}):`,
-            order
+            order,
           );
           queue.push(order);
         } else {
@@ -79,19 +79,20 @@ class TradeExecutionEngine {
 
   private async executeCrypto(order: TradeIntent) {
     console.log(`[Engine] Executing crypto order:`, order);
+
     if (order.tradeType === "SPOT") {
       await createSpotTrade(
         order.userId,
         order.exchange,
         order.credentials,
-        order
+        order,
       );
     } else {
       await createFuturesTrade(
         order.userId,
         order.exchange,
         order.credentials,
-        order
+        order,
       );
     }
   }

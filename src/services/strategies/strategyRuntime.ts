@@ -45,7 +45,7 @@ type StrategyStateMap = {
 };
 
 export class StrategyRuntime<
-  T extends keyof StrategyStateMap = keyof StrategyStateMap
+  T extends keyof StrategyStateMap = keyof StrategyStateMap,
 > {
   private strategy: Strategy;
   public state: StrategyStateMap[T];
@@ -67,7 +67,7 @@ export class StrategyRuntime<
           lastExecutionAt: lastExecution,
           nextRunAt: computeNextRunAt(
             (strategy.config as any).schedule,
-            strategy.lastExecutedAt || new Date(0)
+            strategy.lastExecutedAt || new Date(0),
           ),
           status: "ACTIVE",
         } as StrategyStateMap[T];
@@ -136,13 +136,13 @@ export class StrategyRuntime<
 
     if (this.strategy.type === "GROWTH_DCA") {
       this.handleGrowthDCA(price, Date.now());
-      
+
       // ✅ Only update nextRunAt for Growth DCA
       const growthState = this.state as GrowthDCAState;
       growthState.lastExecutionAt = Date.now();
       growthState.nextRunAt = computeNextRunAt(
         (this.strategy.config as any).schedule,
-        new Date()
+        new Date(),
       );
     }
 
@@ -165,13 +165,13 @@ export class StrategyRuntime<
       // Initialize on first run
       state.nextRunAt = computeNextRunAt(
         config.schedule,
-        state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0)
+        state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0),
       );
       console.log(
         `[GROWTH_DCA] Initialized nextRunAt for ${this.strategy.id}:`,
         {
           nextRunAt: state.nextRunAt,
-        }
+        },
       );
     }
 
@@ -324,7 +324,7 @@ export class StrategyRuntime<
   private async sellEntry(
     entry: DCAEntry,
     price: number,
-    reason: "BOOK_PROFIT" | "STOP_LOSS"
+    reason: "BOOK_PROFIT" | "STOP_LOSS",
   ) {
     const state = this.state as GrowthDCAState;
     state.pendingOrder = true;
@@ -372,7 +372,7 @@ export class StrategyRuntime<
     const decision = evaluateHumanGrid(
       this.strategy,
       this.state as HumanGridState,
-      price
+      price,
     );
 
     if (decision.action === "HOLD") {
@@ -384,7 +384,8 @@ export class StrategyRuntime<
 
     if (decision.action === "BUY" && decision.gridId) {
       // Check investment cap
-      const potentialInvestment = state.investedCapital + config.capital.perGridAmount;
+      const potentialInvestment =
+        state.investedCapital + config.capital.perGridAmount;
       if (potentialInvestment > config.capital.maxCapital) {
         console.log("[HUMAN_GRID] Investment cap reached");
         return;

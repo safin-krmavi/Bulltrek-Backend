@@ -4,7 +4,14 @@ import prisma from "../config/db.config";
 import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
 import { StockMarketDataManager } from "../sockets/stocks/marketData/marketDataManager";
 import { computeNextRunAt } from "../utils/scheduler/computeNextRunAt";
-import { generateGridLevels, validateGridConfig, generateSmartGridLevels, validateSmartGridConfig, calculateBollingerBands, calculateATR } from "../utils/strategies/gridCalculations";
+import {
+  generateGridLevels,
+  validateGridConfig,
+  generateSmartGridLevels,
+  validateSmartGridConfig,
+  calculateBollingerBands,
+  calculateATR,
+} from "../utils/strategies/gridCalculations";
 
 export const createStrategy = async (data: any) => {
   const {
@@ -43,52 +50,52 @@ export const createStrategy = async (data: any) => {
   let config: any;
   let nextRunAt: Date | null = null;
 
-if (strategyType === "SMART_GRID") {
-  // ✅ FIX: Auto-generate parameters from indicators
-const { generateSmartGridParams } =
-  await import("./strategies/indicatorCalculator.js");
+  if (strategyType === "SMART_GRID") {
+    // ✅ FIX: Auto-generate parameters from indicators
+    const { generateSmartGridParams } =
+      await import("./strategies/indicatorCalculator.js");
 
-  const autoParams = await generateSmartGridParams({
-    exchange,
-    symbol,
-    dataSetDays: dataSetDays || 30,
-    userLowerLimit: lowerLimit, // User can override
-    userUpperLimit: upperLimit,
-    userLevels: levels,
-  });
+    const autoParams = await generateSmartGridParams({
+      exchange,
+      symbol,
+      dataSetDays: dataSetDays || 30,
+      userLowerLimit: lowerLimit, // User can override
+      userUpperLimit: upperLimit,
+      userLevels: levels,
+    });
 
-  const smartGridConfig = {
-    lowerLimit: autoParams.lowerLimit,
-    upperLimit: autoParams.upperLimit,
-    levels: autoParams.levels,
-    profitPercentage,
-    stopLossPercentage: stopLossPct,
-    capital: {
-      perGridAmount: investmentPerRun,
-      maxCapital: investmentCap,
-    },
-    leverage: segment === "FUTURES" ? leverage : undefined,
-    direction: segment === "FUTURES" ? direction : undefined,
-    dataSetDays: autoParams.dataSetDays,
-    mode: gridMode || "STATIC",
-    recalculationInterval: recalculationInterval || 15,
-  };
+    const smartGridConfig = {
+      lowerLimit: autoParams.lowerLimit,
+      upperLimit: autoParams.upperLimit,
+      levels: autoParams.levels,
+      profitPercentage,
+      stopLossPercentage: stopLossPct,
+      capital: {
+        perGridAmount: investmentPerRun,
+        maxCapital: investmentCap,
+      },
+      leverage: segment === "FUTURES" ? leverage : undefined,
+      direction: segment === "FUTURES" ? direction : undefined,
+      dataSetDays: autoParams.dataSetDays,
+      mode: gridMode || "STATIC",
+      recalculationInterval: recalculationInterval || 15,
+    };
 
-  const validation = validateSmartGridConfig(smartGridConfig);
-  if (!validation.valid) {
-    throw new Error(validation.error);
-  }
+    const validation = validateSmartGridConfig(smartGridConfig);
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
 
-  const grids = generateSmartGridLevels(smartGridConfig);
+    const grids = generateSmartGridLevels(smartGridConfig);
 
-  config = {
-    ...smartGridConfig,
-    grids,
-    indicators: autoParams.indicators, // ✅ Real calculated values
-  };
+    config = {
+      ...smartGridConfig,
+      grids,
+      indicators: autoParams.indicators, // ✅ Real calculated values
+    };
 
-  nextRunAt = null;
-}else if (strategyType === "HUMAN_GRID") {
+    nextRunAt = null;
+  } else if (strategyType === "HUMAN_GRID") {
     const gridConfig = {
       lowerLimit,
       upperLimit,
@@ -198,7 +205,7 @@ export const getStrategyById = async (strategyId: string) => {
 export const updateStrategy = async (
   strategyId: string,
   userId: string,
-  updates: any
+  updates: any,
 ) => {
   const existing = await prisma.strategy.findFirst({
     where: { id: strategyId, userId },
@@ -300,7 +307,7 @@ export const deleteStrategy = async (strategyId: string, userId: string) => {
 export const changeStrategyStatus = async (
   strategyId: string,
   userId: string,
-  status: "ACTIVE" | "PAUSED" | "STOPPED"
+  status: "ACTIVE" | "PAUSED" | "STOPPED",
 ) => {
   const strategy = await prisma.strategy.findFirst({
     where: { id: strategyId, userId },
