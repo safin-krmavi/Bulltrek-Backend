@@ -153,72 +153,95 @@ export class StrategyRuntime<
    * Handles Growth-DCA logic
    */
 
-  private async handleGrowthDCA(price: number, timestamp: number) {
-    const config = this.strategy.config as any;
-    const state = this.state as GrowthDCAState;
-    // console.log("CHECK THIS", state, this.strategy);
-    // 1️⃣ Pending order guard
-    if (state.pendingOrder) return;
+private async handleGrowthDCA(price: number, timestamp: number) {
+  const config = this.strategy.config as any;
+  const state = this.state as GrowthDCAState;
 
-    // 2️⃣ **CRITICAL FIX**: Check if we're past the scheduled time
-    if (!state.nextRunAt) {
-      // Initialize on first run
-      state.nextRunAt = computeNextRunAt(
-        config.schedule,
-        state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0)
-      );
-      console.log(
-        `[GROWTH_DCA] Initialized nextRunAt for ${this.strategy.id}:`,
-        {
-          nextRunAt: state.nextRunAt,
-        }
-      );
-    }
+  if (state.pendingOrder) return;
 
-    const now = timestamp;
-    const scheduledTime = state.nextRunAt.getTime();
-
-    // **KEY FIX**: Only proceed if we're past the scheduled time
-    if (now < scheduledTime) {
-      // Optional: Log when we're close (within 1 minute) for debugging
-      if (scheduledTime - now < 60000) {
-        console.log(`[GROWTH_DCA] Waiting for schedule:`, {
-          strategyId: this.strategy.id,
-          scheduledTime: new Date(scheduledTime).toISOString(),
-          currentTime: new Date(now).toISOString(),
-          secondsRemaining: Math.floor((scheduledTime - now) / 1000),
-        });
-      }
-      return;
-    }
-
-    // 3️⃣ Investment cap check
-    if (
-      state.investedCapital + config.capital.perOrderAmount >
-      config.capital.maxCapital
-    ) {
-      console.log(`[GROWTH_DCA] Investment cap reached:`, {
-        strategyId: this.strategy.id,
-        invested: state.investedCapital,
-        maxCapital: config.capital.maxCapital,
-      });
-      return;
-    }
-    if (!price || price <= 0) {
-      console.log("INVALID PRICE", price);
-      return;
-    }
-
-    // 4️⃣ Evaluate decision
-    const decision = evaluateGrowthDCA(this.strategy, state, price, timestamp);
-
-    console.log("[GROWTH_DCA] Evaluate decision", {
-      strategyId: this.strategy.id,
-      decision,
-      price,
-      scheduledTime: new Date(scheduledTime).toISOString(),
-      executionTime: new Date(now).toISOString(),
+  if (!state.nextRunAt) {
+    state.nextRunAt = computeNextRunAt(
+      config.schedule,
+      state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0)
+    );
+    console.log(`[GROWTH_DCA] Initialized nextRunAt for ${this.strategy.id}:`, {
+      nextRunAt: state.nextRunAt,
     });
+  }
+
+  const now = timestamp;
+  const scheduledTime = state.nextRunAt.getTime();
+
+  // ✅ FIX: Add 10-second tolerance window for execution
+  const executionWindow = 10 * 1000; // 10 seconds
+  const timeDiff = now - scheduledTime;
+
+  // Only proceed if we're within the execution window
+  if (timeDiff < 0) {
+    // Too early
+    if (scheduledTime - now < 60000) {
+      console.log(`[GROWTH_DCA] Waiting for schedule:`, {
+        strategyId: this.strategy.id,
+        scheduledTime: new Date(scheduledTime).toISOString(),
+        currentTime: new Date(now).toISOString(),
+        secondsRemaining: Math.floor((scheduledTime - now) / 1000),
+      });
+    }
+    return;
+  }
+
+  if (timeDiff > executionWindow) {
+    // ❌ Too late - skip this execution
+    console.warn(`[GROWTH_DCA] Execution window missed, skipping`, {
+      strategyId: this.strategy.id,
+      scheduledTime: new Date(scheduledTime).toISOString(),
+      currentTime: new Date(now).toISOString(),
+      delaySeconds: Math.floor(timeDiff / 1000),
+      windowSeconds: executionWindow / 1000,
+    });
+
+    // Calculate next run time
+    state.nextRunAt = computeNextRunAt(config.schedule, new Date(now));
+    console.log(`[GROWTH_DCA] Next run scheduled for:`, state.nextRunAt.toISOString());
+    return;
+  }
+
+  // ✅ Within execution window - proceed
+  console.log(`[GROWTH_DCA] Executing within window`, {
+    strategyId: this.strategy.id,
+    scheduledTime: new Date(scheduledTime).toISOString(),
+    executionTime: new Date(now).toISOString(),
+    delaySeconds: Math.floor(timeDiff / 1000),
+  });
+
+  // 3️⃣ Investment cap check
+  if (
+    state.investedCapital + config.capital.perOrderAmount >
+    config.capital.maxCapital
+  ) {
+    console.log(`[GROWTH_DCA] Investment cap reached:`, {
+      strategyId: this.strategy.id,
+      invested: state.investedCapital,
+      maxCapital: config.capital.maxCapital,
+    });
+    return;
+  }
+
+  if (!price || price <= 0) {
+    console.log("INVALID PRICE", price);
+    return;
+  }
+
+  // 4️⃣ Evaluate decision
+  const decision = evaluateGrowthDCA(this.strategy, state, price, timestamp);
+
+  console.log("[GROWTH_DCA] Evaluate decision", {
+    strategyId: this.strategy.id,
+    decision,
+    price,
+    scheduledTime: new Date(scheduledTime).toISOString(),
+    executionTime: new Date(now).toISOString(),
+  });
 
     if (decision === "BUY") {
       const perOrder = config.capital.perOrderAmount;

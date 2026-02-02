@@ -100,13 +100,12 @@ export const createStrategyController = async (req: any, res: Response) => {
       }
     }
   } else if (strategyType === "SMART_GRID") {
-    // ✅ NEW: Smart Grid validation
+    // ✅ UPDATED: lowerLimit/upperLimit now optional
     const smartGridRequiredFields = {
       ...baseRequiredFields,
-      lowerLimit,
-      upperLimit,
       levels,
       profitPercentage,
+      dataSetDays, // ✅ Required for auto-generation
     };
 
     const missingFields = Object.entries(smartGridRequiredFields)
@@ -117,6 +116,14 @@ export const createStrategyController = async (req: any, res: Response) => {
       return sendBadRequest(
         res,
         `Missing required fields: ${missingFields.join(", ")}`
+      );
+    }
+
+    // ✅ NEW: Validate dataSetDays range
+    if (dataSetDays < 7 || dataSetDays > 365) {
+      return sendBadRequest(
+        res,
+        "dataSetDays must be between 7 and 365"
       );
     }
 
@@ -167,8 +174,8 @@ export const createStrategyController = async (req: any, res: Response) => {
       daysOfWeek,
       datesOfMonth,
       executionMode,
-      lowerLimit,
-      upperLimit,
+      lowerLimit, // ✅ Optional now
+      upperLimit, // ✅ Optional now
       entryInterval,
       bookProfitBy,
       leverage,

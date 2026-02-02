@@ -63,13 +63,17 @@ type ScheduleOptions = OneTimeSchedule | RateSchedule | CronSchedule;
 function formatAtDate(date: Date): string {
   return date.toISOString().replace(/\.\d+Z$/, "");
 }
-function subtractSeconds(date: Date, seconds: number): Date {
-  return new Date(date.getTime() - seconds * 1000);
+
+// ✅ NEW: Subtract seconds to invoke early
+function invokeEarly(date: Date, secondsEarly: number = 30): Date {
+  return new Date(date.getTime() - secondsEarly * 1000);
 }
+
 function buildScheduleExpression(options: ScheduleOptions): string {
   switch (options.type) {
     case "ONCE": {
-      const adjustedRunAt = subtractSeconds(options.runAt, 30); // 👈 30s early
+      // ✅ Invoke 30 seconds early to compensate for AWS latency
+      const adjustedRunAt = invokeEarly(options.runAt, 30);
       return `at(${formatAtDate(adjustedRunAt)})`;
     }
 

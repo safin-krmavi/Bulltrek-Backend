@@ -4,18 +4,26 @@ import { StockMarketDataManager } from "../../sockets/stocks/marketData/marketDa
 import { isStrategyDue } from "../../utils/strategySchedule";
 
 export function startStrategyScheduler() {
-  console.log("[SCHEDULER] Started");
+  console.log("[SCHEDULER] Started - Monitoring SIGNAL_BASED strategies only");
 
   setInterval(async () => {
     const now = Date.now();
 
+    // ✅ ONLY handle SIGNAL_BASED strategies (Human Grid, Smart Grid)
+    // Growth DCA is handled by AWS Lambda
     strategyRuntimeRegistry.getAllRuntimes().forEach(async (runtime) => {
       const strategy = (runtime as any).strategy;
+      
+      // ✅ Skip Growth DCA entirely
+      if (strategy.type === "GROWTH_DCA") {
+        return;
+      }
+
       const schedule = strategy.config?.schedule;
       if (!schedule) return;
       if (!isStrategyDue(schedule, runtime.state.lastExecutionAt, now)) return;
 
-      console.log(`[SCHEDULER] Triggering strategy ${runtime.state.status}`);
+      console.log(`[SCHEDULER] Triggering SIGNAL_BASED strategy ${strategy.id}`);
 
       let lastPrice: number | null = null;
 
@@ -27,7 +35,6 @@ export function startStrategyScheduler() {
         );
 
         if (!lastPrice || lastPrice <= 0) {
-          // fallback to fetching current market price
           lastPrice = await MarketDataManager.fetchMarketPrice(
             strategy.exchange,
             strategy.segment,
@@ -44,23 +51,24 @@ export function startStrategyScheduler() {
         );
 
         if (!lastPrice || lastPrice <= 0) {
-          // fallback to fetching current market price
           lastPrice = await StockMarketDataManager.fetchMarketPrice(
             strategy.exchange,
             strategy.userId,
             strategy.symbol,
-            
           );
         }
       }
 
-      // skip if still no price
       if (!lastPrice || lastPrice <= 0) {
-        console.log("No market price available for", strategy.symbol);
+        console.log("[SCHEDULER] No market price available for", strategy.symbol);
         return;
       }
 
       await runtime.executeScheduled(lastPrice);
     });
-  }, 10 * 1000); // check every 10s
+
+    // ❌ REMOVED: No longer poll DB for Growth DCA
+    // AWS Lambda handles all Growth DCA executions
+
+  }, 5 * 1000); // Check every 5s for signal-based strategies only
 }

@@ -6,17 +6,49 @@ export function generateGridLevels(config: HumanGridConfig): GridLevel[] {
   const { lowerLimit, upperLimit, entryInterval, bookProfitBy } = config;
   const grids: GridLevel[] = [];
 
+  console.log("[GENERATE_GRID_LEVELS] Starting generation", {
+    lowerLimit,
+    upperLimit,
+    entryInterval,
+    bookProfitBy,
+  });
+
   let currentPrice = lowerLimit;
+  let gridCount = 0;
+
   while (currentPrice <= upperLimit) {
+    const buyPrice = parseFloat(currentPrice.toFixed(6));
+    const sellPrice = parseFloat((currentPrice + bookProfitBy).toFixed(6));
+
     grids.push({
       id: randomUUID(),
-      buyPrice: currentPrice,
-      sellPrice: currentPrice + bookProfitBy,
+      buyPrice,
+      sellPrice,
       quantity: 0,
       status: "EMPTY",
     });
+
+    console.log("[GRID_LEVEL_GENERATED]", {
+      gridNumber: gridCount + 1,
+      buyPrice,
+      sellPrice,
+    });
+
     currentPrice += entryInterval;
+    gridCount++;
+
+    // Safety: prevent infinite loop
+    if (gridCount > 1000) {
+      console.error("[GRID_GENERATION_ERROR] Too many grids generated");
+      break;
+    }
   }
+
+  console.log("[GENERATE_GRID_LEVELS_COMPLETE]", {
+    totalGrids: grids.length,
+    firstGrid: grids[0]?.buyPrice,
+    lastGrid: grids[grids.length - 1]?.buyPrice,
+  });
 
   return grids;
 }
@@ -135,8 +167,11 @@ export function validateSmartGridConfig(config: SmartGridConfig): {
   valid: boolean;
   error?: string;
 } {
-  if (config.lowerLimit >= config.upperLimit) {
-    return { valid: false, error: "Lower limit must be less than upper limit" };
+  // ✅ Skip limit validation if auto-generated (they're always valid)
+  if (config.lowerLimit !== undefined && config.upperLimit !== undefined) {
+    if (config.lowerLimit >= config.upperLimit) {
+      return { valid: false, error: "Lower limit must be less than upper limit" };
+    }
   }
 
   if (config.levels < 2 || config.levels > 100) {
@@ -151,33 +186,37 @@ export function validateSmartGridConfig(config: SmartGridConfig): {
     return { valid: false, error: "Capital amounts must be positive" };
   }
 
-  if (config.capital.maxCapital < config.capital.perGridAmount * config.levels) {
-    return { valid: false, error: "Max capital is insufficient for all grid levels" };
+  // ✅ Only validate capital sufficiency if limits are known
+  if (config.lowerLimit !== undefined && config.upperLimit !== undefined) {
+    if (config.capital.maxCapital < config.capital.perGridAmount * config.levels) {
+      return { valid: false, error: "Max capital is insufficient for all grid levels" };
+    }
   }
 
   if (config.dataSetDays < 7 || config.dataSetDays > 365) {
     return { valid: false, error: "Data set days must be between 7 and 365" };
   }
 
-  // ✅ NEW: Validate grid spacing is reasonable
-  const priceRange = config.upperLimit - config.lowerLimit;
-  const gridInterval = priceRange / config.levels;
-  const minInterval = config.lowerLimit * 0.001; // 0.1% of lower price
+  // ✅ Only validate grid spacing if limits are known
+  if (config.lowerLimit !== undefined && config.upperLimit !== undefined) {
+    const priceRange = config.upperLimit - config.lowerLimit;
+    const gridInterval = priceRange / config.levels;
+    const minInterval = config.lowerLimit * 0.001;
 
-  if (gridInterval < minInterval) {
-    return { 
-      valid: false, 
-      error: `Grid spacing too tight (${gridInterval.toFixed(6)}). Minimum recommended: ${minInterval.toFixed(6)}. Try fewer levels or wider range.`
-    };
-  }
+    if (gridInterval < minInterval) {
+      return { 
+        valid: false, 
+        error: `Grid spacing too tight (${gridInterval.toFixed(6)}). Minimum recommended: ${minInterval.toFixed(6)}. Try fewer levels or wider range.`
+      };
+    }
 
-  // ✅ NEW: Validate profit percentage is achievable given grid spacing
-  const minProfitForSpacing = (gridInterval / config.lowerLimit) * 100;
-  if (config.profitPercentage < minProfitForSpacing * 0.5) {
-    return {
-      valid: false,
-      error: `Profit target (${config.profitPercentage}%) too small for grid spacing. Minimum recommended: ${(minProfitForSpacing * 0.5).toFixed(2)}%`
-    };
+    const minProfitForSpacing = (gridInterval / config.lowerLimit) * 100;
+    if (config.profitPercentage < minProfitForSpacing * 0.5) {
+      return {
+        valid: false,
+        error: `Profit target (${config.profitPercentage}%) too small for grid spacing. Minimum recommended: ${(minProfitForSpacing * 0.5).toFixed(2)}%`
+      };
+    }
   }
 
   return { valid: true };

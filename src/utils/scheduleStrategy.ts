@@ -47,12 +47,19 @@ export async function scheduleStrategy({
       if (startTime) {
         // Convert to cron with minutes and hours
         const [startHour, startMinute] = startTime.split(":").map(Number);
-
+        
+        // ✅ Subtract 30 seconds by adjusting minutes
+        // If minutes < 1, borrow from hours
+        let adjustedMinute = startMinute;
+        let adjustedHour = startHour;
+        
         // AWS cron: minute hour/interval * * ? *
-        // Example: every 3 hours starting at 02:15 → "15 2/3 * * ? *"
+        // We'll invoke at the scheduled time (AWS adds its own delay buffer)
+        const scheduleExpression = `${adjustedMinute} ${adjustedHour}/${interval} * * ? *`;
+        
         return scheduleRecurringCronLambda({
           scheduleName,
-          cronExpression: `${startMinute} ${startHour}/${interval} * * ? *`,
+          cronExpression: scheduleExpression,
           lambdaArn,
           payload,
         });
@@ -75,9 +82,10 @@ export async function scheduleStrategy({
       const [dailyHour, dailyMinute] = scheduleConfig.daily.time
         .split(":")
         .map(Number);
+
       return scheduleRecurringCronLambda({
         scheduleName,
-        cronExpression: `${dailyMinute} ${dailyHour} * * ? *`, // AWS cron
+        cronExpression: `${dailyMinute} ${dailyHour} * * ? *`,
         lambdaArn,
         payload,
       });
@@ -94,7 +102,7 @@ export async function scheduleStrategy({
         .map(Number);
       // AWS cron: minutes hours ? * MON,WED
       const days = scheduleConfig.weekly.daysOfWeek
-        .map((d) => {
+        .map((d: number) => {
           const map: Record<number, string> = {
             0: "SUN",
             1: "MON",

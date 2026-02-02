@@ -67,8 +67,8 @@ export type SmartGridState = {
 };
 
 export type SmartGridConfig = {
-  lowerLimit: number;
-  upperLimit: number;
+  lowerLimit?: number; // ✅ NOW OPTIONAL - Auto-generated if not provided
+  upperLimit?: number; // ✅ NOW OPTIONAL - Auto-generated if not provided
   levels: number;
   profitPercentage: number;
   capital: {
@@ -81,4 +81,20 @@ export type SmartGridConfig = {
   dataSetDays: number;
   mode: "STATIC" | "DYNAMIC";
   recalculationInterval?: number; // minutes
+};
+
+// ✅ NEW: Risk classification type
+export type GridRiskLevel = "LOW" | "MEDIUM" | "HIGH";
+
+// ✅ NEW: Extended indicator output
+export type SmartGridIndicators = {
+  bollingerUpper: number;
+  bollingerLower: number;
+  bollingerMiddle: number;
+  atr: number;
+  historicalHigh: number;
+  historicalLow: number;
+  currentPrice: number;
+  volatilityFactor: number;
+  riskLevel: GridRiskLevel;
 };
