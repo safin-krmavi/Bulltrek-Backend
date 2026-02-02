@@ -112,6 +112,8 @@ export const tradeDispatcher = {
         executionType = user?.role?.name === "SLAVE_PRO" ? "LIVE" : "PAPER";
       }
 
+      
+
       const raw = await getCryptoCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
       if (!credentials) return;

@@ -343,6 +343,28 @@ model StrategyPosition {
   closedAt   DateTime?
 }
 
+model PaperTradePosition {
+  id         String   @id @default(uuid())
+
+  strategyId String?
+  userId     String
+  symbol     String
+  exchange   String
+  assetType  String   // CRYPTO | STOCK
+  tradeType  String?  // SPOT | FUTURES
+
+  side       String
+  entryPrice Float
+  quantity   Float
+
+  takeProfit Float?
+  stopLoss   Float?
+
+  status     String   // OPEN | CLOSED
+
+  createdAt  DateTime @default(now())
+  closedAt   DateTime?
+}
 
 
 // Marketplace

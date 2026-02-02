@@ -4,7 +4,14 @@ import prisma from "../config/db.config";
 import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
 import { StockMarketDataManager } from "../sockets/stocks/marketData/marketDataManager";
 import { computeNextRunAt } from "../utils/scheduler/computeNextRunAt";
-import { generateGridLevels, validateGridConfig, generateSmartGridLevels, validateSmartGridConfig, calculateBollingerBands, calculateATR } from "../utils/strategies/gridCalculations";
+import {
+  generateGridLevels,
+  validateGridConfig,
+  generateSmartGridLevels,
+  validateSmartGridConfig,
+  calculateBollingerBands,
+  calculateATR,
+} from "../utils/strategies/gridCalculations";
 
 export const createStrategy = async (data: any) => {
   const {
@@ -89,7 +96,12 @@ export const createStrategy = async (data: any) => {
     if (!validation.valid) {
       throw new Error(validation.error);
     }
+    const validation = validateSmartGridConfig(smartGridConfig);
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
 
+    const grids = generateSmartGridLevels(smartGridConfig);
     const grids = generateSmartGridLevels(smartGridConfig);
 
     config = {
@@ -216,7 +228,7 @@ export const getStrategyById = async (strategyId: string) => {
 export const updateStrategy = async (
   strategyId: string,
   userId: string,
-  updates: any
+  updates: any,
 ) => {
   const existing = await prisma.strategy.findFirst({
     where: { id: strategyId, userId },
@@ -318,7 +330,7 @@ export const deleteStrategy = async (strategyId: string, userId: string) => {
 export const changeStrategyStatus = async (
   strategyId: string,
   userId: string,
-  status: "ACTIVE" | "PAUSED" | "STOPPED"
+  status: "ACTIVE" | "PAUSED" | "STOPPED",
 ) => {
   const strategy = await prisma.strategy.findFirst({
     where: { id: strategyId, userId },
