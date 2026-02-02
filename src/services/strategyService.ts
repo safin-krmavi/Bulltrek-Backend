@@ -96,12 +96,8 @@ export const createStrategy = async (data: any) => {
     if (!validation.valid) {
       throw new Error(validation.error);
     }
-    const validation = validateSmartGridConfig(smartGridConfig);
-    if (!validation.valid) {
-      throw new Error(validation.error);
-    }
 
-    const grids = generateSmartGridLevels(smartGridConfig);
+
     const grids = generateSmartGridLevels(smartGridConfig);
 
     config = {
