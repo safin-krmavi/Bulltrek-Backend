@@ -307,6 +307,7 @@ model Strategy {
 
   nextRunAt      DateTime?   // NEW
   lastExecutedAt DateTime?  // NEW
+  bootstrappedAt DateTime? 
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

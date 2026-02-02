@@ -13,10 +13,33 @@ export function generateGridLevels(config: HumanGridConfig): GridLevel[] {
     bookProfitBy,
   });
 
-  let currentPrice = lowerLimit;
-  let gridCount = 0;
+  const rangeCents = Math.round((upperLimit - lowerLimit) * 1000000);
+  const intervalCents = Math.round(entryInterval * 1000000);
+  const lowerCents = Math.round(lowerLimit * 1000000);
 
-  while (currentPrice <= upperLimit) {
+  const numGrids = Math.floor(rangeCents / intervalCents) + 1;
+
+  console.log("[GENERATE_GRID_LEVELS] Calculation details", {
+    rangeCents,
+    intervalCents,
+    lowerCents,
+    expectedGrids: numGrids,
+  });
+
+  for (let i = 0; i < numGrids; i++) {
+    const currentPriceCents = lowerCents + (i * intervalCents);
+    const currentPrice = currentPriceCents / 1000000;
+
+    // ✅ Safety check: Stop if we exceed upper limit
+    if (currentPrice > upperLimit + 0.0000001) {
+      console.log("[GENERATE_GRID_LEVELS] Reached upper limit, stopping", {
+        currentPrice,
+        upperLimit,
+        gridNumber: i + 1,
+      });
+      break;
+    }
+
     const buyPrice = parseFloat(currentPrice.toFixed(6));
     const sellPrice = parseFloat((currentPrice + bookProfitBy).toFixed(6));
 
@@ -29,25 +52,40 @@ export function generateGridLevels(config: HumanGridConfig): GridLevel[] {
     });
 
     console.log("[GRID_LEVEL_GENERATED]", {
-      gridNumber: gridCount + 1,
+      gridNumber: i + 1,
+      id: grids[i].id,
       buyPrice,
       sellPrice,
+      currentPrice: currentPrice.toFixed(6),
+      withinRange: currentPrice >= lowerLimit && currentPrice <= upperLimit, // ✅ Add validation
     });
 
-    currentPrice += entryInterval;
-    gridCount++;
-
-    // Safety: prevent infinite loop
-    if (gridCount > 1000) {
+    if (i >= 1000) {
       console.error("[GRID_GENERATION_ERROR] Too many grids generated");
       break;
     }
+  }
+
+  // ✅ Final validation
+  const invalidGrids = grids.filter(g => 
+    g.buyPrice < lowerLimit || g.buyPrice > upperLimit
+  );
+
+  if (invalidGrids.length > 0) {
+    console.error("[GRID_GENERATION_VALIDATION_ERROR]", {
+      invalidGrids: invalidGrids.map(g => g.buyPrice),
+      range: `${lowerLimit} - ${upperLimit}`,
+    });
   }
 
   console.log("[GENERATE_GRID_LEVELS_COMPLETE]", {
     totalGrids: grids.length,
     firstGrid: grids[0]?.buyPrice,
     lastGrid: grids[grids.length - 1]?.buyPrice,
+    allLevels: grids.map(g => g.buyPrice),
+    allWithinRange: grids.every(g => 
+      g.buyPrice >= lowerLimit && g.buyPrice <= upperLimit
+    ), // ✅ Validation flag
   });
 
   return grids;
