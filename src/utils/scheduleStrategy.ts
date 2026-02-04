@@ -1,10 +1,13 @@
 import {
-  scheduleOneTimeLambda,
   scheduleRecurringRateLambda,
   scheduleRecurringCronLambda,
   deleteSchedule,
 } from "./awsScheduler";
 import { Strategy } from "@prisma/client";
+type Payload = {
+  strategyId: string;
+  delayMs?: number;
+};
 
 const getScheduleName = (strategyId: string) => `strategy-${strategyId}`;
 
@@ -12,7 +15,40 @@ interface ScheduleStrategyParams {
   strategy: Strategy;
   lambdaArn: string;
 }
+function minusOneMinute(hour: number, minute: number) {
+  if (minute === 0) {
+    return {
+      hour: hour === 0 ? 23 : hour - 1,
+      minute: 59,
+    };
+  }
 
+  return {
+    hour,
+    minute: minute - 1,
+  };
+}
+function assertNotNextMinute(targetHour: number, targetMinute: number) {
+  const now = new Date();
+
+  const target = new Date(now);
+  target.setHours(targetHour, targetMinute, 0, 0);
+
+  // If time already passed today, assume next occurrence
+  if (target <= now) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  const diffMs = target.getTime() - now.getTime();
+
+  if (diffMs <= 60000) {
+    throw new Error(
+      "Scheduling for the next minute is not allowed. Please choose a time at least 2 minutes ahead.",
+    );
+  }
+}
+
+const EXECUTION_DELAY_MS = 30000;
 /**
  * Maps your strategy's frequency-based schedule to AWS Scheduler
  */
@@ -33,7 +69,11 @@ export async function scheduleStrategy({
   // Delete existing schedule first (for updates)
   await deleteSchedule(scheduleName);
 
-  const payload = { strategyId: strategy.id };
+  const basePayload = { strategyId: strategy.id };
+  const delayedPayload = {
+    strategyId: strategy.id,
+    delayMs: EXECUTION_DELAY_MS,
+  };
 
   switch (scheduleConfig.frequency) {
     case "HOURLY":
@@ -47,21 +87,17 @@ export async function scheduleStrategy({
       if (startTime) {
         // Convert to cron with minutes and hours
         const [startHour, startMinute] = startTime.split(":").map(Number);
-        
-        // ✅ Subtract 30 seconds by adjusting minutes
-        // If minutes < 1, borrow from hours
-        let adjustedMinute = startMinute;
-        let adjustedHour = startHour;
-        
-        // AWS cron: minute hour/interval * * ? *
-        // We'll invoke at the scheduled time (AWS adds its own delay buffer)
-        const scheduleExpression = `${adjustedMinute} ${adjustedHour}/${interval} * * ? *`;
-        
+        assertNotNextMinute(startHour, startMinute);
+        const { hour, minute } = minusOneMinute(startHour, startMinute);
+
+        // minute hour/interval * * ? *
+        const scheduleExpression = `${minute} ${hour}/${interval} * * ? *`;
+
         return scheduleRecurringCronLambda({
           scheduleName,
           cronExpression: scheduleExpression,
           lambdaArn,
-          payload,
+          payload: delayedPayload,
         });
       } else {
         // no start time → simple rate expression
@@ -70,11 +106,11 @@ export async function scheduleStrategy({
           every: interval,
           unit: "hours",
           lambdaArn,
-          payload,
+          payload: basePayload,
         });
       }
 
-    case "DAILY":
+    case "DAILY": {
       if (!scheduleConfig.daily?.time) {
         throw new Error("time required for DAILY frequency");
       }
@@ -82,15 +118,20 @@ export async function scheduleStrategy({
       const [dailyHour, dailyMinute] = scheduleConfig.daily.time
         .split(":")
         .map(Number);
+      assertNotNextMinute(dailyHour, dailyMinute);
+
+      const { hour, minute } = minusOneMinute(dailyHour, dailyMinute);
 
       return scheduleRecurringCronLambda({
         scheduleName,
-        cronExpression: `${dailyMinute} ${dailyHour} * * ? *`,
-        lambdaArn,
-        payload,
-      });
 
-    case "WEEKLY":
+        cronExpression: `${minute} ${hour} * * ? *`,
+        lambdaArn,
+        payload: delayedPayload,
+      });
+    }
+
+    case "WEEKLY": {
       if (
         !scheduleConfig.weekly?.time ||
         !scheduleConfig.weekly?.daysOfWeek?.length
@@ -100,6 +141,10 @@ export async function scheduleStrategy({
       const [weekHour, weekMinute] = scheduleConfig.weekly.time
         .split(":")
         .map(Number);
+      assertNotNextMinute(weekHour, weekMinute);
+
+      const { hour, minute } = minusOneMinute(weekHour, weekMinute);
+
       // AWS cron: minutes hours ? * MON,WED
       const days = scheduleConfig.weekly.daysOfWeek
         .map((d: number) => {
@@ -117,10 +162,11 @@ export async function scheduleStrategy({
         .join(",");
       return scheduleRecurringCronLambda({
         scheduleName,
-        cronExpression: `${weekMinute} ${weekHour} ? * ${days} *`,
+        cronExpression: `${minute} ${hour} ? * ${days} *`,
         lambdaArn,
-        payload,
+        payload: delayedPayload,
       });
+    }
 
     case "MONTHLY":
       if (
@@ -132,12 +178,17 @@ export async function scheduleStrategy({
       const [monthHour, monthMinute] = scheduleConfig.monthly.time
         .split(":")
         .map(Number);
+
+      assertNotNextMinute(monthHour, monthMinute);
+
+      const { hour, minute } = minusOneMinute(monthHour, monthMinute);
       const dates = scheduleConfig.monthly.dates.join(",");
+
       return scheduleRecurringCronLambda({
         scheduleName,
-        cronExpression: `${monthMinute} ${monthHour} ${dates} * ? *`,
+        cronExpression: `${minute} ${hour} ${dates} * ? *`,
         lambdaArn,
-        payload,
+        payload: delayedPayload,
       });
 
     default:

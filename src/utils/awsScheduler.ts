@@ -12,19 +12,19 @@ dotenv.config();
 /*                                AWS CLIENT                                  */
 /* -------------------------------------------------------------------------- */
 if (
-  !process.env.S3BUCKET_REGION ||
-  !process.env.S3BUCKET_ACCESS_KEY ||
-  !process.env.S3BUCKET_SECRET_KEY ||
+  !process.env.REGION ||
+  !process.env.ACCESS_KEY ||
+  !process.env.SECRET_KEY ||
   !process.env.AWS_LAMBDA_ROLE_ARN
 ) {
   throw new Error("Missing required AWS environment variables");
 }
 
 const schedulerClient = new SchedulerClient({
-  region: process.env.S3BUCKET_REGION,
+  region: process.env.REGION,
   credentials: {
-    accessKeyId: process.env.S3BUCKET_ACCESS_KEY,
-    secretAccessKey: process.env.S3BUCKET_SECRET_KEY,
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_KEY,
   },
 });
 
@@ -71,12 +71,8 @@ function invokeEarly(date: Date, secondsEarly: number = 30): Date {
 
 function buildScheduleExpression(options: ScheduleOptions): string {
   switch (options.type) {
-    case "ONCE": {
-      // ✅ Invoke 30 seconds early to compensate for AWS latency
-      const adjustedRunAt = invokeEarly(options.runAt, 30);
-      return `at(${formatAtDate(adjustedRunAt)})`;
-    }
-
+    case "ONCE":
+      return `at(${formatAtDate(options.runAt)})`;
     case "RATE":
       return `rate(${options.rateValue} ${options.rateUnit})`;
 
@@ -93,7 +89,7 @@ function buildScheduleExpression(options: ScheduleOptions): string {
 
 export async function createSchedule(options: ScheduleOptions) {
   const scheduleExpression = buildScheduleExpression(options);
-
+  console.log("ROLE ARN", process.env.AWS_LAMBDA_ROLE_ARN);
   const input = {
     Name: options.scheduleName,
     ScheduleExpression: scheduleExpression,
