@@ -6,6 +6,8 @@ import {
   updateStrategyController,
   deleteStrategyController,
   updateStrategyStatusController,
+    calculateSmartGridLimits,
+  calculateSmartGridLimitsEnhanced,
 } from "../controllers/strategyController";
 import {
   subscribeToCopyStrategy,
@@ -65,5 +67,7 @@ router.delete(
   verifyUser,
   unsubscribeFromCopyStrategy
 );
+router.post("/calculate-smart-grid-limits", calculateSmartGridLimits);
+router.post("/calculate-smart-grid-limits-enhanced", calculateSmartGridLimitsEnhanced);
 
 export default router;

@@ -22,7 +22,164 @@ import { CryptoExchange, StocksExchange } from "@prisma/client";
 import { registerStrategy, unregisterStrategy } from "../strategies/dispatcher";
 import { scheduleStrategy } from "../utils/scheduleStrategy";
 import { deleteSchedule } from "../utils/awsScheduler";
+import { calculateBollingerBands } from "../utils/strategies/gridCalculations";
+import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
 
+/**
+ * Calculate Smart Grid limits based on Bollinger Bands
+ */
+export const calculateSmartGridLimits = async (req: Request, res: Response) => {
+  try {
+    const { exchange, segment, symbol, period = 20, stdDev = 2 } = req.body;
+
+    // Validate input
+    if (!exchange || !segment || !symbol) {
+      return sendBadRequest(res, "exchange, segment, and symbol are required");
+    }
+
+    // console.log("[CALCULATE_SMART_GRID_LIMITS] Request", {
+    //   exchange,
+    //   segment,
+    //   symbol,
+    //   period,
+    //   stdDev,
+    // });
+
+    // Fetch historical prices
+    // For Binance, we can use the market data manager to get recent prices
+    let prices: number[] = [];
+
+    if (exchange === "BINANCE") {
+      // Try to get from cache first
+      const lastPrice = MarketDataManager.getLastPrice(exchange, segment, symbol);
+      
+      if (!lastPrice) {
+        // Fetch fresh data
+        const currentPrice = await MarketDataManager.fetchMarketPrice(
+          exchange,
+          segment,
+          symbol
+        );
+        
+        if (!currentPrice) {
+          return sendServerError(res, "Unable to fetch current market price");
+        }
+
+        // For now, use current price to calculate approximate range
+        // In production, you'd fetch historical candles from Binance API
+        prices = Array(period).fill(currentPrice);
+        
+        console.warn("[CALCULATE_SMART_GRID_LIMITS] Using current price only", {
+          symbol,
+          currentPrice,
+          note: "Historical data not available, using approximation",
+        });
+      } else {
+        // Use last known price
+        prices = Array(period).fill(lastPrice);
+      }
+    } else {
+      return sendBadRequest(res, `Exchange ${exchange} not supported yet`);
+    }
+
+    // Calculate Bollinger Bands
+    const bands = calculateBollingerBands(prices, period, stdDev);
+
+    // console.log("[CALCULATE_SMART_GRID_LIMITS] Calculated bands", {
+    //   symbol,
+    //   upper: bands.upper,
+    //   middle: bands.middle,
+    //   lower: bands.lower,
+    // });
+
+    // Return the limits
+    return sendSuccess(res, "Smart Grid limits calculated successfully", {
+      upperLimit: parseFloat(bands.upper.toFixed(6)),
+      lowerLimit: parseFloat(bands.lower.toFixed(6)),
+      middlePrice: parseFloat(bands.middle.toFixed(6)),
+      currentPrice: prices[prices.length - 1],
+      period,
+      stdDev,
+      calculatedAt: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    console.error("[CALCULATE_SMART_GRID_LIMITS] Error", {
+      error: error.message,
+      stack: error.stack,
+    });
+    return sendServerError(res, error.message);
+  }
+};
+
+/**
+ * Calculate Smart Grid limits with historical data (enhanced version)
+ */
+export const calculateSmartGridLimitsEnhanced = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      exchange,
+      segment,
+      symbol,
+      period = 20,
+      stdDev = 2,
+      dataSetDays = 30,
+    } = req.body;
+
+    // Validate input
+    if (!exchange || !segment || !symbol) {
+      return sendBadRequest(res, "exchange, segment, and symbol are required");
+    }
+
+    console.log("[CALCULATE_SMART_GRID_LIMITS_ENHANCED] Request", {
+      exchange,
+      segment,
+      symbol,
+      period,
+      stdDev,
+      dataSetDays,
+    });
+
+    // TODO: Fetch historical candles from Binance API
+    // For now, return error message
+    return sendServerError(
+      res,
+      "Historical data fetching not implemented yet. Use /calculate-smart-grid-limits for basic calculation."
+    );
+
+    /*
+    // Future implementation:
+    const historicalData = await fetchHistoricalCandles(
+      exchange,
+      segment,
+      symbol,
+      dataSetDays
+    );
+    
+    const closePrices = historicalData.map(candle => candle.close);
+    const bands = calculateBollingerBands(closePrices, period, stdDev);
+    
+    return sendSuccess(res, "Smart Grid limits calculated", {
+      upperLimit: bands.upper,
+      lowerLimit: bands.lower,
+      middlePrice: bands.middle,
+      currentPrice: closePrices[closePrices.length - 1],
+      dataPoints: closePrices.length,
+      period,
+      stdDev,
+      calculatedAt: new Date().toISOString(),
+    });
+    */
+  } catch (error: any) {
+    console.error("[CALCULATE_SMART_GRID_LIMITS_ENHANCED] Error", {
+      error: error.message,
+      stack: error.stack,
+    });
+    return sendServerError(res, error.message);
+  }
+};
 export const createStrategyController = async (req: any, res: Response) => {
   const userId = req.user.userId;
   
