@@ -858,3 +858,44 @@ export async function fetchCoinDCXMarketPrice(params: {
     handleCoinDCXError(error);
   }
 }
+/**
+ * Fetch historical klines from CoinDCX
+ */
+export async function fetchCoinDCXHistoricalKlines(
+  symbol: string,
+  interval: string = "1d",
+  limit: number = 500
+): Promise<any[]> {
+  try {
+    const url = `https://public.coindcx.com/market_data/candles`;
+    
+    const response = await axios.get(url, {
+      params: {
+        pair: symbol.replace('/', '_'), // CoinDCX uses B-BTC_USDT format
+        interval,
+        limit,
+      },
+    });
+
+    if (!response.data || response.data.length === 0) {
+      throw new Error("No data returned from CoinDCX");
+    }
+
+    // CoinDCX returns: { time, open, high, low, close, volume }
+    return response.data.map((candle: any) => [
+      candle.time,
+      candle.open,
+      candle.high,
+      candle.low,
+      candle.close,
+      candle.volume,
+    ]);
+  } catch (error: any) {
+    console.error("[COINDCX_HISTORICAL_KLINES] Error", {
+      symbol,
+      interval,
+      error: error.message,
+    });
+    throw new Error(`Failed to fetch CoinDCX historical data: ${error.message}`);
+  }
+}

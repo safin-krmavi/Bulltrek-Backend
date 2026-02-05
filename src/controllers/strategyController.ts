@@ -24,82 +24,118 @@ import { scheduleStrategy } from "../utils/scheduleStrategy";
 import { deleteSchedule } from "../utils/awsScheduler";
 import { calculateBollingerBands } from "../utils/strategies/gridCalculations";
 import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
+import { fetchBinanceHistoricalKlines } from "../services/crypto/exchange/binanceService";
+import { 
+  fetchHistoricalPrices, 
+  validateInterval, 
+  normalizeInterval 
+} from "../utils/strategies/historicalDataFetcher";
 
 /**
  * Calculate Smart Grid limits based on Bollinger Bands
  */
+/**
+ * Calculate Smart Grid limits based on Bollinger Bands with historical data
+ */
+/**
+ * ✅ UPDATED: Calculate Smart Grid limits with data set integration
+ */
 export const calculateSmartGridLimits = async (req: Request, res: Response) => {
   try {
-    const { exchange, segment, symbol, period = 20, stdDev = 2 } = req.body;
+    const { 
+      exchange, 
+      segment, 
+      symbol, 
+      dataSetDays = 30,
+    } = req.body;
 
     // Validate input
     if (!exchange || !segment || !symbol) {
       return sendBadRequest(res, "exchange, segment, and symbol are required");
     }
 
-    // console.log("[CALCULATE_SMART_GRID_LIMITS] Request", {
-    //   exchange,
-    //   segment,
-    //   symbol,
-    //   period,
-    //   stdDev,
-    // });
-
-    // Fetch historical prices
-    // For Binance, we can use the market data manager to get recent prices
-    let prices: number[] = [];
-
-    if (exchange === "BINANCE") {
-      // Try to get from cache first
-      const lastPrice = MarketDataManager.getLastPrice(exchange, segment, symbol);
-      
-      if (!lastPrice) {
-        // Fetch fresh data
-        const currentPrice = await MarketDataManager.fetchMarketPrice(
-          exchange,
-          segment,
-          symbol
-        );
-        
-        if (!currentPrice) {
-          return sendServerError(res, "Unable to fetch current market price");
-        }
-
-        // For now, use current price to calculate approximate range
-        // In production, you'd fetch historical candles from Binance API
-        prices = Array(period).fill(currentPrice);
-        
-        console.warn("[CALCULATE_SMART_GRID_LIMITS] Using current price only", {
-          symbol,
-          currentPrice,
-          note: "Historical data not available, using approximation",
-        });
-      } else {
-        // Use last known price
-        prices = Array(period).fill(lastPrice);
-      }
-    } else {
-      return sendBadRequest(res, `Exchange ${exchange} not supported yet`);
+    // ✅ Validate segment
+    if (!["SPOT", "FUTURES"].includes(segment)) {
+      return sendBadRequest(res, "segment must be SPOT or FUTURES");
     }
 
-    // Calculate Bollinger Bands
-    const bands = calculateBollingerBands(prices, period, stdDev);
+    console.log("[CALCULATE_SMART_GRID_LIMITS] Request", {
+      exchange,
+      segment,
+      symbol,
+      dataSetDays,
+    });
 
-    // console.log("[CALCULATE_SMART_GRID_LIMITS] Calculated bands", {
-    //   symbol,
-    //   upper: bands.upper,
-    //   middle: bands.middle,
-    //   lower: bands.lower,
-    // });
+    // ✅ Validate exchange support
+    const supportedExchanges = ['BINANCE', 'KUCOIN', 'COINDCX'];
+    if (!supportedExchanges.includes(exchange.toUpperCase())) {
+      return sendBadRequest(
+        res,
+        `Exchange ${exchange} is not supported. Supported: ${supportedExchanges.join(", ")}`
+      );
+    }
 
-    // Return the limits
+    // ✅ Validate dataSetDays
+    const validDataSets = [3, 7, 30, 180, 365];
+    if (!validDataSets.includes(dataSetDays)) {
+      return sendBadRequest(
+        res,
+        `dataSetDays must be one of: ${validDataSets.join(", ")}`
+      );
+    }
+
+    // ✅ Use the comprehensive auto-generation function
+    const { generateSmartGridParams } = await import(
+      "../services/strategies/indicatorCalculator.js"
+    );
+
+    const result = await generateSmartGridParams({
+      exchange,
+      symbol,
+      dataSetDays,
+      segment: segment as "SPOT" | "FUTURES", // ✅ Pass segment
+      userLowerLimit: undefined,
+      userUpperLimit: undefined,
+      userLevels: undefined,
+    });
+
+    console.log("[CALCULATE_SMART_GRID_LIMITS] Calculation complete", {
+      exchange,
+      segment,
+      symbol,
+      dataSetDays,
+      result,
+    });
+
+    // Return comprehensive response
     return sendSuccess(res, "Smart Grid limits calculated successfully", {
-      upperLimit: parseFloat(bands.upper.toFixed(6)),
-      lowerLimit: parseFloat(bands.lower.toFixed(6)),
-      middlePrice: parseFloat(bands.middle.toFixed(6)),
-      currentPrice: prices[prices.length - 1],
-      period,
-      stdDev,
+      exchange,
+      symbol,
+      segment,
+      
+      // ✅ Primary outputs (for form auto-fill)
+      upperLimit: result.upperLimit,
+      lowerLimit: result.lowerLimit,
+      levels: result.levels,
+      
+      // ✅ Indicator breakdown (for transparency)
+      indicators: {
+        bollingerUpper: result.indicators.bollingerUpper,
+        bollingerMiddle: result.indicators.bollingerMiddle,
+        bollingerLower: result.indicators.bollingerLower,
+        atr: result.indicators.atr,
+        historicalHigh: result.indicators.historicalHigh,
+        historicalLow: result.indicators.historicalLow,
+        currentPrice: result.indicators.currentPrice,
+        volatilityFactor: result.indicators.volatilityFactor,
+        riskLevel: result.indicators.riskLevel,
+      },
+      metadata: {
+        dataSetDays: result.dataSetDays,
+        calculationMethod: "Bollinger Bands + ATR with Volatility Buffering",
+        autoGenerated: true,
+      },
+
       calculatedAt: new Date().toISOString(),
     });
   } catch (error: any) {
@@ -110,7 +146,6 @@ export const calculateSmartGridLimits = async (req: Request, res: Response) => {
     return sendServerError(res, error.message);
   }
 };
-
 /**
  * Calculate Smart Grid limits with historical data (enhanced version)
  */
@@ -209,12 +244,15 @@ export const createStrategyController = async (req: any, res: Response) => {
     bookProfitBy,
     leverage,
     direction,
-    // Smart Grid
+    // Smart Grid - NEW FIELDS
+    type, // ✅ NEUTRAL | LONG | SHORT
     levels,
-    profitPercentage,
+    profitPercentage, // ✅ Profit per level (%)
     dataSetDays,
     gridMode,
     recalculationInterval,
+    investment, // ✅ Total investment
+    minimumInvestment, // ✅ Minimum investment per order
   } = req.body;
 
   const baseRequiredFields = {
@@ -223,8 +261,6 @@ export const createStrategyController = async (req: any, res: Response) => {
     exchange,
     segment,
     symbol,
-    investmentPerRun,
-    investmentCap,
     executionMode,
   };
 
@@ -235,6 +271,8 @@ export const createStrategyController = async (req: any, res: Response) => {
       upperLimit,
       entryInterval,
       bookProfitBy,
+      investmentPerRun,
+      investmentCap,
     };
 
     const missingFields = Object.entries(gridRequiredFields)
@@ -252,17 +290,20 @@ export const createStrategyController = async (req: any, res: Response) => {
       if (!leverage || !direction) {
         return sendBadRequest(
           res,
-          "Leverage and Direction are required for Futures trading"
+          "leverage and direction are required for FUTURES segment"
         );
       }
     }
   } else if (strategyType === "SMART_GRID") {
-    // ✅ UPDATED: lowerLimit/upperLimit now optional
+    // ✅ UPDATED: New required fields for Smart Grid
     const smartGridRequiredFields = {
       ...baseRequiredFields,
+      type, // ✅ NEUTRAL | LONG | SHORT
       levels,
       profitPercentage,
-      dataSetDays, // ✅ Required for auto-generation
+      dataSetDays,
+      investment, // ✅ Total investment
+      minimumInvestment, // ✅ Minimum per order
     };
 
     const missingFields = Object.entries(smartGridRequiredFields)
@@ -276,11 +317,62 @@ export const createStrategyController = async (req: any, res: Response) => {
       );
     }
 
-    // ✅ NEW: Validate dataSetDays range
-    if (dataSetDays < 7 || dataSetDays > 365) {
+    // ✅ Validate type
+    if (!["NEUTRAL", "LONG", "SHORT"].includes(type)) {
       return sendBadRequest(
         res,
-        "dataSetDays must be between 7 and 365"
+        "type must be one of: NEUTRAL, LONG, SHORT"
+      );
+    }
+
+    // ✅ Validate dataSetDays
+    const validDataSets = [3, 7, 30, 180, 365];
+    if (!validDataSets.includes(dataSetDays)) {
+      return sendBadRequest(
+        res,
+        `dataSetDays must be one of: ${validDataSets.join(', ')}`
+      );
+    }
+
+    // ✅ Validate levels
+    if (levels < 2 || levels > 50) {
+      return sendBadRequest(
+        res,
+        "levels must be between 2 and 50"
+      );
+    }
+
+    // ✅ Validate profit percentage
+    if (profitPercentage <= 0 || profitPercentage > 100) {
+      return sendBadRequest(
+        res,
+        "profitPercentage must be between 0 and 100"
+      );
+    }
+
+    // ✅ Validate investment amounts
+    if (investment <= 0) {
+      return sendBadRequest(res, "investment must be positive");
+    }
+
+    if (minimumInvestment <= 0) {
+      return sendBadRequest(res, "minimumInvestment must be positive");
+    }
+
+    if (minimumInvestment > investment) {
+      return sendBadRequest(
+        res,
+        "minimumInvestment cannot exceed total investment"
+      );
+    }
+
+    // ✅ Calculate per-grid amount
+    const perGridAmount = investment / levels;
+    
+    if (perGridAmount < minimumInvestment) {
+      return sendBadRequest(
+        res,
+        `Investment per level (${perGridAmount.toFixed(2)}) is below minimum investment (${minimumInvestment}). Reduce levels or increase investment.`
       );
     }
 
@@ -288,14 +380,17 @@ export const createStrategyController = async (req: any, res: Response) => {
       if (!leverage || !direction) {
         return sendBadRequest(
           res,
-          "Leverage and Direction are required for Futures trading"
+          "leverage and direction are required for FUTURES segment"
         );
       }
     }
   } else {
+    // Growth DCA validation
     const requiredFields = {
       ...baseRequiredFields,
       frequency,
+      investmentPerRun,
+      investmentCap,
     };
 
     const missingFields = Object.entries(requiredFields)
@@ -331,17 +426,22 @@ export const createStrategyController = async (req: any, res: Response) => {
       daysOfWeek,
       datesOfMonth,
       executionMode,
-      lowerLimit, // ✅ Optional now
-      upperLimit, // ✅ Optional now
+      // Human Grid
+      lowerLimit,
+      upperLimit,
       entryInterval,
       bookProfitBy,
       leverage,
       direction,
+      // Smart Grid
+      type,
       levels,
       profitPercentage,
       dataSetDays,
       gridMode,
       recalculationInterval,
+      investment,
+      minimumInvestment,
     });
 
     if (
@@ -353,10 +453,9 @@ export const createStrategyController = async (req: any, res: Response) => {
       // Only schedule TIME-BASED strategies
       if (strategy.type !== "HUMAN_GRID" && strategy.type !== "SMART_GRID" && strategy.nextRunAt) {
         const lambdaArn = process.env.RUN_STRATEGY_LAMBDA_ARN!;
-        const schedule = await scheduleStrategy({ strategy, lambdaArn });
-        console.log("[STRATEGY_SCHEDULED]", schedule);
+        await scheduleStrategy({ strategy, lambdaArn });
       } else {
-        console.log("[STRATEGY_SIGNAL_BASED_NO_SCHEDULE]", {
+        console.log("[STRATEGY_SIGNAL_BASED] No AWS schedule needed", {
           strategyId: strategy.id,
           type: strategy.type,
         });

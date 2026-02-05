@@ -96,11 +96,21 @@ export function generateSmartGridLevels(config: SmartGridConfig): GridLevel[] {
   const { lowerLimit, upperLimit, levels, profitPercentage } = config;
   const grids: GridLevel[] = [];
 
-  const priceRange = upperLimit - lowerLimit;
+  const priceRange = upperLimit! - lowerLimit!;
   const gridInterval = priceRange / levels;
 
-  for (let i = 0; i < levels; i++){
-    const buyPrice = lowerLimit + (i * gridInterval);
+  console.log("[GENERATE_SMART_GRID_LEVELS] Starting generation", {
+    lowerLimit,
+    upperLimit,
+    levels,
+    profitPercentage,
+    gridInterval,
+  });
+
+  for (let i = 0; i < levels; i++) {
+    const buyPrice = lowerLimit! + (i * gridInterval);
+    
+    // ✅ Calculate sell price based on profit percentage
     const sellPrice = buyPrice * (1 + profitPercentage / 100);
 
     grids.push({
@@ -110,7 +120,22 @@ export function generateSmartGridLevels(config: SmartGridConfig): GridLevel[] {
       quantity: 0,
       status: "EMPTY",
     });
+
+    console.log("[SMART_GRID_LEVEL_GENERATED]", {
+      levelNumber: i + 1,
+      buyPrice: buyPrice.toFixed(2),
+      sellPrice: sellPrice.toFixed(2),
+      profitAmount: (sellPrice - buyPrice).toFixed(2),
+      profitPercent: profitPercentage,
+    });
   }
+
+  console.log("[GENERATE_SMART_GRID_LEVELS_COMPLETE]", {
+    totalLevels: grids.length,
+    firstLevel: `${grids[0]?.buyPrice} → ${grids[0]?.sellPrice}`,
+    lastLevel: `${grids[grids.length - 1]?.buyPrice} → ${grids[grids.length - 1]?.sellPrice}`,
+    avgProfitPerLevel: ((grids[0]?.sellPrice - grids[0]?.buyPrice) / grids[0]?.buyPrice * 100).toFixed(2) + "%",
+  });
 
   return grids;
 }
@@ -205,7 +230,12 @@ export function validateSmartGridConfig(config: SmartGridConfig): {
   valid: boolean;
   error?: string;
 } {
-  // ✅ Skip limit validation if auto-generated (they're always valid)
+  // Validate type
+  if (!["NEUTRAL", "LONG", "SHORT"].includes(config.type)) {
+    return { valid: false, error: "type must be NEUTRAL, LONG, or SHORT" };
+  }
+
+  // Skip limit validation if auto-generated
   if (config.lowerLimit !== undefined && config.upperLimit !== undefined) {
     if (config.lowerLimit >= config.upperLimit) {
       return { valid: false, error: "Lower limit must be less than upper limit" };
@@ -220,22 +250,28 @@ export function validateSmartGridConfig(config: SmartGridConfig): {
     return { valid: false, error: "Profit percentage must be positive" };
   }
 
-  if (config.capital.perGridAmount <= 0 || config.capital.maxCapital <= 0) {
-    return { valid: false, error: "Capital amounts must be positive" };
+  if (config.investment <= 0 || config.minimumInvestment <= 0) {
+    return { valid: false, error: "Investment amounts must be positive" };
   }
 
-  // ✅ Only validate capital sufficiency if limits are known
-  if (config.lowerLimit !== undefined && config.upperLimit !== undefined) {
-    if (config.capital.maxCapital < config.capital.perGridAmount * config.levels) {
-      return { valid: false, error: "Max capital is insufficient for all grid levels" };
-    }
+  if (config.minimumInvestment > config.investment) {
+    return { valid: false, error: "Minimum investment cannot exceed total investment" };
   }
 
-  if (config.dataSetDays < 7 || config.dataSetDays > 365) {
-    return { valid: false, error: "Data set days must be between 7 and 365" };
+  // Validate per-grid amount meets minimum
+  const perGridAmount = config.investment / config.levels;
+  if (perGridAmount < config.minimumInvestment) {
+    return { 
+      valid: false, 
+      error: `Investment per level (${perGridAmount.toFixed(2)}) is below minimum investment (${config.minimumInvestment}). Reduce levels or increase investment.`
+    };
   }
 
-  // ✅ Only validate grid spacing if limits are known
+  if (config.dataSetDays < 3 || config.dataSetDays > 365) {
+    return { valid: false, error: "Data set days must be between 3 and 365" };
+  }
+
+  // Only validate grid spacing if limits are known
   if (config.lowerLimit !== undefined && config.upperLimit !== undefined) {
     const priceRange = config.upperLimit - config.lowerLimit;
     const gridInterval = priceRange / config.levels;

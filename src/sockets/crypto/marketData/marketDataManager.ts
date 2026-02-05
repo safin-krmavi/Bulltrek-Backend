@@ -23,11 +23,24 @@ export const MarketDataManager = {
    * Ensure socket exists for exchange + segment
    */
   ensureConnection(exchange: CryptoExchange, segment: CryptoTradeType) {
+        if (!["SPOT", "FUTURES"].includes(segment)) {
+      console.error("[MARKET_DATA_MANAGER] Invalid segment", {
+        exchange,
+        segment,
+        validSegments: ["SPOT", "FUTURES"],
+      });
+      throw new Error(`Invalid segment: ${segment}. Must be SPOT or FUTURES`);
+    }
+
+    console.log("[MARKET_DATA_MANAGER] Ensuring connection", {
+      exchange,
+      segment, // ✅ Log segment
+    });
     if (!marketDataRegistry[exchange]) {
       marketDataRegistry[exchange] = {};
     }
 
-    if (!marketDataRegistry[exchange][segment]) {
+       if (!marketDataRegistry[exchange][segment]) {
       // 🔥 CREATE EMPTY CONNECTION FIRST
       marketDataRegistry[exchange][segment] = {
         socket: null,
@@ -37,6 +50,11 @@ export const MarketDataManager = {
         subscribers: new Map(),
       };
 
+      console.log("[MARKET_DATA_MANAGER] Creating new connection", {
+        exchange,
+        segment, // ✅ Log segment
+      });
+
       // Then connect async
       if (exchange === "BINANCE") {
         BinanceMarketDataHandler.connect(segment);
@@ -45,6 +63,11 @@ export const MarketDataManager = {
       } else if (exchange === "COINDCX") {
         CoinDCXHandler.connect(segment);
       }
+    } else {
+      console.log("[MARKET_DATA_MANAGER] Connection already exists", {
+        exchange,
+        segment,
+      });
     }
   },
   /**
@@ -82,6 +105,13 @@ export const MarketDataManager = {
     symbol: string,
     strategyId: string
   ) {
+    console.log("[MARKET_DATA_MANAGER] Subscribe request", {
+      exchange,
+      segment, // ✅ Log segment
+      symbol,
+      strategyId,
+    });
+
     await this.ensureConnection(exchange, segment);
 
     const connection = marketDataRegistry[exchange]?.[segment];
@@ -157,6 +187,15 @@ export const MarketDataManager = {
     symbol: string,
     price: number
   ) {
+    if (!price || price <= 0) {
+      console.warn("[MARKET_DATA_MANAGER] Invalid price received", {
+        exchange,
+        segment,
+        symbol,
+        price,
+      });
+      return;
+    }
     cryptoLastPrices[exchange] ??= {};
     cryptoLastPrices[exchange][segment] ??= {};
     cryptoLastPrices[exchange][segment][symbol] = price;

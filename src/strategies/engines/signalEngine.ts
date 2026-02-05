@@ -130,6 +130,8 @@ export const signalEngine = {
       id: strategy.id,
       type: strategy.type,
       symbol: strategy.symbol,
+      segment: strategy.segment, // ✅ Log segment
+      exchange: strategy.exchange,
     });
 
     let state: StrategyStateMap[keyof StrategyStateMap];
@@ -167,6 +169,14 @@ export const signalEngine = {
         },
         lastRecalculationAt: null,
       } as SmartGridState;
+            console.log("[SMART_GRID_INIT_STATE]", {
+        strategyId: strategy.id,
+        symbol: strategy.symbol,
+        segment: strategy.segment, // ✅ Log segment
+        exchange: strategy.exchange,
+        range: `${smartGridConfig.lowerLimit} - ${smartGridConfig.upperLimit}`,
+        levels: smartGridConfig.levels,
+        mode: smartGridConfig.mode,});
     } else {
       throw new Error(`Unsupported strategy type: ${strategy.type}`);
     }
@@ -175,6 +185,12 @@ export const signalEngine = {
 
     // Subscribe to market data
     if (strategy.assetType === "CRYPTO") {
+        console.log("[SIGNAL_ENGINE] Subscribing to market data", {
+        strategyId: strategy.id,
+        exchange: strategy.exchange,
+        segment: strategy.segment, // ✅ This must match strategy config
+        symbol: strategy.symbol,
+      });
       await MarketDataManager.subscribe(
         strategy.exchange as any,
         strategy.segment as any,
@@ -185,6 +201,7 @@ export const signalEngine = {
 
     console.log("[SIGNAL_ENGINE] Strategy registered successfully", {
       id: strategy.id,
+       segment: strategy.segment,
       subscribedToMarketData: strategy.assetType === "CRYPTO",
     });
   },

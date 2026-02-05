@@ -12,7 +12,8 @@ async function fetchHistoricalData(
   exchange: string,
   symbol: string,
   interval: string = "1d",
-  days: number = 30
+  days: number = 30,
+  segment: "SPOT" | "FUTURES" = "SPOT" // ✅ NEW parameter
 ): Promise<{
   high: number[];
   low: number[];
@@ -22,7 +23,9 @@ async function fetchHistoricalData(
   historicalLow: number;
 }> {
   const limit = days;
-  const candles = await fetchBinanceHistoricalKlines(symbol, interval, limit);
+  
+  // ✅ Only Binance supports historical klines for now
+  const candles = await fetchBinanceHistoricalKlines(symbol, interval, limit, segment);
 
   const high = candles.map((c: any) => parseFloat(c[2]));
   const low = candles.map((c: any) => parseFloat(c[3]));
@@ -73,14 +76,16 @@ export async function generateSmartGridParams(params: {
   exchange: string;
   symbol: string;
   dataSetDays: number;
+  segment?: "SPOT" | "FUTURES"; 
   userLowerLimit?: number;
   userUpperLimit?: number;
   userLevels?: number;
 }) {
-  const { exchange, symbol, dataSetDays, userLowerLimit, userUpperLimit, userLevels } = params;
+  const { exchange, symbol, dataSetDays,segment = "SPOT", userLowerLimit, userUpperLimit, userLevels } = params;
 
   console.log("[SMART_GRID_AUTO_GEN] Starting limit calculation", {
     symbol,
+    segment,
     dataSetDays,
     hasUserOverrides: !!(userLowerLimit || userUpperLimit),
   });
@@ -88,15 +93,17 @@ export async function generateSmartGridParams(params: {
   // ========================================
   // STEP 1: DATASET SELECTION & FETCHING
   // ========================================
-  const { high, low, close, open, historicalHigh, historicalLow } = await fetchHistoricalData(
-    exchange,
-    symbol,
-    "1d",
-    dataSetDays
-  );
+const { high, low, close, open, historicalHigh, historicalLow } = await fetchHistoricalData(
+  exchange,
+  symbol,
+  "1d",        // ✅ interval (string)
+  dataSetDays, // ✅ days (number)
+  segment      // ✅ segment
+);
 
   console.log("[STEP_1] Dataset fetched", {
     candles: close.length,
+    segment, // ✅ Log segment
     historicalRange: `${historicalLow.toFixed(4)} - ${historicalHigh.toFixed(4)}`,
   });
 
@@ -129,7 +136,7 @@ export async function generateSmartGridParams(params: {
   // 3.3 Get current market price
   const currentPrice = await fetchBinanceMarketPrice({
     symbol,
-    assetType: "SPOT", // Adjust based on segment
+    assetType: segment, // ✅ Use dynamic segment
   });
 
   if (!currentPrice) {
@@ -137,6 +144,7 @@ export async function generateSmartGridParams(params: {
   }
 
   console.log("[STEP_3] Core indicators calculated", {
+    segment, // ✅ Use dynamic segment
     bollingerBands: `${bollinger.lower.toFixed(4)} - ${bollinger.upper.toFixed(4)}`,
     atr: atr.toFixed(4),
     currentPrice: currentPrice.toFixed(4),

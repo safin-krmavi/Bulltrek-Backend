@@ -1,4 +1,5 @@
 export type GridLifecycle = "INIT" | "WAITING_FOR_PRICE" | "RUNNING" | "STOPPED";
+
 export type GridLevel = {
   id: string;
   buyPrice: number;
@@ -20,7 +21,7 @@ export type HumanGridConfig = {
   };
   leverage?: number;
   direction?: "LONG" | "SHORT";
-  maxCycles?: number; // ✅ NEW: Maximum number of complete grid cycles
+  maxCycles?: number;
 };
 
 export type HumanGridState = {
@@ -30,7 +31,7 @@ export type HumanGridState = {
   status: "ACTIVE" | "PAUSED" | "STOPPED";
   lifecycle: GridLifecycle;
   pendingOrders: Set<string>;
-  executedCycles: number; // ✅ FIX: Add this property
+  executedCycles: number;
 };
 
 export type GridDecision = {
@@ -49,7 +50,28 @@ export type SmartGridLifecycle =
   | "RUNNING"
   | "STOPPED";
 
-// ✅ UPDATED: Smart Grid State with Lifecycle
+// ✅ UPDATED: Smart Grid Config with new fields
+export type SmartGridConfig = {
+  type: "NEUTRAL" | "LONG" | "SHORT"; // ✅ NEW: Strategy type
+  dataSetDays: number; // ✅ Data set (3, 7, 30, 180, 365)
+  lowerLimit?: number; // ✅ Optional - Auto-generated if not provided
+  upperLimit?: number; // ✅ Optional - Auto-generated if not provided
+  levels: number; // ✅ Number of grid levels
+  profitPercentage: number; // ✅ Profit per level (%)
+  investment: number; // ✅ Total investment amount
+  minimumInvestment: number; // ✅ Minimum investment per order
+  capital: {
+    perGridAmount: number; // Calculated from investment/levels
+    maxCapital: number; // Same as investment
+  };
+  stopLossPercentage?: number;
+  leverage?: number;
+  direction?: "LONG" | "SHORT";
+  mode: "STATIC" | "DYNAMIC";
+  recalculationInterval?: number; // minutes
+};
+
+// ✅ UPDATED: Smart Grid State
 export type SmartGridState = {
   grids: GridLevel[];
   investedCapital: number;
@@ -60,33 +82,22 @@ export type SmartGridState = {
   indicators: {
     bollingerUpper: number;
     bollingerLower: number;
+    bollingerMiddle: number;
     atr: number;
+    historicalHigh: number;
+    historicalLow: number;
+    currentPrice: number;
+    volatilityFactor: number;
+    riskLevel: GridRiskLevel;
   };
   mode: "STATIC" | "DYNAMIC";
   lifecycle: SmartGridLifecycle;
+  executedCycles: number; // ✅ Track completed cycles
 };
 
-export type SmartGridConfig = {
-  lowerLimit?: number; // ✅ NOW OPTIONAL - Auto-generated if not provided
-  upperLimit?: number; // ✅ NOW OPTIONAL - Auto-generated if not provided
-  levels: number;
-  profitPercentage: number;
-  capital: {
-    perGridAmount: number;
-    maxCapital: number;
-  };
-  stopLossPercentage?: number;
-  leverage?: number;
-  direction?: "LONG" | "SHORT";
-  dataSetDays: number;
-  mode: "STATIC" | "DYNAMIC";
-  recalculationInterval?: number; // minutes
-};
-
-// ✅ NEW: Risk classification type
+// ✅ Existing types
 export type GridRiskLevel = "LOW" | "MEDIUM" | "HIGH";
 
-// ✅ NEW: Extended indicator output
 export type SmartGridIndicators = {
   bollingerUpper: number;
   bollingerLower: number;

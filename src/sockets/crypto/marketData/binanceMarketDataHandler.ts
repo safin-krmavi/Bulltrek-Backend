@@ -6,40 +6,75 @@ const BINANCE_SPOT_WS = "wss://stream.binance.com:9443/ws/!miniTicker@arr";
 const BINANCE_FUTURES_WS = "wss://fstream.binance.com/ws/!miniTicker@arr";
 
 export const BinanceMarketDataHandler = {
-  connect(segment: CryptoTradeType) {
-    const url =
-      segment === CryptoTradeType.SPOT ? BINANCE_SPOT_WS : BINANCE_FUTURES_WS;
-
-    const ws = new WebSocket(url);
-
-    ws.on("open", () => {
-      console.log("BINANCE_SOCKET_OPEN", { segment });
+  async connect(segment: CryptoTradeType) {
+    console.log("[BINANCE_MARKET_DATA] Connecting to WebSocket", {
+      segment, // ✅ Log segment
     });
 
-    ws.on("message", (raw) => {
+    // ✅ Use correct WebSocket URL based on segment
+    const wsUrl = segment === "SPOT"
+      ? "wss://stream.binance.com:9443/ws/!ticker@arr"
+      : "wss://fstream.binance.com/ws/!ticker@arr";
+
+    console.log("[BINANCE_MARKET_DATA] WebSocket URL", {
+      segment,
+      url: wsUrl, // ✅ Log URL
+    });
+
+    const ws = new WebSocket(wsUrl);
+
+    ws.on("open", () => {
+      console.log("[BINANCE_MARKET_DATA] WebSocket connected", {
+        segment,
+        url: wsUrl,
+      });
+      MarketDataManager.registerSocket("BINANCE", segment, ws);
+    });
+
+    ws.on("message", (data) => {
       try {
-        const data = JSON.parse(raw.toString());
+        const tickers = JSON.parse(data.toString());
 
-        for (const tick of data) {
-          const symbol = tick.s;
-          const ltp = parseFloat(tick.c);
-          if (!ltp) continue;
+        if (!Array.isArray(tickers)) {
+          console.warn("[BINANCE_MARKET_DATA] Unexpected data format", {
+            segment,
+            dataType: typeof tickers,
+          });
+          return;
+        }
 
-          MarketDataManager.updatePrice("BINANCE", segment, symbol, ltp);
+        for (const ticker of tickers) {
+          const symbol = ticker.s;
+          const price = parseFloat(ticker.c);
+
+          if (!price || price <= 0) continue;
+
+          // ✅ Check if anyone is listening
+          if (MarketDataManager.hasSubscribers("BINANCE", segment, symbol)) {
+            MarketDataManager.updatePrice("BINANCE", segment, symbol, price);
+          }
         }
       } catch (err) {
-        console.log("BINANCE_SOCKET_PARSE_ERROR", segment, err);
+        console.error("[BINANCE_MARKET_DATA] Parse error", {
+          segment,
+          error: err,
+        });
       }
     });
 
-    ws.on("close", () => {
-      console.log("BINANCE_SOCKET_CLOSED", { segment });
+    ws.on("error", (error) => {
+      console.error("[BINANCE_MARKET_DATA] WebSocket error", {
+        segment,
+        error,
+      });
     });
 
-    ws.on("error", (err) => {
-      console.log("BINANCE_SOCKET_ERROR", { segment, err });
+    ws.on("close", (code, reason) => {
+      console.log("[BINANCE_MARKET_DATA] WebSocket closed", {
+        segment,
+        code,
+        reason: reason.toString(),
+      });
     });
-
-    MarketDataManager.registerSocket("BINANCE", segment, ws);
   },
 };

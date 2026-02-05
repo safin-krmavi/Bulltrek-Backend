@@ -902,3 +902,45 @@ export async function fetchKucoinMarketPrice(params: {
     handleKucoinError(error);
   }
 }
+/**
+ * Fetch historical klines from KuCoin
+ */
+export async function fetchKucoinHistoricalKlines(
+  symbol: string,
+  interval: string = "1day",
+  limit: number = 500
+): Promise<any[]> {
+  try {
+    const url = `https://api.kucoin.com/api/v1/market/candles`;
+    
+    const response = await axios.get(url, {
+      params: {
+        symbol: symbol.replace('/', '-'), // KuCoin uses BTC-USDT format
+        type: interval,
+        startAt: Math.floor(Date.now() / 1000) - (limit * 86400), // Rough calculation
+        endAt: Math.floor(Date.now() / 1000),
+      },
+    });
+
+    if (!response.data || !response.data.data) {
+      throw new Error("No data returned from KuCoin");
+    }
+
+    // KuCoin returns: [time, open, close, high, low, volume, turnover]
+    return response.data.data.map((candle: any[]) => [
+      candle[0], // timestamp
+      candle[1], // open
+      candle[3], // high
+      candle[4], // low
+      candle[2], // close
+      candle[5], // volume
+    ]);
+  } catch (error: any) {
+    console.error("[KUCOIN_HISTORICAL_KLINES] Error", {
+      symbol,
+      interval,
+      error: error.message,
+    });
+    throw new Error(`Failed to fetch KuCoin historical data: ${error.message}`);
+  }
+}
