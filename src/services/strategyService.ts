@@ -55,38 +55,39 @@ export const createStrategy = async (data: any) => {
   let nextRunAt: Date | null = null;
 
 if (strategyType === "SMART_GRID") {
-    // ✅ Calculate per-grid amount
-    const perGridAmount = investment / levels;
-
-    // ✅ UPDATED: Auto-generate if limits not provided
     const { generateSmartGridParams } = await import(
       "./strategies/indicatorCalculator.js"
     );
 
     console.log("[SMART_GRID_CREATE] Generating parameters", {
+      exchange,
+      segment,
       symbol,
-      segment, // ✅ Log segment
       dataSetDays,
       type,
-      levels,
-      profitPercentage,
       investment,
       minimumInvestment,
-      perGridAmount,
       userOverrides: {
         lowerLimit,
         upperLimit,
+        levels,
+        profitPercentage,
       },
     });
 
+    // ✅ Generate complete configuration
     const autoParams = await generateSmartGridParams({
       exchange,
       symbol,
       dataSetDays: dataSetDays || 30,
-      segment: segment as "SPOT" | "FUTURES", // ✅ Pass segment
+      segment: segment as "SPOT" | "FUTURES",
+      investment,
+      minimumInvestment,
+      // ✅ Pass user overrides if provided
       userLowerLimit: lowerLimit,
       userUpperLimit: upperLimit,
       userLevels: levels,
+      userProfitPercentage: profitPercentage,
     });
 
     const smartGridConfig = {
@@ -94,13 +95,13 @@ if (strategyType === "SMART_GRID") {
       lowerLimit: autoParams.lowerLimit,
       upperLimit: autoParams.upperLimit,
       levels: autoParams.levels,
-      profitPercentage,
+      profitPercentage: autoParams.profitPercentage,
       stopLossPercentage: stopLossPct,
-      investment,
-      minimumInvestment,
+      investment: autoParams.investment,
+      minimumInvestment: autoParams.minimumInvestment,
       capital: {
-        perGridAmount,
-        maxCapital: investment,
+        perGridAmount: autoParams.perLevelInvestment,
+        maxCapital: autoParams.investment,
       },
       leverage: segment === "FUTURES" ? leverage : undefined,
       direction: segment === "FUTURES" ? direction : undefined,
@@ -126,7 +127,7 @@ if (strategyType === "SMART_GRID") {
 
     console.log("[SMART_GRID_CONFIG_COMPLETE]", {
       type: config.type,
-      segment, // ✅ Log segment
+      segment,
       range: `${config.lowerLimit} - ${config.upperLimit}`,
       levels: config.levels,
       profitPercentage: config.profitPercentage,
@@ -135,7 +136,7 @@ if (strategyType === "SMART_GRID") {
       minimumInvestment: config.minimumInvestment,
       riskLevel: config.indicators.riskLevel,
       gridCount: grids.length,
-      currentMarketPrice: config.indicators.currentPrice, // ✅ Validate price matches
+      currentMarketPrice: config.indicators.currentPrice,
     });
   } else if (strategyType === "HUMAN_GRID") {
     const gridConfig = {

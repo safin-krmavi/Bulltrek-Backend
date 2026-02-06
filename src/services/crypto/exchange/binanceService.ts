@@ -1040,42 +1040,33 @@ export async function fetchBinanceFuturesPositionsBySymbol(
  */
 export async function fetchBinanceHistoricalKlines(
   symbol: string,
-  interval: string = "1d", // 1m, 5m, 1h, 1d, 1w, 1M
-  limit: number = 500, // Max 1000
-  assetType: "SPOT" | "FUTURES" = "SPOT" // ✅ NEW parameter
+  interval: string = "1d",
+  limit: number = 500,
+  assetType: "SPOT" | "FUTURES" = "SPOT"
 ): Promise<any[]> {
   try {
-    // ✅ Use correct base URL based on asset type
-    const baseUrl = assetType === "SPOT" 
-      ? BINANCE_SPOT_BASE_URL 
-      : BINANCE_FUTURES_BASE_URL;
-    
-    const endpoint = "/api/v3/klines";
-    
+    const baseUrl =
+      assetType === "SPOT"
+        ? BINANCE_SPOT_BASE_URL
+        : BINANCE_FUTURES_BASE_URL;
+
+    const endpoint =
+      assetType === "SPOT"
+        ? "/api/v3/klines"
+        : "/fapi/v1/klines";
+
     const url = `${baseUrl}${endpoint}`;
 
-    console.log("[BINANCE_KLINES] Fetching historical data", {
+    console.log("[BINANCE_KLINES] Fetching", {
       symbol,
       interval,
       limit,
-      assetType, // ✅ Log asset type
+      assetType,
       url,
     });
 
     const response = await axios.get(url, {
-      params: {
-        symbol,
-        interval,
-        limit,
-      },
-    });
-
-    console.log("[BINANCE_KLINES] Fetched successfully", {
-      symbol,
-      assetType,
-      candles: response.data.length,
-      firstCandle: response.data[0],
-      lastCandle: response.data[response.data.length - 1],
+      params: { symbol, interval, limit },
     });
 
     return response.data;
@@ -1090,6 +1081,7 @@ export async function fetchBinanceHistoricalKlines(
   }
 }
 
+
 /**
  * ✅ FIXED: Fetch market price with proper segment handling
  */
@@ -1098,33 +1090,23 @@ export async function fetchBinanceMarketPrice(params: {
   assetType: "SPOT" | "FUTURES";
 }) {
   try {
-    // ✅ Use correct base URL
-    const baseUrl = params.assetType === "SPOT"
-      ? BINANCE_SPOT_BASE_URL
-      : BINANCE_FUTURES_BASE_URL;
+    const baseUrl =
+      params.assetType === "SPOT"
+        ? BINANCE_SPOT_BASE_URL
+        : BINANCE_FUTURES_BASE_URL;
 
-    const endpoint = "/api/v3/ticker/price";
+    const endpoint =
+      params.assetType === "SPOT"
+        ? "/api/v3/ticker/price"
+        : "/fapi/v1/ticker/price";
+
     const url = `${baseUrl}${endpoint}`;
-
-    console.log("[BINANCE_PRICE] Fetching", {
-      symbol: params.symbol,
-      assetType: params.assetType,
-      url,
-    });
 
     const response = await axios.get(url, {
       params: { symbol: params.symbol },
     });
 
-    const price = parseFloat(response.data.price);
-
-    console.log("[BINANCE_PRICE] Success", {
-      symbol: params.symbol,
-      assetType: params.assetType,
-      price,
-    });
-
-    return price;
+    return parseFloat(response.data.price);
   } catch (error: any) {
     console.error("[BINANCE_PRICE] Error", {
       symbol: params.symbol,
@@ -1135,3 +1117,4 @@ export async function fetchBinanceMarketPrice(params: {
     return null;
   }
 }
+

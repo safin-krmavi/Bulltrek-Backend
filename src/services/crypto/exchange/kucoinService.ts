@@ -853,82 +853,110 @@ export async function fetchKucoinFuturesPositionBySymbol(
   }
 }
 
-export async function fetchKucoinMarketPrice(params: {
-  symbol: string;
-  assetType: "SPOT" | "FUTURES";
-}) {
-  try {
-    const { symbol, assetType } = params;
+// export async function fetchKucoinMarketPrice(params: {
+//   symbol: string;
+//   assetType: "SPOT" | "FUTURES";
+// }) {
+//   try {
+//     const { symbol, assetType } = params;
 
-    if (!symbol) {
-      throw new Error("Symbol must be provided");
-    }
+//     if (!symbol) {
+//       throw new Error("Symbol must be provided");
+//     }
 
-    let url = "";
+//     let url = "";
 
-    if (assetType === "SPOT") {
-      // Spot: Get last traded price (Level 1 ticker)
-      url = `${KUCOIN_SPOT_BASE_URL}/api/v1/market/orderbook/level1?symbol=${symbol}`;
-      const response = await axios.get(url);
+//     if (assetType === "SPOT") {
+//       // Spot: Get last traded price (Level 1 ticker)
+//       url = `${KUCOIN_SPOT_BASE_URL}/api/v1/market/orderbook/level1?symbol=${symbol}`;
+//       const response = await axios.get(url);
 
-      if (response.data.code !== "200000") {
-        throw new Error(
-          response.data.msg || "KuCoin Spot API returned an error"
-        );
-      }
+//       if (response.data.code !== "200000") {
+//         throw new Error(
+//           response.data.msg || "KuCoin Spot API returned an error"
+//         );
+//       }
 
-      return parseFloat(response.data.data.price); // Last traded price
-    } else if (assetType === "FUTURES") {
-      // Futures: Get mark price
-      url = `${KUCOIN_FUTURES_BASE_URL}/api/v1/mark-price/${symbol}/current`;
-      const response = await axios.get(url);
+//       return parseFloat(response.data.data.price); // Last traded price
+//     } else if (assetType === "FUTURES") {
+//       // Futures: Get mark price
+//       url = `${KUCOIN_FUTURES_BASE_URL}/api/v1/mark-price/${symbol}/current`;
+//       const response = await axios.get(url);
 
-      if (response.data.code !== "200000") {
-        throw new Error(
-          response.data.msg || "KuCoin Futures API returned an error"
-        );
-      }
+//       if (response.data.code !== "200000") {
+//         throw new Error(
+//           response.data.msg || "KuCoin Futures API returned an error"
+//         );
+//       }
 
-      return parseFloat(response.data.data.value); // Mark price
-    } else {
-      throw new Error("Invalid assetType, must be SPOT or FUTURES");
-    }
-  } catch (error: any) {
-    console.error("[KUCOIN][MARKET_PRICE] Failed", {
-      symbol: params.symbol,
-      assetType: params.assetType,
-      error: error?.response?.data || error.message,
-    });
-    handleKucoinError(error);
-  }
-}
+//       return parseFloat(response.data.data.value); // Mark price
+//     } else {
+//       throw new Error("Invalid assetType, must be SPOT or FUTURES");
+//     }
+//   } catch (error: any) {
+//     console.error("[KUCOIN][MARKET_PRICE] Failed", {
+//       symbol: params.symbol,
+//       assetType: params.assetType,
+//       error: error?.response?.data || error.message,
+//     });
+//     handleKucoinError(error);
+//   }
+// }
+// Add these functions to kucoinService.ts
+
 /**
  * Fetch historical klines from KuCoin
  */
 export async function fetchKucoinHistoricalKlines(
   symbol: string,
   interval: string = "1day",
-  limit: number = 500
+  limit: number = 500,
+  assetType: "SPOT" | "FUTURES" = "SPOT"
 ): Promise<any[]> {
   try {
-    const url = `https://api.kucoin.com/api/v1/market/candles`;
+    const baseUrl = assetType === "SPOT" 
+      ? "https://api.kucoin.com"
+      : "https://api-futures.kucoin.com";
     
-    const response = await axios.get(url, {
+    const endpoint = assetType === "SPOT"
+      ? "/api/v1/market/candles"
+      : "/api/v1/kline/query";
+
+    // KuCoin interval mapping
+    const intervalMap: Record<string, string> = {
+      "1m": "1min",
+      "5m": "5min",
+      "15m": "15min",
+      "1h": "1hour",
+      "4h": "4hour",
+      "1d": "1day",
+      "1w": "1week",
+    };
+
+    const kucoinInterval = intervalMap[interval] || interval;
+
+    console.log("[KUCOIN_KLINES] Fetching", {
+      symbol,
+      interval: kucoinInterval,
+      limit,
+      assetType,
+    });
+
+    const response = await axios.get(`${baseUrl}${endpoint}`, {
       params: {
-        symbol: symbol.replace('/', '-'), // KuCoin uses BTC-USDT format
-        type: interval,
-        startAt: Math.floor(Date.now() / 1000) - (limit * 86400), // Rough calculation
-        endAt: Math.floor(Date.now() / 1000),
+        symbol: symbol,
+        type: kucoinInterval,
+        ...(limit && { startAt: Math.floor(Date.now() / 1000) - (limit * 86400) }),
       },
     });
 
-    if (!response.data || !response.data.data) {
-      throw new Error("No data returned from KuCoin");
+    if (!response.data?.data) {
+      return [];
     }
 
-    // KuCoin returns: [time, open, close, high, low, volume, turnover]
-    return response.data.data.map((candle: any[]) => [
-      candle[0], // timestamp
+    // Convert KuCoin format to Binance-like format
+    return response.data.data.map((candle: any) => [
+      candle[0] * 1000, // timestamp
       candle[1], // open
       candle[3], // high
       candle[4], // low
@@ -936,11 +964,46 @@ export async function fetchKucoinHistoricalKlines(
       candle[5], // volume
     ]);
   } catch (error: any) {
-    console.error("[KUCOIN_HISTORICAL_KLINES] Error", {
+    console.error("[KUCOIN_KLINES] Error", {
       symbol,
-      interval,
-      error: error.message,
+      assetType,
+      error: error.response?.data || error.message,
     });
-    throw new Error(`Failed to fetch KuCoin historical data: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * Fetch current market price from KuCoin
+ */
+export async function fetchKucoinMarketPrice(params: {
+  symbol: string;
+  assetType: "SPOT" | "FUTURES";
+}): Promise<number | null> {
+  try {
+    const baseUrl = params.assetType === "SPOT"
+      ? "https://api.kucoin.com"
+      : "https://api-futures.kucoin.com";
+
+    const endpoint = params.assetType === "SPOT"
+      ? "/api/v1/market/orderbook/level1"
+      : "/api/v1/ticker";
+
+    const response = await axios.get(`${baseUrl}${endpoint}`, {
+      params: { symbol: params.symbol },
+    });
+
+    if (params.assetType === "SPOT") {
+      return parseFloat(response.data?.data?.price || "0");
+    } else {
+      return parseFloat(response.data?.data?.lastTradePrice || "0");
+    }
+  } catch (error: any) {
+    console.error("[KUCOIN_PRICE] Error", {
+      symbol: params.symbol,
+      assetType: params.assetType,
+      error: error.response?.data || error.message,
+    });
+    return null;
   }
 }

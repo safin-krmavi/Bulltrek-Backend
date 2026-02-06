@@ -484,13 +484,11 @@ await tradeDispatcher.dispatch({
 });
   }
 
-  // Handle SELL
- // Handle SELL
+// Handle SELL
 if (decision.action === "SELL" && decision.gridId) {
-  // ✅ FIX: Check if grid can be sold
   const grid = state.grids.find(g => g.id === decision.gridId);
   if (!grid) {
-    console.error("[HUMAN_GRID_SELL] Grid not found", {
+    console.error("[HUMAN_GRID] Grid not found for SELL decision", {
       strategyId: strategy.id,
       gridId: decision.gridId,
     });
@@ -498,7 +496,7 @@ if (decision.action === "SELL" && decision.gridId) {
   }
 
   if (grid.status !== "BOUGHT") {
-    console.log("[HUMAN_GRID_SELL] Grid not bought yet, skipping", {
+    console.warn("[HUMAN_GRID] Cannot sell EMPTY grid", {
       strategyId: strategy.id,
       gridId: decision.gridId,
       status: grid.status,
@@ -507,7 +505,7 @@ if (decision.action === "SELL" && decision.gridId) {
   }
 
   if (state.pendingOrders.has(decision.gridId)) {
-    console.log("[HUMAN_GRID_SELL] Order already pending, skipping", {
+    console.log("[HUMAN_GRID] SELL order already pending", {
       strategyId: strategy.id,
       gridId: decision.gridId,
     });
@@ -516,13 +514,16 @@ if (decision.action === "SELL" && decision.gridId) {
 
   state.pendingOrders.add(decision.gridId);
 
-  const formattedSellPrice = parseFloat(decision.price!.toFixed(2));
+  // ✅ FIX: Use grid's sell price, not decision price
+  const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2));
 
   console.log("[HUMAN_GRID_SELL]", {
     strategyId: strategy.id,
     gridId: decision.gridId,
-    sellPrice: formattedSellPrice,
-    quantity: decision.quantity,
+    buyPrice: grid.buyPrice,
+    sellPrice: formattedSellPrice, // ✅ Use grid's sell price
+    quantity: grid.quantity,
+    currentPrice: price,
   });
 
   await tradeDispatcher.dispatch({
@@ -532,73 +533,27 @@ if (decision.action === "SELL" && decision.gridId) {
     tradeType: strategy.segment as "SPOT" | "FUTURES",
     symbol: strategy.symbol,
     side: getOrderSide(config, "SELL"),
-    quantity: decision.quantity!,
-    price: formattedSellPrice,
+    quantity: grid.quantity,
+    price: formattedSellPrice, // ✅ Use grid's sell price
     orderType: "LIMIT",
     strategyId: strategy.id,
     onComplete: () => {
-      const grid = state.grids.find((g) => g.id === decision.gridId);
-      if (!grid) {
-        console.error("[HUMAN_GRID_SELL_COMPLETE] Grid not found", {
-          strategyId: strategy.id,
-          gridId: decision.gridId,
-        });
-        return;
-      }
-
-      // ✅ CRITICAL FIX: Check if already processed
-      if (grid.status === "EMPTY") {
-        console.warn("[HUMAN_GRID_SELL_COMPLETE] Already processed, skipping", {
-          strategyId: strategy.id,
-          gridId: decision.gridId,
-          currentStatus: grid.status,
-          investedCapital: state.investedCapital,
-        });
-        state.pendingOrders.delete(decision.gridId!);
-        return; // ✅ Exit early
-      }
-
-      // ✅ Now safe to update
       grid.status = "EMPTY";
       grid.quantity = 0;
       state.investedCapital -= config.capital.perGridAmount;
       state.pendingOrders.delete(decision.gridId!);
-      state.lastExecutionAt = timestamp;
-
-      // ✅ FIX #4: Check if ALL grids are now EMPTY (cycle complete)
-      const allEmpty = state.grids.every((g) => g.status === "EMPTY");
-      if (allEmpty) {
-        state.executedCycles++;  // ← Only increment when ALL grids complete
-
-        console.log("[HUMAN_GRID_CYCLE_COMPLETE]", {
-          strategyId: strategy.id,
-          completedCycles: state.executedCycles,
-          maxCycles: config.maxCycles,
-        });
-
-        // ✅ FIX #4: Check if max cycles reached
-        if (config.maxCycles && state.executedCycles >= config.maxCycles) {
-          console.log("[HUMAN_GRID] Max cycles reached, stopping strategy", {
-            strategyId: strategy.id,
-            cycles: state.executedCycles,
-          });
-
-          // Stop strategy
-          changeStrategyStatus(strategy.id, strategy.userId, "STOPPED");
-          state.lifecycle = "STOPPED";
-          return;
-        }
-      }
+      state.executedCycles += 1;
 
       console.log("[HUMAN_GRID_SELL_COMPLETE]", {
         strategyId: strategy.id,
         gridId: decision.gridId,
         executedCycles: state.executedCycles,
-        investedCapital: state.investedCapital,
       });
-  },
-});
-  }
+
+      logGridState(strategy.id, state);
+    },
+  });
+}
 }
 /* -------------------------------------------------------------------------- */
 /*                         HUMAN GRID BOOTSTRAP                               */
@@ -668,131 +623,104 @@ async function bootstrapHumanGrid(
   for (let i = 0; i < sortedGrids.length; i++) {
     const grid = sortedGrids[i];
 
-    // Skip if already pending or bought
-    if (state.pendingOrders.has(grid.id)) {
-      console.log("[HUMAN_GRID_BOOTSTRAP] Grid already pending, skipping", {
-        gridId: grid.id,
+    if (grid.buyPrice > currentPrice) {
+      console.log("[HUMAN_GRID_BOOTSTRAP] Grid above current price, skipping", {
+        gridIndex: i + 1,
         buyPrice: grid.buyPrice,
+        currentPrice,
       });
       continue;
     }
 
-    if (grid.status === "BOUGHT") {
-      console.log("[HUMAN_GRID_BOOTSTRAP] Grid already bought, skipping", {
-        gridId: grid.id,
-        buyPrice: grid.buyPrice,
-      });
-      continue;
-    }
-
-    // Check capital availability
-    const potentialInvestment = state.investedCapital + config.capital.perGridAmount;
-    if (potentialInvestment > config.capital.maxCapital) {
-      console.log("[HUMAN_GRID_BOOTSTRAP] Capital limit reached", {
-        strategyId: strategy.id,
-        investedCapital: state.investedCapital,
-        maxCapital: config.capital.maxCapital,
-        gridIndex: i,
-      });
-      break;
-    }
-
-    // ✅ Mark as pending BEFORE dispatching
     state.pendingOrders.add(grid.id);
 
-    const formattedBuyPrice = parseFloat(grid.buyPrice.toFixed(6));
-    const formattedTakeProfit = parseFloat(grid.sellPrice.toFixed(6));
-
-    const stopLossPrice = config.stopLossPercentage
-      ? parseFloat((grid.buyPrice * (1 - config.stopLossPercentage / 100)).toFixed(6))
-      : undefined;
-
-    const qty = await calculateQuantityWithLeverage({
+    const rawQuantity = config.capital.perGridAmount / grid.buyPrice;
+    const formattedQuantity = await formatQuantity({
       exchange: strategy.exchange,
       tradeType: strategy.segment,
       symbol: strategy.symbol,
-      rawQty:
-        strategy.assetType === "STOCK"
-          ? config.capital.perGridAmount
-          : config.capital.perGridAmount / grid.buyPrice,
-      leverage: strategy.segment === "FUTURES" ? config.leverage : undefined,
+      rawQty: rawQuantity,
     });
 
-    console.log("[HUMAN_GRID_BOOTSTRAP_ORDER]", {
+    const formattedBuyPrice = parseFloat(grid.buyPrice.toFixed(2));
+    const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2)); // ✅ Use grid's sell price
+
+    const stopLossPrice = config.stopLossPercentage
+      ? parseFloat((grid.buyPrice * (1 - config.stopLossPercentage / 100)).toFixed(2))
+      : undefined;
+
+    await tradeDispatcher.dispatch({
+      userId: strategy.userId,
+      exchange: strategy.exchange,
+      segment: strategy.assetType as "CRYPTO" | "STOCK",
+      tradeType: strategy.segment as "SPOT" | "FUTURES",
+      symbol: strategy.symbol,
+      side: getOrderSide(config, "BUY"),
+      quantity: formattedQuantity,
+      price: formattedBuyPrice,
+      orderType: "LIMIT",
       strategyId: strategy.id,
-      orderNumber: buyOrdersPlaced + 1,
-      gridId: grid.id,
-      gridIndex: i,
-      buyPrice: formattedBuyPrice,
-      sellPrice: formattedTakeProfit,
-      quantity: qty,
-      stopLoss: stopLossPrice,
-    });
+      onComplete: async () => {
+        // ✅ BUY order filled
+        grid.status = "BOUGHT";
+        grid.quantity = formattedQuantity;
+        state.investedCapital += config.capital.perGridAmount;
+        state.pendingOrders.delete(grid.id);
 
-    try {
-      await tradeDispatcher.dispatch({
-        userId: strategy.userId,
-        exchange: strategy.exchange,
-        segment: strategy.assetType as "CRYPTO" | "STOCK",
-        tradeType: strategy.segment as "SPOT" | "FUTURES",
-        symbol: strategy.symbol,
-        side: getOrderSide(config, "BUY"),
-        quantity: qty,
-        price: formattedBuyPrice,
-        takeProfit: formattedTakeProfit,
-        stopLoss: stopLossPrice,
-        orderType: "LIMIT",
-        strategyId: strategy.id,
-        onComplete: async () => {
-          // ✅ CRITICAL FIX: Check if already processed (idempotency)
-          if (grid.status === "BOUGHT") {
-            console.warn("[HUMAN_GRID_BOOTSTRAP_ORDER_PLACED] Already processed, skipping", {
+        console.log("[HUMAN_GRID_BUY_COMPLETE] Placing automatic SELL order", {
+          strategyId: strategy.id,
+          gridId: grid.id,
+          buyPrice: grid.buyPrice,
+          sellPrice: grid.sellPrice, // ✅ Use grid's sell price
+          quantity: formattedQuantity,
+        });
+
+        // ✅ CRITICAL FIX: Automatically place SELL order
+        state.pendingOrders.add(grid.id);
+
+        await tradeDispatcher.dispatch({
+          userId: strategy.userId,
+          exchange: strategy.exchange,
+          segment: strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: strategy.segment as "SPOT" | "FUTURES",
+          symbol: strategy.symbol,
+          side: getOrderSide(config, "SELL"),
+          quantity: formattedQuantity,
+          price: formattedSellPrice, // ✅ Use grid's sell price
+          orderType: "LIMIT",
+          strategyId: strategy.id,
+          onComplete: async () => {
+            // ✅ SELL order filled
+            grid.status = "EMPTY";
+            grid.quantity = 0;
+            state.investedCapital -= config.capital.perGridAmount;
+            state.pendingOrders.delete(grid.id);
+            state.executedCycles += 1;
+
+            console.log("[HUMAN_GRID_SELL_COMPLETE] Cycle completed", {
               strategyId: strategy.id,
               gridId: grid.id,
-              currentStatus: grid.status,
+              executedCycles: state.executedCycles,
             });
-            state.pendingOrders.delete(grid.id);
-            return;
-          }
 
-          // ✅ Update grid status (marks as filled)
-          grid.status = "BOUGHT";
-          grid.quantity = qty;
-          
-          // ✅ FIX: Count capital ONLY HERE (not in try block)
-          state.investedCapital += config.capital.perGridAmount;
-          
-          state.pendingOrders.delete(grid.id);
-          state.lastExecutionAt = timestamp;
+            logGridState(strategy.id, state);
+          },
+        });
+      },
+    });
 
-          console.log("[HUMAN_GRID_BOOTSTRAP_ORDER_PLACED]", {
-            strategyId: strategy.id,
-            gridId: grid.id,
-            buyPrice: formattedBuyPrice,
-            quantity: qty,
-            gridStatus: grid.status,
-            investedCapital: state.investedCapital,
-          });
-        },
-      });
-
-      // ✅ FIX: ONLY increment order counter, NOT capital
-      // Capital is counted in onComplete when order is confirmed
-      buyOrdersPlaced++;
-      
-    } catch (error: any) {
-      console.error("[HUMAN_GRID_BOOTSTRAP_ORDER_FAILED]", {
-        strategyId: strategy.id,
-        gridId: grid.id,
-        buyPrice: formattedBuyPrice,
-        error: error.message,
-      });
-      // ✅ Remove from pending on failure (grid stays EMPTY, capital not counted)
-      state.pendingOrders.delete(grid.id);
-    }
+    buyOrdersPlaced++;
+    
+    console.log("[HUMAN_GRID_BOOTSTRAP] BUY order placed", {
+      gridIndex: i + 1,
+      gridId: grid.id,
+      buyPrice: formattedBuyPrice,
+      sellPrice: formattedSellPrice, // ✅ Log sell price
+      quantity: formattedQuantity,
+      totalOrders: buyOrdersPlaced,
+    });
   }
 
-  // ✅ Transition to RUNNING state
   state.lifecycle = "RUNNING";
 
   console.log("[HUMAN_GRID_BOOTSTRAP_COMPLETE]", {
@@ -804,7 +732,7 @@ async function bootstrapHumanGrid(
     investedCapital: state.investedCapital,
     placedGrids: sortedGrids.slice(0, buyOrdersPlaced).map(g => ({
       buyPrice: g.buyPrice,
-      sellPrice: g.sellPrice,
+      sellPrice: g.sellPrice, // ✅ Show sell price
     })),
   });
   
@@ -870,110 +798,91 @@ async function handleSmartGrid(
 
   // ✅ PHASE 1: DYNAMIC MODE RECALCULATION (if enabled)
   if (state.mode === "DYNAMIC") {
-    const recalcInterval = (config.recalculationInterval || 15) * 60 * 1000;
-    const shouldRecalculate =
-      !state.lastRecalculationAt || timestamp - state.lastRecalculationAt > recalcInterval;
+    const config = strategy.config as any;
+    const now = timestamp;
+    const intervalMs = (config.recalculationInterval || 15) * 60 * 1000;
 
-    if (shouldRecalculate) {
+    if (!state.lastRecalculationAt || now - state.lastRecalculationAt >= intervalMs) {
       console.log("[SMART_GRID_DYNAMIC] Recalculating grid parameters", {
         strategyId: strategy.id,
-        lastRecalc: state.lastRecalculationAt
-          ? new Date(state.lastRecalculationAt).toISOString()
-          : "never",
+        lastRecalculation: state.lastRecalculationAt 
+          ? new Date(state.lastRecalculationAt).toISOString() 
+          : 'never',
+        intervalMinutes: config.recalculationInterval || 15,
       });
 
       try {
-const { generateSmartGridParams } = await import(
-  "../../services/strategies/indicatorCalculator.js"
-);
+        const { generateSmartGridParams } = await import(
+          "../../services/strategies/indicatorCalculator.js"
+        );
+
+        // ✅ FIX: Pass all required parameters from config
         const newParams = await generateSmartGridParams({
           exchange: strategy.exchange,
           symbol: strategy.symbol,
           dataSetDays: config.dataSetDays,
+          segment: strategy.segment as "SPOT" | "FUTURES", // ✅ Add segment
+          investment: config.investment, // ✅ From config
+          minimumInvestment: config.minimumInvestment, // ✅ From config
+          userLevels: config.levels, // ✅ Keep same number of levels
+          userProfitPercentage: config.profitPercentage, // ✅ Keep same profit %
         });
 
-        const rangeDiff = Math.abs(newParams.lowerLimit - config.lowerLimit) / config.lowerLimit;
+        // ✅ Update config with new limits (but keep investment/levels same)
+        config.lowerLimit = newParams.lowerLimit;
+        config.upperLimit = newParams.upperLimit;
+        config.indicators = newParams.indicators;
 
-        if (rangeDiff > 0.1) {
-          console.log("[SMART_GRID_DYNAMIC] Significant range change, initiating rebalance", {
-            oldRange: `${config.lowerLimit} - ${config.upperLimit}`,
-            newRange: `${newParams.lowerLimit} - ${newParams.upperLimit}`,
-            diff: `${(rangeDiff * 100).toFixed(2)}%`,
-          });
+        // ✅ Regenerate grids with new limits
+        const { generateSmartGridLevels } = await import(
+          "../../utils/strategies/gridCalculations.js"
+        );
+        
+        const newGrids = generateSmartGridLevels(config);
 
-          // ✅ FIX #3: Use Promise.allSettled to wait for all orders
-          const sellPromises = state.grids
-            .filter((g) => g.status === "BOUGHT")
-            .map((grid) => {
-              return new Promise<void>((resolve) => {
-                state.pendingOrders.add(grid.id);
+        // ✅ Preserve existing positions
+        const preservedGrids = newGrids.map((newGrid, index) => {
+          const oldGrid = state.grids[index];
+          if (oldGrid && oldGrid.status === "BOUGHT") {
+            // Keep bought grids as-is with their original prices
+            return oldGrid;
+          }
+          // Update empty grids with new prices
+          return newGrid;
+        });
 
-                tradeDispatcher.dispatch({
-                  userId: strategy.userId,
-                  exchange: strategy.exchange,
-                  segment: strategy.assetType as "CRYPTO" | "STOCK",
-                  tradeType: strategy.segment as "SPOT" | "FUTURES",
-                  symbol: strategy.symbol,
-                  side: getOrderSide(config, "SELL"),
-                  quantity: grid.quantity,
-                  price: parseFloat(price.toFixed(2)),
-                  orderType: "MARKET",
-                  strategyId: strategy.id,
-                  onComplete: () => {
-                    grid.status = "EMPTY";
-                    grid.quantity = 0;
-                    state.pendingOrders.delete(grid.id);
-                    resolve();
-                  },
-                });
-              });
-            });
+        state.grids = preservedGrids;
+        state.indicators = newParams.indicators;
+        state.lastRecalculationAt = now;
 
-          await Promise.allSettled(sellPromises);
+        // ✅ Update strategy in database
+        await prisma.strategy.update({
+          where: { id: strategy.id },
+          data: { 
+            config: {
+              ...config,
+              grids: preservedGrids,
+              indicators: newParams.indicators,
+            }
+          },
+        });
 
-          // ✅ FIX #3: Atomically update config and state
-          const updatedConfig = {
-            ...config,
-            lowerLimit: newParams.lowerLimit,
-            upperLimit: newParams.upperLimit,
-            indicators: newParams.indicators,
-          };
-
-          // Update database
-          await prisma.strategy.update({
-            where: { id: strategy.id },
-            data: {
-              config: updatedConfig,
-            },
-          });
-
-          // ✅ FIX #3: Update in-memory state after DB success
-          Object.assign(config, updatedConfig);
-          state.grids = generateSmartGridLevels(updatedConfig);
-          state.investedCapital = 0;
-          state.pendingOrders.clear();
-          state.lastRecalculationAt = timestamp;
-
-          // ✅ FIX #3: Update strategy reference
-          registeredStrategies.set(strategy.id, {
-            strategy: { ...strategy, config: updatedConfig },
-            state,
-          });
-
-          console.log("[SMART_GRID_DYNAMIC_COMPLETE]", {
-            strategyId: strategy.id,
-            newGridCount: state.grids.length,
-          });
-        } else {
-          // No rebalance needed, just update timestamp
-          state.lastRecalculationAt = timestamp;
-        }
-      } catch (error) {
-        console.error("[SMART_GRID_DYNAMIC_ERROR]", {
+        console.log("[SMART_GRID_DYNAMIC_RECALCULATION_COMPLETE]", {
           strategyId: strategy.id,
-          error: (error as any).message,
+          oldRange: `${config.lowerLimit} - ${config.upperLimit}`,
+          newRange: `${newParams.lowerLimit} - ${newParams.upperLimit}`,
+          oldRiskLevel: state.indicators.riskLevel,
+          newRiskLevel: newParams.indicators.riskLevel,
+          preservedPositions: preservedGrids.filter(g => g.status === "BOUGHT").length,
+          updatedGrids: preservedGrids.filter(g => g.status === "EMPTY").length,
         });
-        // Don't update lastRecalculationAt on error - retry next interval
+      } catch (error: any) {
+        console.error("[SMART_GRID_DYNAMIC_RECALCULATION_ERROR]", {
+          strategyId: strategy.id,
+          error: error.message,
+          stack: error.stack,
+        });
+        // Continue with old parameters on error
       }
     }
   }
