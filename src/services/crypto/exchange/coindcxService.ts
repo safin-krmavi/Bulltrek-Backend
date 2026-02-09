@@ -919,7 +919,7 @@ export async function fetchCoinDCXMarketPrice(params: {
     const response = await axios.get("https://api.coindcx.com/exchange/ticker");
 
     const ticker = response.data.find((t: any) => t.market === coindcxSymbol);
-    
+
     return ticker ? parseFloat(ticker.last_price) : null;
   } catch (error: any) {
     console.error("[COINDCX_PRICE] Error", {

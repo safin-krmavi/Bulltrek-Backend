@@ -169,14 +169,15 @@ export const signalEngine = {
         },
         lastRecalculationAt: null,
       } as SmartGridState;
-            console.log("[SMART_GRID_INIT_STATE]", {
+      console.log("[SMART_GRID_INIT_STATE]", {
         strategyId: strategy.id,
         symbol: strategy.symbol,
         segment: strategy.segment, // ✅ Log segment
         exchange: strategy.exchange,
         range: `${smartGridConfig.lowerLimit} - ${smartGridConfig.upperLimit}`,
         levels: smartGridConfig.levels,
-        mode: smartGridConfig.mode,});
+        mode: smartGridConfig.mode,
+      });
     } else {
       throw new Error(`Unsupported strategy type: ${strategy.type}`);
     }
@@ -185,7 +186,7 @@ export const signalEngine = {
 
     // Subscribe to market data
     if (strategy.assetType === "CRYPTO") {
-        console.log("[SIGNAL_ENGINE] Subscribing to market data", {
+      console.log("[SIGNAL_ENGINE] Subscribing to market data", {
         strategyId: strategy.id,
         exchange: strategy.exchange,
         segment: strategy.segment, // ✅ This must match strategy config
@@ -201,7 +202,7 @@ export const signalEngine = {
 
     console.log("[SIGNAL_ENGINE] Strategy registered successfully", {
       id: strategy.id,
-       segment: strategy.segment,
+      segment: strategy.segment,
       subscribedToMarketData: strategy.assetType === "CRYPTO",
     });
   },
@@ -209,7 +210,7 @@ export const signalEngine = {
   /**
    * Unregister a strategy
    */
-   unregister(strategyId: string) {
+  unregister(strategyId: string) {
     const entry = registeredStrategies.get(strategyId);
     if (!entry) return;
 
@@ -226,7 +227,7 @@ export const signalEngine = {
     }
 
     registeredStrategies.delete(strategyId);
-    
+
     // ✅ NEW: Clean up bootstrap tracking
     bootstrapedStrategies.delete(strategyId);
 
@@ -430,130 +431,130 @@ async function handleHumanGrid(
       stopLoss: stopLossPrice,
     });
 
-   // In handleHumanGrid function, BUY section:
+    // In handleHumanGrid function, BUY section:
 
-await tradeDispatcher.dispatch({
-  userId: strategy.userId,
-  exchange: strategy.exchange,
-  segment: strategy.assetType as "CRYPTO" | "STOCK",
-  tradeType: strategy.segment as "SPOT" | "FUTURES",
-  symbol: strategy.symbol,
-  side: getOrderSide(config, "BUY"),
-  quantity: qty,
-  price: formattedBuyPrice,
-  takeProfit: formattedTakeProfit,
-  stopLoss: stopLossPrice,
-  orderType: "LIMIT",
-  strategyId: strategy.id,
-  onComplete: async () => {
-    const grid = state.grids.find((g) => g.id === decision.gridId);
+    await tradeDispatcher.dispatch({
+      userId: strategy.userId,
+      exchange: strategy.exchange,
+      segment: strategy.assetType as "CRYPTO" | "STOCK",
+      tradeType: strategy.segment as "SPOT" | "FUTURES",
+      symbol: strategy.symbol,
+      side: getOrderSide(config, "BUY"),
+      quantity: qty,
+      price: formattedBuyPrice,
+      takeProfit: formattedTakeProfit,
+      stopLoss: stopLossPrice,
+      orderType: "LIMIT",
+      strategyId: strategy.id,
+      onComplete: async () => {
+        const grid = state.grids.find((g) => g.id === decision.gridId);
+        if (!grid) {
+          console.error("[HUMAN_GRID_BUY_COMPLETE] Grid not found", {
+            strategyId: strategy.id,
+            gridId: decision.gridId,
+          });
+          return;
+        }
+
+        // ✅ CRITICAL FIX: Check if already processed
+        if (grid.status === "BOUGHT") {
+          console.warn("[HUMAN_GRID_BUY_COMPLETE] Already processed, skipping", {
+            strategyId: strategy.id,
+            gridId: decision.gridId,
+            currentStatus: grid.status,
+            investedCapital: state.investedCapital,
+          });
+          state.pendingOrders.delete(decision.gridId!);
+          return; // ✅ Exit early - don't update again
+        }
+
+        // ✅ Now safe to update (only runs once)
+        grid.status = "BOUGHT";
+        grid.quantity = qty;
+        state.investedCapital += config.capital.perGridAmount;
+        state.pendingOrders.delete(decision.gridId!);
+        state.lastExecutionAt = timestamp;
+
+        console.log("[HUMAN_GRID_BUY_COMPLETE]", {
+          strategyId: strategy.id,
+          gridId: decision.gridId,
+          investedCapital: state.investedCapital,
+          gridStatus: grid.status,
+        });
+      },
+    });
+  }
+
+  // Handle SELL
+  if (decision.action === "SELL" && decision.gridId) {
+    const grid = state.grids.find(g => g.id === decision.gridId);
     if (!grid) {
-      console.error("[HUMAN_GRID_BUY_COMPLETE] Grid not found", {
+      console.error("[HUMAN_GRID] Grid not found for SELL decision", {
         strategyId: strategy.id,
         gridId: decision.gridId,
       });
       return;
     }
 
-    // ✅ CRITICAL FIX: Check if already processed
-    if (grid.status === "BOUGHT") {
-      console.warn("[HUMAN_GRID_BUY_COMPLETE] Already processed, skipping", {
+    if (grid.status !== "BOUGHT") {
+      console.warn("[HUMAN_GRID] Cannot sell EMPTY grid", {
         strategyId: strategy.id,
         gridId: decision.gridId,
-        currentStatus: grid.status,
-        investedCapital: state.investedCapital,
+        status: grid.status,
       });
-      state.pendingOrders.delete(decision.gridId!);
-      return; // ✅ Exit early - don't update again
+      return;
     }
 
-    // ✅ Now safe to update (only runs once)
-    grid.status = "BOUGHT";
-    grid.quantity = qty;
-    state.investedCapital += config.capital.perGridAmount;
-    state.pendingOrders.delete(decision.gridId!);
-    state.lastExecutionAt = timestamp;
-
-    console.log("[HUMAN_GRID_BUY_COMPLETE]", {
-      strategyId: strategy.id,
-      gridId: decision.gridId,
-      investedCapital: state.investedCapital,
-      gridStatus: grid.status,
-    });
-  },
-});
-  }
-
-// Handle SELL
-if (decision.action === "SELL" && decision.gridId) {
-  const grid = state.grids.find(g => g.id === decision.gridId);
-  if (!grid) {
-    console.error("[HUMAN_GRID] Grid not found for SELL decision", {
-      strategyId: strategy.id,
-      gridId: decision.gridId,
-    });
-    return;
-  }
-
-  if (grid.status !== "BOUGHT") {
-    console.warn("[HUMAN_GRID] Cannot sell EMPTY grid", {
-      strategyId: strategy.id,
-      gridId: decision.gridId,
-      status: grid.status,
-    });
-    return;
-  }
-
-  if (state.pendingOrders.has(decision.gridId)) {
-    console.log("[HUMAN_GRID] SELL order already pending", {
-      strategyId: strategy.id,
-      gridId: decision.gridId,
-    });
-    return;
-  }
-
-  state.pendingOrders.add(decision.gridId);
-
-  // ✅ FIX: Use grid's sell price, not decision price
-  const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2));
-
-  console.log("[HUMAN_GRID_SELL]", {
-    strategyId: strategy.id,
-    gridId: decision.gridId,
-    buyPrice: grid.buyPrice,
-    sellPrice: formattedSellPrice, // ✅ Use grid's sell price
-    quantity: grid.quantity,
-    currentPrice: price,
-  });
-
-  await tradeDispatcher.dispatch({
-    userId: strategy.userId,
-    exchange: strategy.exchange,
-    segment: strategy.assetType as "CRYPTO" | "STOCK",
-    tradeType: strategy.segment as "SPOT" | "FUTURES",
-    symbol: strategy.symbol,
-    side: getOrderSide(config, "SELL"),
-    quantity: grid.quantity,
-    price: formattedSellPrice, // ✅ Use grid's sell price
-    orderType: "LIMIT",
-    strategyId: strategy.id,
-    onComplete: () => {
-      grid.status = "EMPTY";
-      grid.quantity = 0;
-      state.investedCapital -= config.capital.perGridAmount;
-      state.pendingOrders.delete(decision.gridId!);
-      state.executedCycles += 1;
-
-      console.log("[HUMAN_GRID_SELL_COMPLETE]", {
+    if (state.pendingOrders.has(decision.gridId)) {
+      console.log("[HUMAN_GRID] SELL order already pending", {
         strategyId: strategy.id,
         gridId: decision.gridId,
-        executedCycles: state.executedCycles,
       });
+      return;
+    }
 
-      logGridState(strategy.id, state);
-    },
-  });
-}
+    state.pendingOrders.add(decision.gridId);
+
+    // ✅ FIX: Use grid's sell price, not decision price
+    const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2));
+
+    console.log("[HUMAN_GRID_SELL]", {
+      strategyId: strategy.id,
+      gridId: decision.gridId,
+      buyPrice: grid.buyPrice,
+      sellPrice: formattedSellPrice, // ✅ Use grid's sell price
+      quantity: grid.quantity,
+      currentPrice: price,
+    });
+
+    await tradeDispatcher.dispatch({
+      userId: strategy.userId,
+      exchange: strategy.exchange,
+      segment: strategy.assetType as "CRYPTO" | "STOCK",
+      tradeType: strategy.segment as "SPOT" | "FUTURES",
+      symbol: strategy.symbol,
+      side: getOrderSide(config, "SELL"),
+      quantity: grid.quantity,
+      price: formattedSellPrice, // ✅ Use grid's sell price
+      orderType: "LIMIT",
+      strategyId: strategy.id,
+      onComplete: () => {
+        grid.status = "EMPTY";
+        grid.quantity = 0;
+        state.investedCapital -= config.capital.perGridAmount;
+        state.pendingOrders.delete(decision.gridId!);
+        state.executedCycles += 1;
+
+        console.log("[HUMAN_GRID_SELL_COMPLETE]", {
+          strategyId: strategy.id,
+          gridId: decision.gridId,
+          executedCycles: state.executedCycles,
+        });
+
+        logGridState(strategy.id, state);
+      },
+    });
+  }
 }
 /* -------------------------------------------------------------------------- */
 /*                         HUMAN GRID BOOTSTRAP                               */
@@ -710,7 +711,7 @@ async function bootstrapHumanGrid(
     });
 
     buyOrdersPlaced++;
-    
+
     console.log("[HUMAN_GRID_BOOTSTRAP] BUY order placed", {
       gridIndex: i + 1,
       gridId: grid.id,
@@ -735,7 +736,7 @@ async function bootstrapHumanGrid(
       sellPrice: g.sellPrice, // ✅ Show sell price
     })),
   });
-  
+
   logGridState(strategy.id, state);
 }
 /* -------------------------------------------------------------------------- */
@@ -805,8 +806,8 @@ async function handleSmartGrid(
     if (!state.lastRecalculationAt || now - state.lastRecalculationAt >= intervalMs) {
       console.log("[SMART_GRID_DYNAMIC] Recalculating grid parameters", {
         strategyId: strategy.id,
-        lastRecalculation: state.lastRecalculationAt 
-          ? new Date(state.lastRecalculationAt).toISOString() 
+        lastRecalculation: state.lastRecalculationAt
+          ? new Date(state.lastRecalculationAt).toISOString()
           : 'never',
         intervalMinutes: config.recalculationInterval || 15,
       });
@@ -837,7 +838,7 @@ async function handleSmartGrid(
         const { generateSmartGridLevels } = await import(
           "../../utils/strategies/gridCalculations.js"
         );
-        
+
         const newGrids = generateSmartGridLevels(config);
 
         // ✅ Preserve existing positions
@@ -858,7 +859,7 @@ async function handleSmartGrid(
         // ✅ Update strategy in database
         await prisma.strategy.update({
           where: { id: strategy.id },
-          data: { 
+          data: {
             config: {
               ...config,
               grids: preservedGrids,

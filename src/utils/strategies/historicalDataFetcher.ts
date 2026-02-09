@@ -56,12 +56,12 @@ export async function fetchHistoricalPrices(params: {
       if (Array.isArray(candle)) {
         return parseFloat(candle[4]); // Index 4 is close price for most exchanges
       }
-      
+
       // Handle object format (if exchange returns objects)
       if (candle.close) {
         return parseFloat(candle.close);
       }
-      
+
       throw new Error(`Unsupported candle format from ${exchange}`);
     });
 

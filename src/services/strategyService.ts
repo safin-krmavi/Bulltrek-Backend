@@ -54,7 +54,7 @@ export const createStrategy = async (data: any) => {
   let config: any;
   let nextRunAt: Date | null = null;
 
-if (strategyType === "SMART_GRID") {
+  if (strategyType === "SMART_GRID") {
     const { generateSmartGridParams } = await import(
       "./strategies/indicatorCalculator.js"
     );

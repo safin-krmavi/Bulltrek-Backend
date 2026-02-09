@@ -25,10 +25,10 @@ import { deleteSchedule } from "../utils/awsScheduler";
 import { calculateBollingerBands } from "../utils/strategies/gridCalculations";
 import { MarketDataManager } from "../sockets/crypto/marketData/marketDataManager";
 import { fetchBinanceHistoricalKlines } from "../services/crypto/exchange/binanceService";
-import { 
-  fetchHistoricalPrices, 
-  validateInterval, 
-  normalizeInterval 
+import {
+  fetchHistoricalPrices,
+  validateInterval,
+  normalizeInterval
 } from "../utils/strategies/historicalDataFetcher";
 
 /**
@@ -228,7 +228,7 @@ export const calculateSmartGridLimitsEnhanced = async (
 };
 export const createStrategyController = async (req: any, res: Response) => {
   const userId = req.user.userId;
-  
+
   const {
     name,
     strategyType,
@@ -379,7 +379,7 @@ export const createStrategyController = async (req: any, res: Response) => {
 
     // ✅ Calculate per-grid amount
     const perGridAmount = investment / levels;
-    
+
     if (perGridAmount < minimumInvestment) {
       return sendBadRequest(
         res,
@@ -563,7 +563,7 @@ export const deleteStrategyController = async (req: any, res: Response) => {
 
     const scheduleName = `strategy-${strategy.id}`;
     await deleteSchedule(scheduleName);
-    
+
     return sendSuccess(res, "Strategy deleted");
   } catch (error: any) {
     console.error("[STRATEGY_DELETE]", error);
@@ -594,7 +594,7 @@ export const updateStrategyStatusController = async (
 
     // 2️⃣ Persist status
     const updated = await changeStrategyStatus(strategyId, userId, status);
-    
+
     // 3️⃣ Entering ACTIVE → setup
     if (updated.status === "ACTIVE") {
       await registerStrategy(strategyId);

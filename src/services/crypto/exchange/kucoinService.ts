@@ -586,12 +586,12 @@ export async function fetchKucoinFuturesOrders(
     symbol?: string;
     side?: "buy" | "sell";
     type?:
-      | "limit"
-      | "market"
-      | "limit_stop"
-      | "market_stop"
-      | "oco_limit"
-      | "oco_stop";
+    | "limit"
+    | "market"
+    | "limit_stop"
+    | "market_stop"
+    | "oco_limit"
+    | "oco_stop";
     startAt?: number;
     endAt?: number;
     currentPage?: number;
@@ -914,10 +914,10 @@ export async function fetchKucoinHistoricalKlines(
   assetType: "SPOT" | "FUTURES" = "SPOT"
 ): Promise<any[]> {
   try {
-    const baseUrl = assetType === "SPOT" 
+    const baseUrl = assetType === "SPOT"
       ? "https://api.kucoin.com"
       : "https://api-futures.kucoin.com";
-    
+
     const endpoint = assetType === "SPOT"
       ? "/api/v1/market/candles"
       : "/api/v1/kline/query";
