@@ -7,6 +7,9 @@ import prisma from "../../config/db.config";
 import { tradeDispatcher } from "./tradeDispatcher";
 import { evaluateHumanGrid } from "./evaluators/humanGridEvaluator";
 import { HumanGridState } from "../../types/strategies/humanGrid.types";
+import { evaluateUTC } from "./evaluators/utcEvaluator";
+import { UTCState } from "../../types/strategies/utc.types";
+import { Candle } from "../../utils/strategies/historicalDataFetcher.js";
 
 // Base runtime state
 type BaseStrategyRuntimeState = {
@@ -39,6 +42,7 @@ type GrowthDCAState = {
 type StrategyStateMap = {
   GROWTH_DCA: GrowthDCAState;
   HUMAN_GRID: HumanGridState;
+  UTC: UTCState;
   SCALPING: BaseStrategyRuntimeState;
   GRID: BaseStrategyRuntimeState;
   // Add future strategies here
@@ -92,6 +96,22 @@ export class StrategyRuntime<
         } as StrategyStateMap[T];
         break;
 
+      case "UTC":
+        this.state = {
+          investedCapital: 0,
+          positionQty: 0,
+          avgEntryPrice: null,
+          lastExecutionAt: null,
+          status: "ACTIVE",
+          pendingOrder: false,
+          utBotBuyTrailingStop: 0,
+          utBotSellTrailingStop: 0,
+          stcValue: 0,
+          previousSTCValue: 0,
+          currentPosition: "NONE",
+        } as StrategyStateMap[T];
+        break;
+
       default:
         this.state = {
           investedCapital: 0,
@@ -127,6 +147,10 @@ export class StrategyRuntime<
       case "HUMAN_GRID":
         this.handleHumanGrid(price, timestamp);
         break;
+
+      case "UTC":
+        this.handleUTC(price, timestamp);
+        break;
     }
   }
 
@@ -153,95 +177,95 @@ export class StrategyRuntime<
    * Handles Growth-DCA logic
    */
 
-private async handleGrowthDCA(price: number, timestamp: number) {
-  const config = this.strategy.config as any;
-  const state = this.state as GrowthDCAState;
+  private async handleGrowthDCA(price: number, timestamp: number) {
+    const config = this.strategy.config as any;
+    const state = this.state as GrowthDCAState;
 
-  if (state.pendingOrder) return;
+    if (state.pendingOrder) return;
 
-  if (!state.nextRunAt) {
-    state.nextRunAt = computeNextRunAt(
-      config.schedule,
-      state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0)
-    );
-    console.log(`[GROWTH_DCA] Initialized nextRunAt for ${this.strategy.id}:`, {
-      nextRunAt: state.nextRunAt,
-    });
-  }
+    if (!state.nextRunAt) {
+      state.nextRunAt = computeNextRunAt(
+        config.schedule,
+        state.lastExecutionAt ? new Date(state.lastExecutionAt) : new Date(0)
+      );
+      console.log(`[GROWTH_DCA] Initialized nextRunAt for ${this.strategy.id}:`, {
+        nextRunAt: state.nextRunAt,
+      });
+    }
 
-  const now = timestamp;
-  const scheduledTime = state.nextRunAt.getTime();
+    const now = timestamp;
+    const scheduledTime = state.nextRunAt.getTime();
 
-  // ✅ FIX: Add 10-second tolerance window for execution
-  const executionWindow = 10 * 1000; // 10 seconds
-  const timeDiff = now - scheduledTime;
+    // ✅ FIX: Add 10-second tolerance window for execution
+    const executionWindow = 10 * 1000; // 10 seconds
+    const timeDiff = now - scheduledTime;
 
-  // Only proceed if we're within the execution window
-  if (timeDiff < 0) {
-    // Too early
-    if (scheduledTime - now < 60000) {
-      console.log(`[GROWTH_DCA] Waiting for schedule:`, {
+    // Only proceed if we're within the execution window
+    if (timeDiff < 0) {
+      // Too early
+      if (scheduledTime - now < 60000) {
+        console.log(`[GROWTH_DCA] Waiting for schedule:`, {
+          strategyId: this.strategy.id,
+          scheduledTime: new Date(scheduledTime).toISOString(),
+          currentTime: new Date(now).toISOString(),
+          secondsRemaining: Math.floor((scheduledTime - now) / 1000),
+        });
+      }
+      return;
+    }
+
+    if (timeDiff > executionWindow) {
+      // ❌ Too late - skip this execution
+      console.warn(`[GROWTH_DCA] Execution window missed, skipping`, {
         strategyId: this.strategy.id,
         scheduledTime: new Date(scheduledTime).toISOString(),
         currentTime: new Date(now).toISOString(),
-        secondsRemaining: Math.floor((scheduledTime - now) / 1000),
+        delaySeconds: Math.floor(timeDiff / 1000),
+        windowSeconds: executionWindow / 1000,
       });
-    }
-    return;
-  }
 
-  if (timeDiff > executionWindow) {
-    // ❌ Too late - skip this execution
-    console.warn(`[GROWTH_DCA] Execution window missed, skipping`, {
+      // Calculate next run time
+      state.nextRunAt = computeNextRunAt(config.schedule, new Date(now));
+      console.log(`[GROWTH_DCA] Next run scheduled for:`, state.nextRunAt.toISOString());
+      return;
+    }
+
+    // ✅ Within execution window - proceed
+    console.log(`[GROWTH_DCA] Executing within window`, {
       strategyId: this.strategy.id,
       scheduledTime: new Date(scheduledTime).toISOString(),
-      currentTime: new Date(now).toISOString(),
+      executionTime: new Date(now).toISOString(),
       delaySeconds: Math.floor(timeDiff / 1000),
-      windowSeconds: executionWindow / 1000,
     });
 
-    // Calculate next run time
-    state.nextRunAt = computeNextRunAt(config.schedule, new Date(now));
-    console.log(`[GROWTH_DCA] Next run scheduled for:`, state.nextRunAt.toISOString());
-    return;
-  }
+    // 3️⃣ Investment cap check
+    if (
+      state.investedCapital + config.capital.perOrderAmount >
+      config.capital.maxCapital
+    ) {
+      console.log(`[GROWTH_DCA] Investment cap reached:`, {
+        strategyId: this.strategy.id,
+        invested: state.investedCapital,
+        maxCapital: config.capital.maxCapital,
+      });
+      return;
+    }
 
-  // ✅ Within execution window - proceed
-  console.log(`[GROWTH_DCA] Executing within window`, {
-    strategyId: this.strategy.id,
-    scheduledTime: new Date(scheduledTime).toISOString(),
-    executionTime: new Date(now).toISOString(),
-    delaySeconds: Math.floor(timeDiff / 1000),
-  });
+    if (!price || price <= 0) {
+      console.log("INVALID PRICE", price);
+      return;
+    }
 
-  // 3️⃣ Investment cap check
-  if (
-    state.investedCapital + config.capital.perOrderAmount >
-    config.capital.maxCapital
-  ) {
-    console.log(`[GROWTH_DCA] Investment cap reached:`, {
+    // 4️⃣ Evaluate decision
+    const decision = evaluateGrowthDCA(this.strategy, state, price, timestamp);
+
+    console.log("[GROWTH_DCA] Evaluate decision", {
       strategyId: this.strategy.id,
-      invested: state.investedCapital,
-      maxCapital: config.capital.maxCapital,
+      decision,
+      price,
+      scheduledTime: new Date(scheduledTime).toISOString(),
+      executionTime: new Date(now).toISOString(),
     });
-    return;
-  }
-
-  if (!price || price <= 0) {
-    console.log("INVALID PRICE", price);
-    return;
-  }
-
-  // 4️⃣ Evaluate decision
-  const decision = evaluateGrowthDCA(this.strategy, state, price, timestamp);
-
-  console.log("[GROWTH_DCA] Evaluate decision", {
-    strategyId: this.strategy.id,
-    decision,
-    price,
-    scheduledTime: new Date(scheduledTime).toISOString(),
-    executionTime: new Date(now).toISOString(),
-  });
 
     if (decision === "BUY") {
       const perOrder = config.capital.perOrderAmount;
@@ -476,6 +500,177 @@ private async handleGrowthDCA(price: number, timestamp: number) {
         },
       });
     }
+  }
+
+  /**
+   * Handles UTC (UT Bot + STC) strategy logic
+   */
+  private async handleUTC(price: number, timestamp: number) {
+    const state = this.state as UTCState;
+    const config = this.strategy.config as any;
+
+    if (state.pendingOrder) return;
+
+    // Fetch historical candles for indicator calculation
+    // We need enough data for both UT Bot and STC
+    const minCandles = Math.max(
+      config.buyAtrPeriod + 10,
+      config.stcLength * 2 + 50
+    );
+
+    try {
+      // Fetch candle data from exchange
+      // Note: We need OHLCV data, not just close prices
+      // For now, we'll use a helper to fetch full candles
+      const candles = await this.fetchHistoricalCandles(
+        this.strategy.exchange,
+        this.strategy.segment,
+        this.strategy.symbol,
+        "5m", // TODO: Make this configurable
+        minCandles
+      );
+
+      // Evaluate UTC strategy
+      const decision = evaluateUTC(
+        this.strategy,
+        state,
+        price,
+        candles
+      );
+
+      console.log("[UTC] Decision", {
+        strategyId: this.strategy.id,
+        action: decision.action,
+        reason: decision.reason,
+        price,
+      });
+
+      if (decision.action === "BUY") {
+        const perOrder = config.capital.perOrderAmount;
+        const qty = await formatQuantity({
+          exchange: this.strategy.exchange,
+          tradeType: this.strategy.segment,
+          symbol: this.strategy.symbol,
+          rawQty: perOrder / price,
+        });
+
+        state.pendingOrder = true;
+        state.lastExecutionAt = timestamp;
+
+        console.log("[UTC] Placing BUY order", {
+          strategyId: this.strategy.id,
+          price,
+          qty,
+          investmentAmount: perOrder,
+        });
+
+        tradeDispatcher.dispatch({
+          userId: this.strategy.userId,
+          exchange: this.strategy.exchange,
+          segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: this.strategy.segment as any,
+          symbol: this.strategy.symbol,
+          side: "BUY",
+          quantity: qty,
+          price,
+          orderType: "MARKET",
+          strategyId: this.strategy.id,
+          onComplete: () => {
+            // Update state after successful buy
+            const totalCost = qty * price;
+            const newTotalQty = state.positionQty + qty;
+            const newTotalCost = (state.avgEntryPrice || 0) * state.positionQty + totalCost;
+
+            state.avgEntryPrice = newTotalCost / newTotalQty;
+            state.positionQty = newTotalQty;
+            state.investedCapital += perOrder;
+            state.currentPosition = "LONG";
+            state.pendingOrder = false;
+
+            console.log("[UTC] BUY completed", {
+              strategyId: this.strategy.id,
+              avgEntryPrice: state.avgEntryPrice,
+              positionQty: state.positionQty,
+              investedCapital: state.investedCapital,
+            });
+          },
+        });
+      } else if (decision.action === "SELL" && decision.quantity) {
+        state.pendingOrder = true;
+
+        console.log("[UTC] Placing SELL order", {
+          strategyId: this.strategy.id,
+          price,
+          qty: decision.quantity,
+          reason: decision.reason,
+        });
+
+        tradeDispatcher.dispatch({
+          userId: this.strategy.userId,
+          exchange: this.strategy.exchange,
+          segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: this.strategy.segment as any,
+          symbol: this.strategy.symbol,
+          side: "SELL",
+          quantity: decision.quantity,
+          price,
+          orderType: "MARKET",
+          strategyId: this.strategy.id,
+          onComplete: () => {
+            // Update state after successful sell
+            const soldValue = decision.quantity! * price;
+            state.investedCapital -= soldValue;
+            state.positionQty = 0;
+            state.avgEntryPrice = null;
+            state.currentPosition = "NONE";
+            state.pendingOrder = false;
+
+            console.log("[UTC] SELL completed", {
+              strategyId: this.strategy.id,
+              soldValue,
+              investedCapital: state.investedCapital,
+            });
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error("[UTC] Error", {
+        strategyId: this.strategy.id,
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Fetch historical candles from exchange
+   * Helper method for UTC strategy
+   */
+  private async fetchHistoricalCandles(
+    exchange: string,
+    segment: string,
+    symbol: string,
+    interval: string,
+    limit: number
+  ): Promise<any[]> {
+    // Import exchange services
+    if (exchange === "BINANCE") {
+      const { fetchBinanceHistoricalKlines } = await import(
+        "../../services/crypto/exchange/binanceService.js"
+      );
+      return await fetchBinanceHistoricalKlines(symbol, interval, limit, segment as any);
+    } else if (exchange === "KUCOIN") {
+      const { fetchKucoinHistoricalKlines } = await import(
+        "../../services/crypto/exchange/kucoinService.js"
+      );
+      return await fetchKucoinHistoricalKlines(symbol, interval, limit, segment as any);
+    } else if (exchange === "COINDCX") {
+      const { fetchCoinDCXHistoricalKlines } = await import(
+        "../../services/crypto/exchange/coindcxService.js"
+      );
+      return await fetchCoinDCXHistoricalKlines(symbol, interval, limit, segment as any);
+    }
+
+    throw new Error(`Unsupported exchange: ${exchange}`);
   }
 
   /**

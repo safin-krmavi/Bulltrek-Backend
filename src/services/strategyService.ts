@@ -49,6 +49,10 @@ export const createStrategy = async (data: any) => {
     recalculationInterval,
     investment,
     minimumInvestment,
+    // UTC new fields
+    timeFrame,
+    utcUpperLimit,
+    utcLowerLimit,
   } = data;
 
   let config: any;
@@ -164,6 +168,43 @@ export const createStrategy = async (data: any) => {
       grids,
     };
     nextRunAt = null;
+  } else if (strategyType === "UTC") {
+    // ✅ UTC Strategy Configuration
+    const utcConfig = {
+      timeFrame,
+      leverage: segment === "FUTURES" ? leverage : undefined,
+      upperLimit: utcUpperLimit,
+      lowerLimit: utcLowerLimit,
+      capital: {
+        perOrderAmount: investmentPerRun,
+        maxCapital: investmentCap,
+      },
+      risk: {
+        stopLoss: {
+          enabled: stopLossPct !== undefined,
+          percentage: stopLossPct,
+        },
+      },
+      entry: {
+        priceTrigger: {
+          enabled: priceStart !== undefined && priceStop !== undefined,
+          startPrice: priceStart,
+          stopPrice: priceStop,
+        },
+      },
+    };
+
+    config = utcConfig;
+    nextRunAt = null; // UTC is signal-based, not time-based
+
+    console.log("[UTC_CONFIG_COMPLETE]", {
+      timeFrame: config.timeFrame,
+      upperLimit: config.upperLimit,
+      lowerLimit: config.lowerLimit,
+      leverage: config.leverage,
+      perOrderAmount: config.capital.perOrderAmount,
+      maxCapital: config.capital.maxCapital,
+    });
   } else {
     // Existing Growth DCA logic
     config = {

@@ -3,6 +3,18 @@ import { fetchKucoinHistoricalKlines } from "../../services/crypto/exchange/kuco
 import { fetchCoinDCXHistoricalKlines } from "../../services/crypto/exchange/coindcxService";
 
 /**
+ * Candle data structure for technical indicators
+ */
+export interface Candle {
+  timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+/**
  * Unified interface for fetching historical price data across all exchanges
  */
 export async function fetchHistoricalPrices(params: {

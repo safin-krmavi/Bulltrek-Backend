@@ -3,6 +3,49 @@ import { fetchKucoinHistoricalKlines, fetchKucoinMarketPrice } from "../crypto/e
 import { fetchCoinDCXHistoricalKlines, fetchCoinDCXMarketPrice } from "../crypto/exchange/coindcxService";
 
 /**
+ * Calculate minimum investment per grid based on exchange requirements
+ * 
+ * This function determines a sensible minimum investment amount by considering:
+ * 1. Exchange minimum order value (e.g., Binance SPOT minimum ~$10)
+ * 2. Reasonable percentage of total investment (2%)
+ */
+function calculateMinimumInvestment(params: {
+  exchange: string;
+  segment: "SPOT" | "FUTURES";
+  totalInvestment: number;
+}): number {
+  const { exchange, segment, totalInvestment } = params;
+
+  // Exchange minimum order values (in USD)
+  let exchangeMinimumUSD: number;
+
+  switch (exchange.toUpperCase()) {
+    case "BINANCE":
+      exchangeMinimumUSD = segment === "SPOT" ? 10 : 5; // SPOT: $10, FUTURES: $5
+      break;
+    case "KUCOIN":
+      exchangeMinimumUSD = segment === "SPOT" ? 1 : 1; // KuCoin has lower minimums
+      break;
+    case "COINDCX":
+      exchangeMinimumUSD = 10; // CoinDCX minimum
+      break;
+    default:
+      exchangeMinimumUSD = 10; // Safe default
+  }
+
+  // Minimum should be at least 2% of total investment
+  // This ensures we don't create too many tiny grids
+  const percentageBasedMinimum = totalInvestment * 0.02;
+
+  // Use whichever is higher: exchange minimum or 2% of investment
+  const calculatedMinimum = Math.max(exchangeMinimumUSD, percentageBasedMinimum);
+
+  // Round to 2 decimal places
+  return parseFloat(calculatedMinimum.toFixed(2));
+}
+
+
+/**
  * Fetch historical OHLC data from any exchange
  */
 async function fetchHistoricalData(
@@ -135,7 +178,7 @@ function calculateBollingerBands(
 } {
   const middle = calculateSMA(prices, period);
   const slice = prices.slice(-period);
-  
+
   const variance =
     slice.reduce((sum, price) => sum + Math.pow(price - middle, 2), 0) / period;
   const standardDeviation = Math.sqrt(variance);
@@ -192,11 +235,11 @@ function calculateOptimalLevels(
 ): number {
   const priceRange = upperLimit - lowerLimit;
   const maxLevels = Math.floor(totalInvestment / minimumInvestment);
-  
+
   // ✅ Calculate optimal levels based on price range
   const optimalSpacing = priceRange * 0.02; // 2% of range
   const optimalLevels = Math.ceil(priceRange / optimalSpacing);
-  
+
   // ✅ Return smaller of optimal or maximum affordable
   return Math.min(Math.max(5, optimalLevels), maxLevels, 50);
 }
@@ -212,10 +255,10 @@ function calculateOptimalProfitPercentage(
 ): number {
   const gridSpacing = (upperLimit - lowerLimit) / levels;
   const spacingPercent = (gridSpacing / lowerLimit) * 100;
-  
+
   // ✅ Profit should be at least 50% of grid spacing, adjusted by volatility
   const baseProfitPercent = spacingPercent * 0.5 * volatilityFactor;
-  
+
   // ✅ Clamp between 0.5% and 10%
   return Math.max(0.5, Math.min(10, baseProfitPercent));
 }
@@ -229,7 +272,7 @@ export async function generateSmartGridParams(params: {
   dataSetDays: number;
   segment?: "SPOT" | "FUTURES";
   investment: number;
-  minimumInvestment: number;
+  minimumInvestment?: number;
   userLowerLimit?: number;
   userUpperLimit?: number;
   userLevels?: number;
@@ -241,12 +284,19 @@ export async function generateSmartGridParams(params: {
     dataSetDays,
     segment = "SPOT",
     investment,
-    minimumInvestment,
+    minimumInvestment: userMinimumInvestment,
     userLowerLimit,
     userUpperLimit,
     userLevels,
     userProfitPercentage,
   } = params;
+
+  // ✅ Auto-calculate minimum investment if not provided
+  const minimumInvestment = userMinimumInvestment || calculateMinimumInvestment({
+    exchange,
+    segment,
+    totalInvestment: investment,
+  });
 
   console.log("[SMART_GRID_AUTO_GEN] Starting calculation", {
     exchange,
@@ -255,13 +305,14 @@ export async function generateSmartGridParams(params: {
     dataSetDays,
     investment,
     minimumInvestment,
+    minimumInvestmentSource: userMinimumInvestment ? "user-provided" : "auto-calculated",
     hasUserOverrides: !!(userLowerLimit || userUpperLimit || userLevels),
   });
 
   // ========================================
   // STEP 1: FETCH HISTORICAL DATA
   // ========================================
-  const { high, low, close, open, historicalHigh, historicalLow } = 
+  const { high, low, close, open, historicalHigh, historicalLow } =
     await fetchHistoricalData(exchange, symbol, "1d", dataSetDays, segment);
 
   console.log("[STEP_1] Historical data fetched", {
@@ -360,11 +411,20 @@ export async function generateSmartGridParams(params: {
   // STEP 6: VALIDATE CONFIGURATION
   // ========================================
   const perLevelInvestment = investment / levels;
-  
+  const minimumInvestmentRequired = levels * minimumInvestment;
+  const maxAffordableLevels = Math.floor(investment / minimumInvestment);
+
   if (perLevelInvestment < minimumInvestment) {
     throw new Error(
-      `Investment per level (${perLevelInvestment.toFixed(2)}) is below minimum (${minimumInvestment}). ` +
-      `Reduce levels to ${Math.floor(investment / minimumInvestment)} or increase total investment.`
+      `Configuration invalid:\n` +
+      `- Levels: ${levels}\n` +
+      `- Minimum investment required: ${minimumInvestmentRequired.toFixed(2)}\n` +
+      `- Your investment: ${investment.toFixed(2)}\n` +
+      `- Per level: ${perLevelInvestment.toFixed(2)} (minimum: ${minimumInvestment})\n\n` +
+      `Options:\n` +
+      `1. Increase investment to ${minimumInvestmentRequired.toFixed(2)}\n` +
+      `2. Reduce levels to ${maxAffordableLevels}\n` +
+      `3. Lower minimum investment per level`
     );
   }
 
@@ -380,6 +440,8 @@ export async function generateSmartGridParams(params: {
 
   console.log("[STEP_6] Validation passed", {
     perLevelInvestment: perLevelInvestment.toFixed(2),
+    minimumInvestmentRequired: minimumInvestmentRequired.toFixed(2),
+    maxAffordableLevels,
     gridSpacing: gridSpacing.toFixed(6),
     spacingPercent: ((gridSpacing / lowerLimit) * 100).toFixed(2) + "%",
   });
@@ -392,18 +454,26 @@ export async function generateSmartGridParams(params: {
     symbol,
     segment,
     dataSetDays,
-    
+
     // ✅ Grid parameters
     lowerLimit: parseFloat(lowerLimit.toFixed(6)),
     upperLimit: parseFloat(upperLimit.toFixed(6)),
     levels,
     profitPercentage: parseFloat(profitPercentage.toFixed(2)),
-    
+
     // ✅ Investment breakdown
     investment,
     minimumInvestment,
     perLevelInvestment: parseFloat(perLevelInvestment.toFixed(2)),
-    
+
+    // ✅ Validation info
+    validation: {
+      isValid: true,
+      minimumInvestmentRequired: parseFloat(minimumInvestmentRequired.toFixed(2)),
+      currentPerLevelInvestment: parseFloat(perLevelInvestment.toFixed(2)),
+      maxAffordableLevels,
+    },
+
     // ✅ Indicators (for transparency)
     indicators: {
       bollingerUpper: parseFloat(bollinger.upper.toFixed(6)),

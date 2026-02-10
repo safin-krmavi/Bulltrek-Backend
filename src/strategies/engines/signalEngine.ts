@@ -13,6 +13,7 @@ import {
   SmartGridState,
   GridLevel,
 } from "../../types/strategies/humanGrid.types";
+import { UTCState } from "../../types/strategies/utc.types.js";
 import { changeStrategyStatus } from "../../services/strategyService";
 import prisma from "../../config/db.config";
 
@@ -38,6 +39,7 @@ type StrategyStateMap = {
   GROWTH_DCA: GrowthDCAState;
   HUMAN_GRID: HumanGridState;
   SMART_GRID: SmartGridState;
+  UTC: UTCState;
 };
 const bootstrapedStrategies = new Set<string>();
 
@@ -177,6 +179,28 @@ export const signalEngine = {
         range: `${smartGridConfig.lowerLimit} - ${smartGridConfig.upperLimit}`,
         levels: smartGridConfig.levels,
         mode: smartGridConfig.mode,
+      });
+    } else if (strategy.type === "UTC") {
+      // UTC strategy is handled by StrategyRuntime, not SignalEngine
+      // But we need to initialize state for tracking
+      state = {
+        investedCapital: 0,
+        positionQty: 0,
+        avgEntryPrice: null,
+        lastExecutionAt: null,
+        status: "ACTIVE",
+        pendingOrder: false,
+        utBotBuyTrailingStop: 0,
+        utBotSellTrailingStop: 0,
+        stcValue: 0,
+        previousSTCValue: 0,
+        currentPosition: "NONE",
+      } as UTCState;
+      console.log("[UTC_INIT_STATE]", {
+        strategyId: strategy.id,
+        symbol: strategy.symbol,
+        segment: strategy.segment,
+        exchange: strategy.exchange,
       });
     } else {
       throw new Error(`Unsupported strategy type: ${strategy.type}`);
@@ -402,8 +426,8 @@ async function handleHumanGrid(
 
     state.pendingOrders.add(decision.gridId);
 
-    const formattedBuyPrice = parseFloat(decision.price!.toFixed(2));
-    const formattedTakeProfit = parseFloat((decision.price! + config.bookProfitBy).toFixed(2));
+    const formattedBuyPrice = parseFloat(decision.price!.toFixed(6));
+    const formattedTakeProfit = parseFloat((decision.price! + config.bookProfitBy).toFixed(6));
 
     const stopLossPrice = config.stopLossPercentage
       ? parseFloat((price * (1 - config.stopLossPercentage / 100)).toFixed(2))
@@ -516,7 +540,7 @@ async function handleHumanGrid(
     state.pendingOrders.add(decision.gridId);
 
     // ✅ FIX: Use grid's sell price, not decision price
-    const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2));
+    const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(6));
 
     console.log("[HUMAN_GRID_SELL]", {
       strategyId: strategy.id,
@@ -643,8 +667,8 @@ async function bootstrapHumanGrid(
       rawQty: rawQuantity,
     });
 
-    const formattedBuyPrice = parseFloat(grid.buyPrice.toFixed(2));
-    const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2)); // ✅ Use grid's sell price
+    const formattedBuyPrice = parseFloat(grid.buyPrice.toFixed(6));
+    const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(6)); // ✅ Use grid's sell price
 
     const stopLossPrice = config.stopLossPercentage
       ? parseFloat((grid.buyPrice * (1 - config.stopLossPercentage / 100)).toFixed(2))
@@ -930,9 +954,9 @@ async function handleSmartGrid(
 
     state.pendingOrders.add(decision.gridId);
 
-    const formattedBuyPrice = parseFloat(decision.price!.toFixed(2));
+    const formattedBuyPrice = parseFloat(decision.price!.toFixed(6));
     const formattedTakeProfit = parseFloat(
-      (decision.price! * (1 + config.profitPercentage / 100)).toFixed(2)
+      (decision.price! * (1 + config.profitPercentage / 100)).toFixed(6)
     );
 
     const stopLossPrice = config.stopLossPercentage
@@ -1015,7 +1039,7 @@ async function handleSmartGrid(
   if (decision.action === "SELL" && decision.gridId) {
     state.pendingOrders.add(decision.gridId);
 
-    const formattedSellPrice = parseFloat(decision.price!.toFixed(2));
+    const formattedSellPrice = parseFloat(decision.price!.toFixed(6));
 
     console.log("[SMART_GRID_SELL]", {
       strategyId: strategy.id,
@@ -1104,8 +1128,8 @@ async function bootstrapSmartGrid(
 
       state.pendingOrders.add(grid.id);
 
-      const formattedBuyPrice = parseFloat(grid.buyPrice.toFixed(2));
-      const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(2));
+      const formattedBuyPrice = parseFloat(grid.buyPrice.toFixed(6));
+      const formattedSellPrice = parseFloat(grid.sellPrice.toFixed(6));
 
       const stopLossPrice = config.stopLossPercentage
         ? parseFloat((grid.buyPrice * (1 - config.stopLossPercentage / 100)).toFixed(2))

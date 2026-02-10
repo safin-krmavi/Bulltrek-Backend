@@ -17,40 +17,51 @@ export function evaluateHumanGrid(
     };
   }
 
-  // Find the nearest grid level to current price
-  const nearestGrid = state.grids.reduce((prev, curr) => {
-    const prevDiff = Math.abs(prev.buyPrice - currentPrice);
-    const currDiff = Math.abs(curr.buyPrice - currentPrice);
-    return currDiff < prevDiff ? curr : prev;
-  });
+  // Find ALL eligible grids for BUY (EMPTY grids at or below current price)
+  const eligibleBuyGrids = state.grids.filter(
+    (grid) =>
+      grid.status === "EMPTY" &&
+      !state.pendingOrders.has(grid.id) &&
+      currentPrice >= grid.buyPrice * 0.999 // 0.1% tolerance for floating point
+  );
 
-  // Check for BUY opportunity
-  if (
-    nearestGrid.status === "EMPTY" &&
-    !state.pendingOrders.has(nearestGrid.id) &&
-    currentPrice <= nearestGrid.buyPrice
-  ) {
+  // Find ALL eligible grids for SELL (BOUGHT grids at or above sell price)
+  const eligibleSellGrids = state.grids.filter(
+    (grid) =>
+      grid.status === "BOUGHT" &&
+      !state.pendingOrders.has(grid.id) &&
+      currentPrice >= grid.sellPrice * 0.999 // 0.1% tolerance
+  );
+
+  // Prioritize SELL over BUY (take profits first)
+  if (eligibleSellGrids.length > 0) {
+    // Sell the grid with the highest sell price first (most profit)
+    const gridToSell = eligibleSellGrids.reduce((prev, curr) =>
+      curr.sellPrice > prev.sellPrice ? curr : prev
+    );
+
     return {
-      action: "BUY",
-      price: nearestGrid.buyPrice,
-      quantity: config.capital.perGridAmount,
-      gridId: nearestGrid.id,
-      reason: "Price reached buy level",
+      action: "SELL",
+      price: gridToSell.sellPrice,
+      quantity: gridToSell.quantity,
+      gridId: gridToSell.id,
+      reason: `Price reached sell level (${eligibleSellGrids.length} grids ready)`,
     };
   }
 
-  // Check for SELL opportunity
-  if (
-    nearestGrid.status === "BOUGHT" &&
-    !state.pendingOrders.has(nearestGrid.id) &&
-    currentPrice >= nearestGrid.sellPrice
-  ) {
+  // Check for BUY opportunity - buy the LOWEST priced eligible grid first
+  if (eligibleBuyGrids.length > 0) {
+    // Buy the lowest price grid first (closest to lower limit)
+    const gridToBuy = eligibleBuyGrids.reduce((prev, curr) =>
+      curr.buyPrice < prev.buyPrice ? curr : prev
+    );
+
     return {
-      action: "SELL",
-      price: nearestGrid.sellPrice,
-      quantity: nearestGrid.quantity,
-      gridId: nearestGrid.id,
-      reason: "Price reached sell level",
+      action: "BUY",
+      price: gridToBuy.buyPrice,
+      quantity: config.capital.perGridAmount,
+      gridId: gridToBuy.id,
+      reason: `Price reached buy level (${eligibleBuyGrids.length} grids ready)`,
     };
   }
 
@@ -78,7 +89,7 @@ export function evaluateSmartGrid(
 
   // Find the nearest grid level to current price
   const sortedGrids = [...state.grids].sort((a, b) => a.buyPrice - b.buyPrice);
-  
+
   let nearestBuyGrid = null;
   let nearestSellGrid = null;
 

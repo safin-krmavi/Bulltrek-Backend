@@ -52,10 +52,10 @@ export const calculateSmartGridLimits = async (req: Request, res: Response) => {
     } = req.body;
 
     // Validate input
-    if (!exchange || !segment || !symbol || !investment || !minimumInvestment) {
+    if (!exchange || !segment || !symbol || !investment) {
       return sendBadRequest(
         res,
-        "exchange, segment, symbol, investment, and minimumInvestment are required"
+        "exchange, segment, symbol, and investment are required"
       );
     }
 
@@ -83,12 +83,19 @@ export const calculateSmartGridLimits = async (req: Request, res: Response) => {
     }
 
     // Validate investments
-    if (investment <= 0 || minimumInvestment <= 0) {
-      return sendBadRequest(res, "investment and minimumInvestment must be positive");
+    if (investment <= 0) {
+      return sendBadRequest(res, "investment must be positive");
     }
 
-    if (minimumInvestment > investment) {
-      return sendBadRequest(res, "minimumInvestment cannot exceed investment");
+    // ✅ Validate minimumInvestment only if provided
+    if (minimumInvestment !== undefined) {
+      if (minimumInvestment <= 0) {
+        return sendBadRequest(res, "minimumInvestment must be positive");
+      }
+
+      if (minimumInvestment > investment) {
+        return sendBadRequest(res, "minimumInvestment cannot exceed investment");
+      }
     }
 
     console.log("[CALCULATE_SMART_GRID_LIMITS] Request", {
@@ -137,6 +144,15 @@ export const calculateSmartGridLimits = async (req: Request, res: Response) => {
       // ✅ Investment breakdown
       investment: result.investment,
       perLevelInvestment: result.perLevelInvestment,
+
+      // ✅ Validation feedback
+      validation: result.validation,
+
+      // ✅ Recommendations
+      recommendations: {
+        minimumInvestmentRequired: result.validation.minimumInvestmentRequired,
+        maxAffordableLevels: result.validation.maxAffordableLevels,
+      },
 
       // ✅ Indicators (for transparency)
       indicators: result.indicators,
@@ -264,6 +280,10 @@ export const createStrategyController = async (req: any, res: Response) => {
     recalculationInterval,
     investment, // ✅ Total investment
     minimumInvestment, // ✅ Minimum investment per order
+    // UTC - NEW FIELDS
+    timeFrame,
+    upperLimit: utcUpperLimit,
+    lowerLimit: utcLowerLimit,
   } = req.body;
 
   const baseRequiredFields = {
@@ -395,6 +415,41 @@ export const createStrategyController = async (req: any, res: Response) => {
         );
       }
     }
+  } else if (strategyType === "UTC") {
+    // ✅ UTC Strategy Validation
+    const utcRequiredFields = {
+      ...baseRequiredFields,
+      investmentPerRun,
+      investmentCap,
+    };
+
+    const missingFields = Object.entries(utcRequiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return sendBadRequest(
+        res,
+        `Missing required fields: ${missingFields.join(", ")}`
+      );
+    }
+
+    // ✅ Validate UTC parameters
+    if (!timeFrame) {
+      return sendBadRequest(res, "timeFrame is required for UTC strategy");
+    }
+
+    if (utcUpperLimit === undefined || utcLowerLimit === undefined) {
+      return sendBadRequest(res, "upperLimit and lowerLimit are required for UTC strategy");
+    }
+
+    if (utcUpperLimit <= utcLowerLimit) {
+      return sendBadRequest(res, "upperLimit must be greater than lowerLimit");
+    }
+
+    if (segment === "FUTURES" && !leverage) {
+      return sendBadRequest(res, "leverage is required for FUTURES segment");
+    }
   } else {
     // Growth DCA validation
     const requiredFields = {
@@ -453,6 +508,10 @@ export const createStrategyController = async (req: any, res: Response) => {
       recalculationInterval,
       investment,
       minimumInvestment,
+      // UTC
+      timeFrame,
+      utcUpperLimit,
+      utcLowerLimit,
     });
 
     if (
