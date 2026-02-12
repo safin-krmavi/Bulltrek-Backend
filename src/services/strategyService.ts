@@ -49,6 +49,7 @@ export const createStrategy = async (data: any) => {
     recalculationInterval,
     investment,
     minimumInvestment,
+    perGridAmount, // ✅ NEW: User-editable perGridAmount
     // UTC new fields
     timeFrame,
     utcUpperLimit,
@@ -71,27 +72,33 @@ export const createStrategy = async (data: any) => {
       type,
       investment,
       minimumInvestment,
+      perGridAmount, // ✅ NEW
       userOverrides: {
         lowerLimit,
         upperLimit,
         levels,
         profitPercentage,
+        perGridAmount, // ✅ NEW
       },
     });
 
-    // ✅ Generate complete configuration
+    // ✅ Generate complete configuration with new parameters
     const autoParams = await generateSmartGridParams({
       exchange,
       symbol,
       dataSetDays: dataSetDays || 30,
       segment: segment as "SPOT" | "FUTURES",
-      investment,
-      minimumInvestment,
-      // ✅ Pass user overrides if provided
+      investment, // Legacy parameter for backward compatibility
+      minimumInvestment, // Legacy parameter
+      // ✅ User overrides
       userLowerLimit: lowerLimit,
       userUpperLimit: upperLimit,
       userLevels: levels,
       userProfitPercentage: profitPercentage,
+      // ✅ NEW: Additional user overrides
+      userPerGridAmount: perGridAmount,
+      userInvestment: investment, // Explicit user investment
+      userMinInvestment: minimumInvestment, // Explicit user min investment
     });
 
     const smartGridConfig = {
@@ -104,7 +111,7 @@ export const createStrategy = async (data: any) => {
       investment: autoParams.investment,
       minimumInvestment: autoParams.minimumInvestment,
       capital: {
-        perGridAmount: autoParams.perLevelInvestment,
+        perGridAmount: autoParams.perGridAmount, // ✅ Use calculated perGridAmount
         maxCapital: autoParams.investment,
       },
       leverage: segment === "FUTURES" ? leverage : undefined,
@@ -179,6 +186,15 @@ export const createStrategy = async (data: any) => {
         perOrderAmount: investmentPerRun,
         maxCapital: investmentCap,
       },
+      // UT Bot Indicator Parameters (defaults)
+      buyKeySensitivity: 1.0,
+      buyAtrPeriod: 10,
+      sellKeySensitivity: 1.0,
+      sellAtrPeriod: 10,
+      // STC Indicator Parameters (defaults)
+      stcLength: 12,
+      stcFastLength: 26,
+      stcSlowLength: 50,
       risk: {
         stopLoss: {
           enabled: stopLossPct !== undefined,
@@ -204,6 +220,87 @@ export const createStrategy = async (data: any) => {
       leverage: config.leverage,
       perOrderAmount: config.capital.perOrderAmount,
       maxCapital: config.capital.maxCapital,
+    });
+  } else if (strategyType === "INDY_TREND") {
+    const {
+      strategyName,
+      investment,
+      investmentCap,
+      lowerLimit: indyLowerLimit,
+      upperLimit: indyUpperLimit,
+      priceTriggerStart,
+      priceTriggerStop,
+      stopLossByPercent,
+      riskRewardRatio,
+      mode,
+      supertrendFactor,
+      supertrendAtrLength,
+      rsiLength,
+      rsiUpperBand,
+      rsiLowerBand,
+      adxSmoothing,
+      adxDiLength,
+      adxThreshold,
+      partialExit,
+      trailingStop,
+    } = data;
+
+    if (!strategyName || strategyName.length < 3 || strategyName.length > 50) {
+      throw new Error("Strategy name must be 3-50 characters");
+    }
+
+    if (!investment || investment <= 0) {
+      throw new Error("Investment must be greater than 0");
+    }
+
+    if (!timeFrame) {
+      throw new Error("Time frame is required");
+    }
+
+    if (segment === "FUTURES" && assetType === "CRYPTO") {
+      if (!leverage || leverage < 1 || leverage > 20) {
+        throw new Error("Leverage must be between 1x and 20x for Crypto Futures");
+      }
+    }
+
+    config = {
+      timeFrame: timeFrame || "5m",
+      leverage: segment === "FUTURES" ? leverage : undefined,
+      lowerLimit: indyLowerLimit,
+      upperLimit: indyUpperLimit,
+      priceTriggerStart,
+      priceTriggerStop,
+      investment,
+      investmentCap: investmentCap || investment * 3,
+      stopLossByPercent: stopLossByPercent || 2,
+      riskRewardRatio: riskRewardRatio || 2,
+      supertrend: {
+        factor: supertrendFactor || 3.0,
+        atrLength: supertrendAtrLength || 10,
+      },
+      rsi: {
+        length: rsiLength || 21,
+        upperBand: rsiUpperBand || 70,
+        lowerBand: rsiLowerBand || 30,
+      },
+      adx: {
+        smoothing: adxSmoothing || 21,
+        diLength: adxDiLength || 21,
+        threshold: adxThreshold || 25,
+      },
+      mode: mode || "NEUTRAL",
+      partialExit,
+      trailingStop,
+    };
+
+    nextRunAt = null;
+
+    console.log("[INDY_TREND_CONFIG_COMPLETE]", {
+      strategyName,
+      timeFrame: config.timeFrame,
+      investment: config.investment,
+      investmentCap: config.investmentCap,
+      mode: config.mode,
     });
   } else {
     // Existing Growth DCA logic

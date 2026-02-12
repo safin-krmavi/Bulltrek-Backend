@@ -48,6 +48,25 @@ export interface UTCConfig {
         maxCapital: number;
     };
 
+    // UT Bot Indicator Parameters
+    buyKeySensitivity: number;      // UT Bot buy sensitivity (default: 1)
+    buyAtrPeriod: number;           // ATR period for buy signals (default: 10)
+    sellKeySensitivity: number;     // UT Bot sell sensitivity (default: 1)
+    sellAtrPeriod: number;          // ATR period for sell signals (default: 10)
+
+    // STC Indicator Parameters
+    stcLength: number;              // STC length (default: 12)
+    stcFastLength: number;          // STC fast length (default: 26)
+    stcSlowLength: number;          // STC slow length (default: 50)
+
+    // Exit Strategy
+    exit?: {
+        bookProfit?: {
+            enabled: boolean;
+            percentage: number;     // Take profit percentage
+        };
+    };
+
     // Risk Management (optional)
     risk?: {
         stopLoss?: {

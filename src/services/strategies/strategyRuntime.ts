@@ -9,6 +9,8 @@ import { evaluateHumanGrid } from "./evaluators/humanGridEvaluator";
 import { HumanGridState } from "../../types/strategies/humanGrid.types";
 import { evaluateUTC } from "./evaluators/utcEvaluator";
 import { UTCState } from "../../types/strategies/utc.types";
+import { evaluateIndyTrend } from "./evaluators/indyTrendEvaluator";
+import { IndyTrendState } from "../../types/strategies/indyTrend.types";
 import { Candle } from "../../utils/strategies/historicalDataFetcher.js";
 
 // Base runtime state
@@ -43,6 +45,7 @@ type StrategyStateMap = {
   GROWTH_DCA: GrowthDCAState;
   HUMAN_GRID: HumanGridState;
   UTC: UTCState;
+  INDY_TREND: IndyTrendState;
   SCALPING: BaseStrategyRuntimeState;
   GRID: BaseStrategyRuntimeState;
   // Add future strategies here
@@ -112,6 +115,21 @@ export class StrategyRuntime<
         } as StrategyStateMap[T];
         break;
 
+      case "INDY_TREND":
+        this.state = {
+          investedCapital: 0,
+          positionQty: 0,
+          avgEntryPrice: null,
+          lastExecutionAt: null,
+          status: "ACTIVE",
+          currentPosition: "NONE",
+          cooldownUntil: null,
+          consecutiveLosses: 0,
+          pausedUntil: null,
+          pendingOrder: false,
+        } as StrategyStateMap[T];
+        break;
+
       default:
         this.state = {
           investedCapital: 0,
@@ -149,8 +167,24 @@ export class StrategyRuntime<
         break;
 
       case "UTC":
-        this.handleUTC(price, timestamp);
+        // UTC uses candle close events, not price ticks
+        // this.handleUTC(price, timestamp);
         break;
+    }
+  }
+
+  /**
+   * Called when a candle closes (for UTC and INDY_TREND strategies)
+   */
+  onCandleClose(price: number, timestamp: number, candles: any[]) {
+    if (this.state.status !== "ACTIVE") return;
+
+    if (this.strategy.type === "UTC") {
+      this.handleUTC(price, timestamp, candles);
+    }
+
+    if (this.strategy.type === "INDY_TREND") {
+      this.handleIndyTrend(price, timestamp, candles);
     }
   }
 
@@ -505,37 +539,46 @@ export class StrategyRuntime<
   /**
    * Handles UTC (UT Bot + STC) strategy logic
    */
-  private async handleUTC(price: number, timestamp: number) {
+  private async handleUTC(price: number, timestamp: number, candles?: any[]) {
     const state = this.state as UTCState;
     const config = this.strategy.config as any;
 
     if (state.pendingOrder) return;
 
-    // Fetch historical candles for indicator calculation
-    // We need enough data for both UT Bot and STC
-    const minCandles = Math.max(
-      config.buyAtrPeriod + 10,
-      config.stcLength * 2 + 50
-    );
+    // Use provided candles or fetch if not available
+    let historicalCandles = candles;
 
-    try {
-      // Fetch candle data from exchange
-      // Note: We need OHLCV data, not just close prices
-      // For now, we'll use a helper to fetch full candles
-      const candles = await this.fetchHistoricalCandles(
-        this.strategy.exchange,
-        this.strategy.segment,
-        this.strategy.symbol,
-        "5m", // TODO: Make this configurable
-        minCandles
+    if (!historicalCandles) {
+      // Fallback: fetch historical candles
+      const minCandles = Math.max(
+        config.buyAtrPeriod + 10,
+        config.stcLength * 2 + 50
       );
 
+      try {
+        historicalCandles = await this.fetchHistoricalCandles(
+          this.strategy.exchange,
+          this.strategy.segment,
+          this.strategy.symbol,
+          config.timeFrame || "5m",
+          minCandles
+        );
+      } catch (error: any) {
+        console.error("[UTC] Error fetching candles", {
+          strategyId: this.strategy.id,
+          error: error.message,
+        });
+        return;
+      }
+    }
+
+    try {
       // Evaluate UTC strategy
       const decision = evaluateUTC(
         this.strategy,
         state,
         price,
-        candles
+        historicalCandles
       );
 
       console.log("[UTC] Decision", {
@@ -543,6 +586,7 @@ export class StrategyRuntime<
         action: decision.action,
         reason: decision.reason,
         price,
+        candleCount: historicalCandles.length,
       });
 
       if (decision.action === "BUY") {
@@ -642,8 +686,212 @@ export class StrategyRuntime<
   }
 
   /**
+   * Handles INDY TREND (Supertrend + RSI + ADX) strategy logic
+   */
+  private async handleIndyTrend(price: number, timestamp: number, candles?: Candle[]) {
+    const state = this.state as IndyTrendState;
+    const config = this.strategy.config as any;
+
+    if (state.pendingOrder) return;
+
+    // Use provided candles or fetch if not available
+    let historicalCandles = candles;
+
+    if (!historicalCandles) {
+      const minCandles = Math.max(
+        config.supertrend.atrLength + 10,
+        config.rsi.length + 10,
+        config.adx.diLength + config.adx.smoothing + 10
+      );
+
+      try {
+        historicalCandles = await this.fetchHistoricalCandles(
+          this.strategy.exchange,
+          this.strategy.segment,
+          this.strategy.symbol,
+          config.timeFrame || "5m",
+          minCandles
+        );
+      } catch (error: any) {
+        console.error("[INDY_TREND] Error fetching candles", {
+          strategyId: this.strategy.id,
+          error: error.message,
+        });
+        return;
+      }
+    }
+
+    try {
+      // Evaluate INDY TREND strategy
+      const decision = evaluateIndyTrend(
+        this.strategy,
+        state,
+        price,
+        historicalCandles
+      );
+
+      console.log("[INDY_TREND] Decision", {
+        strategyId: this.strategy.id,
+        action: decision.action,
+        reason: decision.reason,
+        price,
+        candleCount: historicalCandles.length,
+      });
+
+      if (decision.action === "BUY") {
+        // Calculate quantity based on leverage (if Futures)
+        const investmentAmount = config.investment;
+        const leverage = config.leverage || 1;
+        const rawQty = config.leverage
+          ? (investmentAmount * leverage) / price
+          : investmentAmount / price;
+
+        const qty = await formatQuantity({
+          exchange: this.strategy.exchange,
+          tradeType: this.strategy.segment,
+          symbol: this.strategy.symbol,
+          rawQty,
+        });
+
+        state.pendingOrder = true;
+        state.lastExecutionAt = timestamp;
+
+        console.log("[INDY_TREND] Placing BUY order (LONG)", {
+          strategyId: this.strategy.id,
+          price,
+          qty,
+          investmentAmount,
+          leverage,
+          stopLoss: decision.stopLoss,
+          takeProfit: decision.takeProfit,
+        });
+
+        tradeDispatcher.dispatch({
+          userId: this.strategy.userId,
+          exchange: this.strategy.exchange,
+          segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: this.strategy.segment as any,
+          symbol: this.strategy.symbol,
+          side: "BUY",
+          quantity: qty,
+          price,
+          orderType: "MARKET",
+          strategyId: this.strategy.id,
+          onComplete: () => {
+            // Update state after successful buy
+            const totalCost = qty * price;
+            const newTotalQty = state.positionQty + qty;
+            const newTotalCost = (state.avgEntryPrice || 0) * state.positionQty + totalCost;
+
+            state.avgEntryPrice = newTotalCost / newTotalQty;
+            state.positionQty = newTotalQty;
+            state.investedCapital += investmentAmount;
+            state.currentPosition = "LONG";
+            state.pendingOrder = false;
+
+            console.log("[INDY_TREND] BUY completed", {
+              strategyId: this.strategy.id,
+              avgEntryPrice: state.avgEntryPrice,
+              positionQty: state.positionQty,
+              investedCapital: state.investedCapital,
+            });
+          },
+        });
+      } else if (decision.action === "SELL" && decision.quantity) {
+        state.pendingOrder = true;
+
+        const isProfit = decision.reason.includes("Take Profit");
+        const isLoss = decision.reason.includes("Stop Loss");
+
+        console.log("[INDY_TREND] Placing SELL order", {
+          strategyId: this.strategy.id,
+          price,
+          qty: decision.quantity,
+          reason: decision.reason,
+          isProfit,
+          isLoss,
+        });
+
+        tradeDispatcher.dispatch({
+          userId: this.strategy.userId,
+          exchange: this.strategy.exchange,
+          segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: this.strategy.segment as any,
+          symbol: this.strategy.symbol,
+          side: "SELL",
+          quantity: decision.quantity,
+          price,
+          orderType: "MARKET",
+          strategyId: this.strategy.id,
+          onComplete: () => {
+            // Update state after successful sell
+            const soldValue = decision.quantity! * price;
+            state.investedCapital -= soldValue;
+            state.positionQty = 0;
+            state.avgEntryPrice = null;
+            state.currentPosition = "NONE";
+            state.pendingOrder = false;
+
+            // Set cooldown (1 candle = 5 minutes)
+            const timeFrameMs = this.getTimeFrameMs(config.timeFrame || "5m");
+            state.cooldownUntil = timestamp + timeFrameMs;
+
+            // Track consecutive losses
+            if (isLoss) {
+              state.consecutiveLosses += 1;
+              if (state.consecutiveLosses >= 3) {
+                // Pause for 1 hour after 3 consecutive losses
+                state.pausedUntil = timestamp + (60 * 60 * 1000);
+                console.warn("[INDY_TREND] Strategy paused due to 3 consecutive losses", {
+                  strategyId: this.strategy.id,
+                  pausedUntil: new Date(state.pausedUntil).toISOString(),
+                });
+              }
+            } else if (isProfit) {
+              // Reset consecutive losses on profit
+              state.consecutiveLosses = 0;
+            }
+
+            console.log("[INDY_TREND] SELL completed", {
+              strategyId: this.strategy.id,
+              soldValue,
+              investedCapital: state.investedCapital,
+              cooldownUntil: new Date(state.cooldownUntil).toISOString(),
+              consecutiveLosses: state.consecutiveLosses,
+            });
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error("[INDY_TREND] Error", {
+        strategyId: this.strategy.id,
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Convert timeframe string to milliseconds
+   */
+  private getTimeFrameMs(timeFrame: string): number {
+    const value = parseInt(timeFrame);
+    const unit = timeFrame.replace(/[0-9]/g, "").toLowerCase();
+
+    switch (unit) {
+      case "m":
+        return value * 60 * 1000;
+      case "h":
+        return value * 60 * 60 * 1000;
+      case "d":
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        return 5 * 60 * 1000; // Default 5 minutes
+    }
+  }
+
+  /**
    * Fetch historical candles from exchange
-   * Helper method for UTC strategy
+   * Helper method for UTC and INDY_TREND strategies
    */
   private async fetchHistoricalCandles(
     exchange: string,

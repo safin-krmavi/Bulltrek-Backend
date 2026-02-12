@@ -14,8 +14,12 @@ import {
   GridLevel,
 } from "../../types/strategies/humanGrid.types";
 import { UTCState } from "../../types/strategies/utc.types.js";
+import { IndyTrendState } from "../../types/strategies/indyTrend.types.js";
 import { changeStrategyStatus } from "../../services/strategyService";
 import prisma from "../../config/db.config";
+import { BinanceKlineHandler } from "../../sockets/crypto/marketData/binanceKlineHandler";
+import { bootstrapCandles } from "../../sockets/crypto/marketData/candleBootstrap";
+import { CandleBuffer } from "../../sockets/crypto/marketData/candleBuffer";
 
 /* -------------------------------------------------------------------------- */
 /*                            STRATEGY STATE MAP                              */
@@ -40,6 +44,7 @@ type StrategyStateMap = {
   HUMAN_GRID: HumanGridState;
   SMART_GRID: SmartGridState;
   UTC: UTCState;
+  INDY_TREND: IndyTrendState;
 };
 const bootstrapedStrategies = new Set<string>();
 
@@ -202,6 +207,174 @@ export const signalEngine = {
         segment: strategy.segment,
         exchange: strategy.exchange,
       });
+
+      // ✅ Bootstrap candles and subscribe to kline stream for UTC
+      if (strategy.exchange === "BINANCE" && !bootstrapedStrategies.has(strategy.id)) {
+        try {
+          const config = strategy.config as any;
+          const timeframe = config.timeFrame || "5m";
+
+          console.log("[UTC_BOOTSTRAP] Starting", {
+            strategyId: strategy.id,
+            symbol: strategy.symbol,
+            timeframe,
+          });
+
+          // Bootstrap historical candles
+          await bootstrapCandles({
+            exchange: strategy.exchange,
+            segment: strategy.segment as any,
+            symbol: strategy.symbol,
+            timeframe,
+            limit: 500,
+          });
+
+          // Subscribe to kline stream
+          await BinanceKlineHandler.connect(
+            strategy.segment as any,
+            strategy.symbol,
+            timeframe
+          );
+
+          // Listen for candle close events
+          const candleCloseHandler = (data: any) => {
+            if (
+              data.exchange === strategy.exchange &&
+              data.segment === strategy.segment &&
+              data.symbol === strategy.symbol
+            ) {
+              console.log("[UTC_CANDLE_CLOSE] Triggering evaluation", {
+                strategyId: strategy.id,
+                symbol: data.symbol,
+                time: new Date(data.candle.time).toISOString(),
+                close: data.candle.close,
+              });
+
+              // Get all candles from buffer
+              const candles = CandleBuffer.getCandles(
+                data.exchange,
+                data.segment,
+                data.symbol
+              );
+
+              // Trigger UTC evaluation with candle data
+              signalEngine.onCandleClose(strategy.id, data.candle.close, Date.now(), candles);
+            }
+          };
+
+          BinanceKlineHandler.on("candleClose", candleCloseHandler);
+
+          bootstrapedStrategies.add(strategy.id);
+
+          console.log("[UTC_BOOTSTRAP] Complete", {
+            strategyId: strategy.id,
+            candleCount: CandleBuffer.getCandleCount(
+              strategy.exchange,
+              strategy.segment,
+              strategy.symbol
+            ),
+          });
+        } catch (error: any) {
+          console.error("[UTC_BOOTSTRAP] Error", {
+            strategyId: strategy.id,
+            error: error.message,
+            stack: error.stack,
+          });
+        }
+      }
+    } else if (strategy.type === "INDY_TREND") {
+      // INDY_TREND strategy is handled by StrategyRuntime, not SignalEngine
+      // But we need to initialize state for tracking
+      state = {
+        investedCapital: 0,
+        positionQty: 0,
+        avgEntryPrice: null,
+        currentPosition: "NONE",
+        cooldownUntil: null,
+        consecutiveLosses: 0,
+        pausedUntil: null,
+      } as IndyTrendState;
+      console.log("[INDY_TREND_INIT_STATE]", {
+        strategyId: strategy.id,
+        symbol: strategy.symbol,
+        segment: strategy.segment,
+        exchange: strategy.exchange,
+      });
+
+      // ✅ Bootstrap candles and subscribe to kline stream for INDY_TREND
+      if (strategy.exchange === "BINANCE" && !bootstrapedStrategies.has(strategy.id)) {
+        try {
+          const config = strategy.config as any;
+          const timeframe = config.timeFrame || "5m";
+
+          console.log("[INDY_TREND_BOOTSTRAP] Starting", {
+            strategyId: strategy.id,
+            symbol: strategy.symbol,
+            timeframe,
+          });
+
+          // Bootstrap historical candles
+          await bootstrapCandles({
+            exchange: strategy.exchange,
+            segment: strategy.segment as any,
+            symbol: strategy.symbol,
+            timeframe,
+            limit: 500,
+          });
+
+          // Subscribe to kline stream
+          await BinanceKlineHandler.connect(
+            strategy.segment as any,
+            strategy.symbol,
+            timeframe
+          );
+
+          // Listen for candle close events
+          const candleCloseHandler = (data: any) => {
+            if (
+              data.exchange === strategy.exchange &&
+              data.segment === strategy.segment &&
+              data.symbol === strategy.symbol
+            ) {
+              console.log("[INDY_TREND_CANDLE_CLOSE] Triggering evaluation", {
+                strategyId: strategy.id,
+                symbol: data.symbol,
+                time: new Date(data.candle.time).toISOString(),
+                close: data.candle.close,
+              });
+
+              // Get all candles from buffer
+              const candles = CandleBuffer.getCandles(
+                data.exchange,
+                data.segment,
+                data.symbol
+              );
+
+              // Trigger INDY_TREND evaluation with candle data
+              signalEngine.onCandleClose(strategy.id, data.candle.close, Date.now(), candles);
+            }
+          };
+
+          BinanceKlineHandler.on("candleClose", candleCloseHandler);
+
+          bootstrapedStrategies.add(strategy.id);
+
+          console.log("[INDY_TREND_BOOTSTRAP] Complete", {
+            strategyId: strategy.id,
+            candleCount: CandleBuffer.getCandleCount(
+              strategy.exchange,
+              strategy.segment,
+              strategy.symbol
+            ),
+          });
+        } catch (error: any) {
+          console.error("[INDY_TREND_BOOTSTRAP] Error", {
+            strategyId: strategy.id,
+            error: error.message,
+            stack: error.stack,
+          });
+        }
+      }
     } else {
       throw new Error(`Unsupported strategy type: ${strategy.type}`);
     }
@@ -263,9 +436,25 @@ export const signalEngine = {
    */
   async onMarketTick(strategyId: string, price: number, timestamp: number) {
     const entry = registeredStrategies.get(strategyId);
-    if (!entry) return;
+    if (!entry) {
+      console.warn("[SIGNAL_ENGINE_TICK] Strategy not found in registry", {
+        strategyId,
+        price,
+      });
+      return;
+    }
 
     const { strategy, state } = entry;
+
+    // ✅ ENHANCED LOGGING: Track market ticks for Human Grid
+    if (strategy.type === "HUMAN_GRID") {
+      console.log("[SIGNAL_ENGINE_TICK] Human Grid tick received", {
+        strategyId,
+        symbol: strategy.symbol,
+        price,
+        lifecycle: (state as HumanGridState).lifecycle,
+      });
+    }
 
     try {
       if (strategy.type === "HUMAN_GRID") {
@@ -279,6 +468,55 @@ export const signalEngine = {
     } catch (error) {
       console.error("[SIGNAL_ENGINE_ERROR]", {
         strategyId,
+        type: strategy.type,
+        error: (error as any).message,
+        stack: (error as any).stack,
+      });
+    }
+  },
+
+  /**
+   * Handle candle close event for UTC and INDY_TREND strategies
+   */
+  async onCandleClose(strategyId: string, price: number, timestamp: number, candles: any[]) {
+    const entry = registeredStrategies.get(strategyId);
+    if (!entry) return;
+
+    const { strategy, state } = entry;
+
+    try {
+      if (strategy.type === "UTC" || strategy.type === "INDY_TREND") {
+        console.log(`[${strategy.type}_CANDLE_CLOSE_HANDLER] Triggering StrategyRuntime`, {
+          strategyId,
+          type: strategy.type,
+          price,
+          candleCount: candles.length,
+        });
+
+        // Get StrategyRuntime instance from registry
+        const { strategyRuntimeRegistry } = await import("../../services/strategies/strategyRuntimeRegistry.js");
+        const runtime = strategyRuntimeRegistry.getRuntime(strategyId);
+
+        if (!runtime) {
+          console.error(`[${strategy.type}_CANDLE_CLOSE_HANDLER] StrategyRuntime not found`, {
+            strategyId,
+            type: strategy.type,
+          });
+          return;
+        }
+
+        // Call the runtime's onCandleClose method
+        await runtime.onCandleClose(price, timestamp, candles);
+
+        console.log(`[${strategy.type}_CANDLE_CLOSE_HANDLER] Evaluation complete`, {
+          strategyId,
+          type: strategy.type,
+        });
+      }
+    } catch (error) {
+      console.error("[SIGNAL_ENGINE_CANDLE_CLOSE_ERROR]", {
+        strategyId,
+        type: strategy.type,
         error: (error as any).message,
         stack: (error as any).stack,
       });
@@ -311,6 +549,21 @@ async function handleHumanGrid(
   timestamp: number
 ) {
   const config = strategy.config as any;
+
+  // ✅ ENHANCED LOGGING: Track every call to this function
+  console.log("[HUMAN_GRID_HANDLER_CALLED]", {
+    strategyId: strategy.id,
+    symbol: strategy.symbol,
+    currentPrice: price,
+    lifecycle: state.lifecycle,
+    gridRange: `${config.lowerLimit} - ${config.upperLimit}`,
+    priceInRange: price >= config.lowerLimit && price <= config.upperLimit,
+    totalGrids: state.grids.length,
+    emptyGrids: state.grids.filter(g => g.status === "EMPTY").length,
+    boughtGrids: state.grids.filter(g => g.status === "BOUGHT").length,
+    pendingOrders: state.pendingOrders.size,
+    investedCapital: state.investedCapital,
+  });
 
   // ✅ PHASE 0: LIFECYCLE STATE MACHINE
 

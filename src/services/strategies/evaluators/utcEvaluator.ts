@@ -3,19 +3,7 @@ import { UTCState, UTCDecision, UTCConfig } from "../../../types/strategies/utc.
 import { calculateUTBot, calculateSTC } from "../../../utils/strategies/indicators.js";
 import { Candle } from "../../../utils/strategies/historicalDataFetcher.js";
 
-/**
- * Evaluate UTC Strategy
- * 
- * Combines UT Bot and STC indicators to generate trading signals:
- * - BUY: UT Bot Buy signal AND STC rising AND STC > 50
- * - SELL: UT Bot Sell signal OR take-profit/stop-loss triggered
- * 
- * @param strategy - Strategy database record
- * @param state - Current UTC strategy state
- * @param currentPrice - Current market price
- * @param historicalCandles - Recent candle data for indicator calculation
- * @returns UTCDecision with action and reason
- */
+
 export function evaluateUTC(
     strategy: Strategy,
     state: UTCState,
@@ -23,6 +11,15 @@ export function evaluateUTC(
     historicalCandles: Candle[]
 ): UTCDecision {
     const config = strategy.config as unknown as UTCConfig;
+
+    // ✅ Add default values for missing config parameters (backward compatibility)
+    const buyKeySensitivity = config.buyKeySensitivity ?? 1.0;
+    const buyAtrPeriod = config.buyAtrPeriod ?? 10;
+    const sellKeySensitivity = config.sellKeySensitivity ?? 1.0;
+    const sellAtrPeriod = config.sellAtrPeriod ?? 10;
+    const stcLength = config.stcLength ?? 12;
+    const stcFastLength = config.stcFastLength ?? 26;
+    const stcSlowLength = config.stcSlowLength ?? 50;
 
     console.log("[UTC_EVALUATE] Starting evaluation", {
         strategyId: strategy.id,
@@ -74,11 +71,11 @@ export function evaluateUTC(
         }
 
         // Check UT Bot Sell signal
-        if (historicalCandles.length >= config.sellAtrPeriod + 10) {
+        if (historicalCandles.length >= sellAtrPeriod + 10) {
             const utBotSellResults = calculateUTBot(
                 historicalCandles,
-                config.sellKeySensitivity,
-                config.sellAtrPeriod
+                sellKeySensitivity,
+                sellAtrPeriod
             );
 
             const latestSellSignal = utBotSellResults[utBotSellResults.length - 1];
@@ -135,8 +132,8 @@ export function evaluateUTC(
 
         // Ensure we have enough historical data
         const minCandlesNeeded = Math.max(
-            config.buyAtrPeriod + 10,
-            config.stcLength * 2 + 50
+            buyAtrPeriod + 10,
+            stcSlowLength + 10
         );
 
         if (historicalCandles.length < minCandlesNeeded) {
@@ -153,8 +150,8 @@ export function evaluateUTC(
         // Calculate UT Bot Buy signal
         const utBotBuyResults = calculateUTBot(
             historicalCandles,
-            config.buyKeySensitivity,
-            config.buyAtrPeriod
+            buyKeySensitivity,
+            buyAtrPeriod
         );
 
         const latestBuySignal = utBotBuyResults[utBotBuyResults.length - 1];
@@ -174,9 +171,9 @@ export function evaluateUTC(
         // Calculate STC indicator
         const stcValues = calculateSTC(
             historicalCandles,
-            config.stcLength,
-            config.stcFastLength,
-            config.stcSlowLength || 50
+            stcLength,
+            stcFastLength,
+            stcSlowLength
         );
 
         const currentSTC = stcValues[stcValues.length - 1];

@@ -52,10 +52,10 @@ export const calculateSmartGridLimits = async (req: Request, res: Response) => {
     } = req.body;
 
     // Validate input
-    if (!exchange || !segment || !symbol || !investment) {
+    if (!exchange || !segment || !symbol) {
       return sendBadRequest(
         res,
-        "exchange, segment, symbol, and investment are required"
+        "exchange, segment, and symbol are required"
       );
     }
 
@@ -82,8 +82,8 @@ export const calculateSmartGridLimits = async (req: Request, res: Response) => {
       );
     }
 
-    // Validate investments
-    if (investment <= 0) {
+    // ✅ Validate investment only if provided
+    if (investment !== undefined && investment <= 0) {
       return sendBadRequest(res, "investment must be positive");
     }
 
@@ -246,7 +246,7 @@ export const createStrategyController = async (req: any, res: Response) => {
   const userId = req.user.userId;
 
   const {
-    name,
+    name, // Renamed from 'name' to 'strategyName'
     strategyType,
     assetType,
     exchange,
@@ -267,8 +267,8 @@ export const createStrategyController = async (req: any, res: Response) => {
     // Human Grid
     lowerLimit,
     upperLimit,
-    entryInterval,
-    bookProfitBy,
+    entryInterval, // Kept for Human Grid
+    bookProfitBy, // Kept for Human Grid
     leverage,
     direction,
     // Smart Grid - NEW FIELDS
@@ -278,13 +278,31 @@ export const createStrategyController = async (req: any, res: Response) => {
     dataSetDays,
     gridMode,
     recalculationInterval,
-    investment, // ✅ Total investment
-    minimumInvestment, // ✅ Minimum investment per order
+    investment: userInvestment, // ✅ Total investment (renamed to avoid conflict with auto-calculated 'investment')
+    minimumInvestment: userMinInvestment, // ✅ Minimum investment per order (renamed)
+    perGridAmount, // ✅ NEW: Smart Grid editable parameters
     // UTC - NEW FIELDS
     timeFrame,
     upperLimit: utcUpperLimit,
     lowerLimit: utcLowerLimit,
+    // INDY_TREND - NEW FIELDS
+    mode,
+    priceTriggerStart,
+    priceTriggerStop,
+    stopLossByPercent,
+    riskRewardRatio,
+    supertrendFactor,
+    supertrendAtrLength,
+    rsiLength,
+    rsiUpperBand,
+    rsiLowerBand,
+    adxSmoothing,
+    adxDiLength,
+    adxThreshold,
+    partialExit,
+    trailingStop,
   } = req.body;
+
 
   const baseRequiredFields = {
     name,
@@ -326,19 +344,35 @@ export const createStrategyController = async (req: any, res: Response) => {
       }
     }
   } else if (strategyType === "SMART_GRID") {
-    // ✅ UPDATED: New required fields for Smart Grid
+    // ✅ UPDATED: New required fields    // ✅ Smart Grid required fields (some are now optional for auto-calculation)
     const smartGridRequiredFields = {
-      ...baseRequiredFields,
+      name, // Renamed from 'name'
+      strategyType,
+      exchange,
+      segment,
+      symbol,
+      executionMode,
       type, // ✅ NEUTRAL | LONG | SHORT
-      levels,
-      profitPercentage,
       dataSetDays,
-      investment, // ✅ Total investment
-      minimumInvestment, // ✅ Minimum per order
+      // ✅ NOTE: levels, profitPercentage, investment, minimumInvestment, perGridAmount are now optional
+      // The system will auto-calculate missing values based on what's provided
     };
 
     const missingFields = Object.entries(smartGridRequiredFields)
-      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .filter(([key, value]) => {
+        // Allow certain fields to be undefined/null/empty if they are optional
+        const optionalFields = [
+          'levels',
+          'profitPercentage',
+          'investment',
+          'minimumInvestment',
+          'perGridAmount',
+        ];
+        if (optionalFields.includes(key)) {
+          return false; // Don't mark as missing if it's an optional field
+        }
+        return value === undefined || value === null || value === "";
+      })
       .map(([key]) => key);
 
     if (missingFields.length > 0) {
@@ -381,30 +415,36 @@ export const createStrategyController = async (req: any, res: Response) => {
       );
     }
 
-    // ✅ Validate investment amounts
-    if (investment <= 0) {
+    // ✅ Validate investment amounts (only if provided)
+    if (userInvestment !== undefined && userInvestment <= 0) {
       return sendBadRequest(res, "investment must be positive");
     }
 
-    if (minimumInvestment <= 0) {
+    if (userMinInvestment !== undefined && userMinInvestment <= 0) {
       return sendBadRequest(res, "minimumInvestment must be positive");
     }
 
-    if (minimumInvestment > investment) {
+    if (userInvestment && userMinInvestment && userMinInvestment > userInvestment) {
       return sendBadRequest(
         res,
         "minimumInvestment cannot exceed total investment"
       );
     }
 
-    // ✅ Calculate per-grid amount
-    const perGridAmount = investment / levels;
+    // ✅ Validate perGridAmount if provided
+    if (perGridAmount !== undefined && perGridAmount <= 0) {
+      return sendBadRequest(res, "perGridAmount must be positive");
+    }
 
-    if (perGridAmount < minimumInvestment) {
-      return sendBadRequest(
-        res,
-        `Investment per level (${perGridAmount.toFixed(2)}) is below minimum investment (${minimumInvestment}). Reduce levels or increase investment.`
-      );
+    // ✅ Validate consistency if multiple parameters provided
+    if (perGridAmount && levels && userInvestment) {
+      const calculatedInvestment = perGridAmount * levels;
+      if (Math.abs(calculatedInvestment - userInvestment) > 0.01) {
+        return sendBadRequest(
+          res,
+          `Parameter inconsistency: perGridAmount (${perGridAmount}) × levels (${levels}) = ${calculatedInvestment}, but investment is ${userInvestment}`
+        );
+      }
     }
 
     if (segment === "FUTURES") {
@@ -421,34 +461,51 @@ export const createStrategyController = async (req: any, res: Response) => {
       ...baseRequiredFields,
       investmentPerRun,
       investmentCap,
+      timeFrame,
     };
 
-    const missingFields = Object.entries(utcRequiredFields)
+    const missingUtcFields = Object.entries(utcRequiredFields)
       .filter(([_, value]) => value === undefined || value === null || value === "")
       .map(([key]) => key);
 
-    if (missingFields.length > 0) {
+    if (missingUtcFields.length > 0) {
       return sendBadRequest(
         res,
-        `Missing required fields: ${missingFields.join(", ")}`
+        `Missing required fields for UTC strategy: ${missingUtcFields.join(", ")}`
       );
     }
 
-    // ✅ Validate UTC parameters
-    if (!timeFrame) {
-      return sendBadRequest(res, "timeFrame is required for UTC strategy");
-    }
-
-    if (utcUpperLimit === undefined || utcLowerLimit === undefined) {
-      return sendBadRequest(res, "upperLimit and lowerLimit are required for UTC strategy");
-    }
-
-    if (utcUpperLimit <= utcLowerLimit) {
-      return sendBadRequest(res, "upperLimit must be greater than lowerLimit");
-    }
-
+    // ✅ Validate leverage for FUTURES
     if (segment === "FUTURES" && !leverage) {
       return sendBadRequest(res, "leverage is required for FUTURES segment");
+    }
+  } else if (strategyType === "INDY_TREND") {
+    // ✅ INDY TREND Strategy Validation
+    const indyTrendRequiredFields = {
+      ...baseRequiredFields,
+      investment: userInvestment,
+      timeFrame,
+    };
+
+    const missingIndyFields = Object.entries(indyTrendRequiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingIndyFields.length > 0) {
+      return sendBadRequest(
+        res,
+        `Missing required fields for INDY_TREND strategy: ${missingIndyFields.join(", ")}`
+      );
+    }
+
+    // ✅ Validate leverage for FUTURES
+    if (segment === "FUTURES" && assetType === "CRYPTO") {
+      if (!leverage || leverage < 1 || leverage > 20) {
+        return sendBadRequest(
+          res,
+          "leverage must be between 1x and 20x for Crypto Futures"
+        );
+      }
     }
   } else {
     // Growth DCA validation
@@ -506,12 +563,29 @@ export const createStrategyController = async (req: any, res: Response) => {
       dataSetDays,
       gridMode,
       recalculationInterval,
-      investment,
-      minimumInvestment,
+      investment: userInvestment, // ✅ Pass renamed variable
+      minimumInvestment: userMinInvestment, // ✅ Pass renamed variable
+      perGridAmount, // ✅ NEW: Pass perGridAmount
       // UTC
       timeFrame,
       utcUpperLimit,
       utcLowerLimit,
+      // INDY_TREND
+      mode,
+      priceTriggerStart,
+      priceTriggerStop,
+      stopLossByPercent,
+      riskRewardRatio,
+      supertrendFactor,
+      supertrendAtrLength,
+      rsiLength,
+      rsiUpperBand,
+      rsiLowerBand,
+      adxSmoothing,
+      adxDiLength,
+      adxThreshold,
+      partialExit,
+      trailingStop,
     });
 
     if (

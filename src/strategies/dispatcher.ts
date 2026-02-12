@@ -32,6 +32,17 @@ export async function registerStrategy(strategyId: string) {
 
   if (executionMode === EXECUTION_MODES.SIGNAL_BASED) {
     await signalEngine.register(strategy); // ✅ FIX: Pass strategy object, make it async
+
+    // ✅ CRITICAL: Also register with StrategyRuntimeRegistry for UTC and INDY_TREND
+    // This ensures the runtime is available when candle-close events trigger
+    if (strategy.type === "UTC" || strategy.type === "INDY_TREND") {
+      const { strategyRuntimeRegistry } = await import("../services/strategies/strategyRuntimeRegistry.js");
+      await strategyRuntimeRegistry.register(strategy);
+      console.log(`[STRATEGY_RUNTIME_REGISTERED] ${strategy.type} runtime registered`, {
+        strategyId: strategy.id,
+        type: strategy.type,
+      });
+    }
   }
 
   exitMonitor.register(strategy);
@@ -40,7 +51,7 @@ export async function registerStrategy(strategyId: string) {
 
 export async function unregisterStrategy(strategyId: string) {
   console.log("[STRATEGY_UNREGISTER_COMPLETE]", { strategyId }); // ✅ FIX: Changed log message
-  
+
   timeEngine.unregister(strategyId);
   signalEngine.unregister(strategyId); // ✅ FIX: Changed from register to unregister
   exitMonitor.unregister(strategyId);

@@ -44,6 +44,39 @@ function calculateMinimumInvestment(params: {
   return parseFloat(calculatedMinimum.toFixed(2));
 }
 
+/**
+ * Calculate recommended investment amount
+ * Used when user doesn't provide investment - auto-calculates based on:
+ * 1. Minimum investment per grid
+ * 2. Estimated number of grid levels
+ * 3. Safety multiplier (1.5x for flexibility)
+ */
+function calculateRecommendedInvestment(params: {
+  minimumInvestment: number;
+  estimatedLevels: number;
+}): number {
+  const { minimumInvestment, estimatedLevels } = params;
+
+  // Safety multiplier: 1.5x to ensure sufficient capital
+  const safetyMultiplier = 1.5;
+
+  // Investment = (minimum per grid) × (estimated levels) × (safety multiplier)
+  const recommended = minimumInvestment * estimatedLevels * safetyMultiplier;
+
+  // Round to nearest 10 for cleaner numbers (e.g., 150 instead of 147.5)
+  const rounded = Math.ceil(recommended / 10) * 10;
+
+  console.log("[CALCULATE_RECOMMENDED_INVESTMENT]", {
+    minimumInvestment,
+    estimatedLevels,
+    safetyMultiplier,
+    rawRecommended: recommended,
+    roundedRecommended: rounded,
+  });
+
+  return rounded;
+}
+
 
 /**
  * Fetch historical OHLC data from any exchange
@@ -226,6 +259,7 @@ function calculateRiskLevel(atr: number, currentPrice: number): "LOW" | "MEDIUM"
 
 /**
  * Calculate optimal grid levels based on price range and volatility
+ * CRITICAL: Must ensure investment per level >= minimumInvestment
  */
 function calculateOptimalLevels(
   lowerLimit: number,
@@ -234,14 +268,31 @@ function calculateOptimalLevels(
   totalInvestment: number
 ): number {
   const priceRange = upperLimit - lowerLimit;
-  const maxLevels = Math.floor(totalInvestment / minimumInvestment);
 
-  // ✅ Calculate optimal levels based on price range
+  // ✅ HARD CONSTRAINT: Maximum levels we can afford
+  const maxAffordableLevels = Math.floor(totalInvestment / minimumInvestment);
+
+  // ✅ Calculate optimal levels based on 2% price spacing
   const optimalSpacing = priceRange * 0.02; // 2% of range
   const optimalLevels = Math.ceil(priceRange / optimalSpacing);
 
-  // ✅ Return smaller of optimal or maximum affordable
-  return Math.min(Math.max(5, optimalLevels), maxLevels, 50);
+  // ✅ CRITICAL: Return whichever is SMALLER to ensure we never violate minimum investment
+  // Also enforce minimum of 5 levels and maximum of 50 levels
+  const safeLevels = Math.min(optimalLevels, maxAffordableLevels);
+  const finalLevels = Math.min(Math.max(5, safeLevels), 50);
+
+  console.log("[CALCULATE_OPTIMAL_LEVELS]", {
+    priceRange: priceRange.toFixed(4),
+    optimalSpacing: optimalSpacing.toFixed(4),
+    optimalLevels,
+    maxAffordableLevels,
+    safeLevels,
+    finalLevels,
+    investmentPerLevel: (totalInvestment / finalLevels).toFixed(2),
+    minimumRequired: minimumInvestment,
+  });
+
+  return finalLevels;
 }
 
 /**
@@ -271,43 +322,34 @@ export async function generateSmartGridParams(params: {
   symbol: string;
   dataSetDays: number;
   segment?: "SPOT" | "FUTURES";
-  investment: number;
+  investment?: number; // ✅ Made optional
   minimumInvestment?: number;
   userLowerLimit?: number;
   userUpperLimit?: number;
   userLevels?: number;
   userProfitPercentage?: number;
+  // ✅ NEW: Additional user overrides
+  userPerGridAmount?: number;
+  userInvestment?: number;
+  userMinInvestment?: number;
 }) {
   const {
     exchange,
     symbol,
     dataSetDays,
     segment = "SPOT",
-    investment,
-    minimumInvestment: userMinimumInvestment,
+    investment: legacyInvestment, // Legacy parameter for backward compatibility
+    minimumInvestment: legacyMinimumInvestment,
     userLowerLimit,
     userUpperLimit,
     userLevels,
     userProfitPercentage,
+    // ✅ NEW: User overrides
+    userPerGridAmount,
+    userInvestment,
+    userMinInvestment,
   } = params;
 
-  // ✅ Auto-calculate minimum investment if not provided
-  const minimumInvestment = userMinimumInvestment || calculateMinimumInvestment({
-    exchange,
-    segment,
-    totalInvestment: investment,
-  });
-
-  console.log("[SMART_GRID_AUTO_GEN] Starting calculation", {
-    exchange,
-    symbol,
-    segment,
-    dataSetDays,
-    investment,
-    minimumInvestment,
-    minimumInvestmentSource: userMinimumInvestment ? "user-provided" : "auto-calculated",
-    hasUserOverrides: !!(userLowerLimit || userUpperLimit || userLevels),
-  });
 
   // ========================================
   // STEP 1: FETCH HISTORICAL DATA
@@ -320,6 +362,98 @@ export async function generateSmartGridParams(params: {
     segment,
     historicalRange: `${historicalLow.toFixed(4)} - ${historicalHigh.toFixed(4)}`,
   });
+
+  // ========================================
+  // STEP 1.5: CALCULATE INVESTMENT PARAMETERS WITH USER OVERRIDES
+  // ========================================
+  // ✅ NEW: Smart recalculation based on what user provides
+
+  // First, calculate base minimum investment
+  const baseMinimumInvestment = userMinInvestment || legacyMinimumInvestment || calculateMinimumInvestment({
+    exchange,
+    segment,
+    totalInvestment: 100, // Temporary value for calculation
+  });
+
+  let finalInvestment: number;
+  let finalPerGridAmount: number;
+  let finalMinimumInvestment: number = baseMinimumInvestment;
+  let calculatedLevels: number | undefined;
+
+  // Priority 1: User provides BOTH investment and perGridAmount → calculate levels
+  if (userInvestment && userPerGridAmount) {
+    finalInvestment = userInvestment;
+    finalPerGridAmount = userPerGridAmount;
+    calculatedLevels = Math.round(finalInvestment / finalPerGridAmount);
+
+    console.log("[STEP_1.5] User provided investment + perGridAmount", {
+      userInvestment: finalInvestment,
+      userPerGridAmount: finalPerGridAmount,
+      calculatedLevels,
+      source: "calculated from investment/perGridAmount",
+    });
+  }
+  // Priority 2: User provides investment + levels → calculate perGridAmount
+  else if ((userInvestment || legacyInvestment) && userLevels) {
+    finalInvestment = userInvestment || legacyInvestment!;
+    calculatedLevels = userLevels;
+    finalPerGridAmount = finalInvestment / calculatedLevels;
+
+    console.log("[STEP_1.5] User provided investment + levels", {
+      userInvestment: finalInvestment,
+      userLevels: calculatedLevels,
+      calculatedPerGridAmount: finalPerGridAmount,
+      source: "calculated from investment/levels",
+    });
+  }
+  // Priority 3: User provides perGridAmount + levels → calculate investment
+  else if (userPerGridAmount && userLevels) {
+    finalPerGridAmount = userPerGridAmount;
+    calculatedLevels = userLevels;
+    finalInvestment = finalPerGridAmount * calculatedLevels;
+
+    console.log("[STEP_1.5] User provided perGridAmount + levels", {
+      userPerGridAmount: finalPerGridAmount,
+      userLevels: calculatedLevels,
+      calculatedInvestment: finalInvestment,
+      source: "calculated from perGridAmount*levels",
+    });
+  }
+  // Priority 4: User provides only investment → auto-calculate rest
+  else if (userInvestment || legacyInvestment) {
+    finalInvestment = userInvestment || legacyInvestment!;
+    // Will calculate perGridAmount after levels are determined
+    finalPerGridAmount = 0; // Placeholder
+
+    console.log("[STEP_1.5] User provided only investment", {
+      userInvestment: finalInvestment,
+      note: "perGridAmount will be calculated after levels",
+    });
+  }
+  // Priority 5: No user overrides → full auto-calculation
+  else {
+    // Auto-calculate investment based on market analysis
+    const priceRange = historicalHigh - historicalLow;
+    const estimatedInterval = priceRange * 0.02;
+    const estimatedLevels = Math.ceil(priceRange / estimatedInterval);
+
+    finalInvestment = calculateRecommendedInvestment({
+      minimumInvestment: baseMinimumInvestment,
+      estimatedLevels: Math.min(estimatedLevels, 20),
+    });
+    finalPerGridAmount = 0; // Placeholder
+
+    console.log("[STEP_1.5] Full auto-calculation", {
+      priceRange: priceRange.toFixed(4),
+      estimatedLevels,
+      cappedLevels: Math.min(estimatedLevels, 20),
+      recommendedInvestment: finalInvestment,
+    });
+  }
+
+  // Store for later use
+  let investment = finalInvestment;
+  let minimumInvestment = finalMinimumInvestment;
 
   // ========================================
   // STEP 2: CALCULATE INDICATORS
@@ -379,17 +513,22 @@ export async function generateSmartGridParams(params: {
   // ========================================
   // STEP 4: CALCULATE OPTIMAL LEVELS
   // ========================================
-  const levels = userLevels || calculateOptimalLevels(
+  // ✅ Use calculated levels if available, otherwise user override or auto-calculate
+  const levels = calculatedLevels || userLevels || calculateOptimalLevels(
     lowerLimit,
     upperLimit,
     minimumInvestment,
     investment
   );
 
-  console.log("[STEP_4] Levels calculated", {
+  // ✅ Now calculate perGridAmount if not already set
+  const perGridAmount = finalPerGridAmount || (investment / levels);
+
+  console.log("[STEP_4] Levels and perGridAmount finalized", {
     levels,
-    userProvided: !!userLevels,
-    investmentPerLevel: (investment / levels).toFixed(2),
+    perGridAmount: perGridAmount.toFixed(2),
+    totalInvestment: investment.toFixed(2),
+    source: calculatedLevels ? "calculated" : (userLevels ? "user-provided" : "auto-calculated"),
   });
 
   // ========================================
@@ -410,9 +549,22 @@ export async function generateSmartGridParams(params: {
   // ========================================
   // STEP 6: VALIDATE CONFIGURATION
   // ========================================
-  const perLevelInvestment = investment / levels;
+  const perLevelInvestment = perGridAmount;
   const minimumInvestmentRequired = levels * minimumInvestment;
   const maxAffordableLevels = Math.floor(investment / minimumInvestment);
+
+  // ✅ Validate consistency: perGridAmount * levels should equal investment
+  const calculatedInvestment = perGridAmount * levels;
+  if (Math.abs(calculatedInvestment - investment) > 0.01) {
+    throw new Error(
+      `Parameter inconsistency detected:\n` +
+      `- perGridAmount: ${perGridAmount.toFixed(2)}\n` +
+      `- levels: ${levels}\n` +
+      `- perGridAmount × levels = ${calculatedInvestment.toFixed(2)}\n` +
+      `- investment: ${investment.toFixed(2)}\n\n` +
+      `These values must be consistent. Please adjust your parameters.`
+    );
+  }
 
   if (perLevelInvestment < minimumInvestment) {
     throw new Error(
@@ -420,11 +572,11 @@ export async function generateSmartGridParams(params: {
       `- Levels: ${levels}\n` +
       `- Minimum investment required: ${minimumInvestmentRequired.toFixed(2)}\n` +
       `- Your investment: ${investment.toFixed(2)}\n` +
-      `- Per level: ${perLevelInvestment.toFixed(2)} (minimum: ${minimumInvestment})\n\n` +
+      `- Per grid: ${perLevelInvestment.toFixed(2)} (minimum: ${minimumInvestment.toFixed(2)})\n\n` +
       `Options:\n` +
       `1. Increase investment to ${minimumInvestmentRequired.toFixed(2)}\n` +
       `2. Reduce levels to ${maxAffordableLevels}\n` +
-      `3. Lower minimum investment per level`
+      `3. Increase perGridAmount to ${minimumInvestment.toFixed(2)}`
     );
   }
 
@@ -461,10 +613,11 @@ export async function generateSmartGridParams(params: {
     levels,
     profitPercentage: parseFloat(profitPercentage.toFixed(2)),
 
-    // ✅ Investment breakdown
-    investment,
-    minimumInvestment,
-    perLevelInvestment: parseFloat(perLevelInvestment.toFixed(2)),
+    // ✅ Investment parameters
+    investment: parseFloat(investment.toFixed(2)),
+    minimumInvestment: parseFloat(minimumInvestment.toFixed(2)),
+    perLevelInvestment: parseFloat(perGridAmount.toFixed(2)), // ✅ Now uses calculated perGridAmount
+    perGridAmount: parseFloat(perGridAmount.toFixed(2)), // ✅ NEW: Expose perGridAmount explicitly
 
     // ✅ Validation info
     validation: {
@@ -474,8 +627,9 @@ export async function generateSmartGridParams(params: {
       maxAffordableLevels,
     },
 
-    // ✅ Indicators (for transparency)
+    // ✅ Market indicators
     indicators: {
+      // Backward compatibility - flat structure
       bollingerUpper: parseFloat(bollinger.upper.toFixed(6)),
       bollingerMiddle: parseFloat(bollinger.middle.toFixed(6)),
       bollingerLower: parseFloat(bollinger.lower.toFixed(6)),
