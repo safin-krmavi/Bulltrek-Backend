@@ -5,6 +5,7 @@ import {
 } from "../crypto/exchange/tradeService";
 import { placeStockOrder } from "../stocks/exchange/exchangeService";
 import { TradeIntent } from "./tradeDispatcher";
+import { executePaperTrade } from "./paperTradeExecutor.js";
 
 class TradeExecutionEngine {
   private queues: Record<string, TradeIntent[]> = {};
@@ -80,6 +81,14 @@ class TradeExecutionEngine {
   private async executeCrypto(order: TradeIntent) {
     console.log(`[Engine] Executing crypto order:`, order);
 
+    // ✅ Check execution type - route to paper executor if PAPER
+    if (order.executionType === "PAPER") {
+      console.log(`[Engine] Routing to paper trade executor`);
+      await executePaperTrade(order);
+      return;
+    }
+
+    // Existing live trading logic
     if (order.tradeType === "SPOT") {
       await createSpotTrade(
         order.userId,
@@ -99,6 +108,15 @@ class TradeExecutionEngine {
 
   private async executeStock(order: TradeIntent) {
     console.log(`[Engine] Executing stock order:`, order);
+
+    // ✅ Check execution type - route to paper executor if PAPER
+    if (order.executionType === "PAPER") {
+      console.log(`[Engine] Routing to paper trade executor`);
+      await executePaperTrade(order);
+      return;
+    }
+
+    // Existing live trading logic
     await placeStockOrder(order.exchange, order.credentials, {
       symbol: order.symbol,
       side: order.side,

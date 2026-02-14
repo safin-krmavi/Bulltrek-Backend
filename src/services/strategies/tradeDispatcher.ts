@@ -4,6 +4,7 @@ import { getCryptoCredentials } from "../crypto/credentialsService";
 import { getStocksCredentials } from "../stocks/credentialsService";
 import { ensureValidStocksSession } from "./ensureValidStocksSession";
 import { tradeExecutionEngine } from "./tradeExecutionEngine";
+import { StrategyExecutionMode } from "@prisma/client";
 
 export type TradeIntent = {
   userId: string;
@@ -46,13 +47,13 @@ export const tradeDispatcher = {
 
     // 2️⃣ Copy trading
     if (!lockedIntent.strategyId) return;
-    
+
     const strategy = await prisma.strategy.findUnique({
       where: { id: lockedIntent.strategyId },
       select: { executionMode: true },
     });
 
-    if (strategy?.executionMode !== "PUBLISHED") {
+    if (strategy?.executionMode !== StrategyExecutionMode.PUBLISHED) {
       console.log(
         "Cannot execute strategy as the executionMode is:",
         strategy?.executionMode,
@@ -108,22 +109,48 @@ export const tradeDispatcher = {
       });
 
       let executionType = intent.executionType;
+
+      // ✅ NEW: Check strategy execution mode if not already set
+      if (intent.strategyId && !executionType) {
+        const strategy = await prisma.strategy.findUnique({
+          where: { id: intent.strategyId },
+          select: { executionMode: true },
+        });
+
+        executionType =
+          strategy?.executionMode === StrategyExecutionMode.PAPER
+            ? "PAPER"
+            : "LIVE";
+        console.log("[DISPATCHER] Set execution type from strategy", {
+          strategyId: intent.strategyId,
+          executionMode: strategy?.executionMode,
+          executionType,
+        });
+      }
+
+      // Existing copy trade logic
       if (intent.isCopyTrade) {
         executionType = user?.role?.name === "SLAVE_PRO" ? "LIVE" : "PAPER";
       }
 
-      
-
       const raw = await getCryptoCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
-      if (!credentials) return;
+
+      // ✅ NEW: Skip credentials check for paper trading
+      if (executionType === "LIVE" && !credentials) {
+        console.error("[DISPATCHER] Missing credentials for LIVE trading", {
+          userId: intent.userId,
+          exchange: intent.exchange,
+        });
+        return;
+      }
 
       // ✅ Lock trade type in execution
       tradeExecutionEngine.enqueue({
         ...intent,
         tradeType: intent.tradeType, // Preserve original
         executionType,
-        credentials,
+        credentials: executionType === "LIVE" ? credentials : undefined,
       });
       return;
     }
@@ -135,28 +162,59 @@ export const tradeDispatcher = {
       });
 
       let executionType = intent.executionType;
+
+      // ✅ NEW: Check strategy execution mode if not already set
+      if (intent.strategyId && !executionType) {
+        const strategy = await prisma.strategy.findUnique({
+          where: { id: intent.strategyId },
+          select: { executionMode: true },
+        });
+
+        executionType =
+          strategy?.executionMode === StrategyExecutionMode.PAPER
+            ? "PAPER"
+            : "LIVE";
+        console.log("[DISPATCHER] Set execution type from strategy", {
+          strategyId: intent.strategyId,
+          executionMode: strategy?.executionMode,
+          executionType,
+        });
+      }
+
+      // Existing copy trade logic
       if (intent.isCopyTrade) {
         executionType = user?.role?.name === "SLAVE_PRO" ? "LIVE" : "PAPER";
       }
 
       const raw = await getStocksCredentials(intent.userId, intent.exchange);
       const credentials = Array.isArray(raw) ? raw[0] : raw;
-      if (!credentials) return;
 
-      try {
-        await ensureValidStocksSession({
+      // ✅ NEW: Skip credentials check for paper trading
+      if (executionType === "LIVE" && !credentials) {
+        console.error("[DISPATCHER] Missing credentials for LIVE trading", {
           userId: intent.userId,
           exchange: intent.exchange,
         });
-      } catch (err) {
-        await handleExpiredSession(intent, err);
         return;
+      }
+
+      // Only validate session for LIVE trading
+      if (executionType === "LIVE") {
+        try {
+          await ensureValidStocksSession({
+            userId: intent.userId,
+            exchange: intent.exchange,
+          });
+        } catch (err) {
+          await handleExpiredSession(intent, err);
+          return;
+        }
       }
 
       tradeExecutionEngine.enqueue({
         ...intent,
         executionType,
-        credentials,
+        credentials: executionType === "LIVE" ? credentials : undefined,
       });
       return;
     }

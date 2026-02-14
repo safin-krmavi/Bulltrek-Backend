@@ -245,9 +245,9 @@ export const createStrategy = async (data: any) => {
       trailingStop,
     } = data;
 
-    if (!strategyName || strategyName.length < 3 || strategyName.length > 50) {
-      throw new Error("Strategy name must be 3-50 characters");
-    }
+    // if (!strategyName || strategyName.length < 3 || strategyName.length > 50) {
+    //   throw new Error("Strategy name must be 3-50 characters");
+    // }
 
     if (!investment || investment <= 0) {
       throw new Error("Investment must be greater than 0");

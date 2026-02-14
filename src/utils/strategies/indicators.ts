@@ -24,7 +24,7 @@ function calculateSMA(values: number[], period: number): number[] {
 /**
  * Calculate Exponential Moving Average (EMA)
  */
-function calculateEMA(values: number[], period: number): number[] {
+export function calculateEMA(values: number[], period: number): number[] {
   const k = 2 / (period + 1);
   const ema: number[] = [];
 
@@ -655,6 +655,224 @@ export function calculateADX(
   while (results.length < candles.length) {
     const last = results[results.length - 1];
     results.push(last);
+  }
+
+  return results;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         LAGUERRE RSI INDICATOR                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Calculate Laguerre RSI
+ * A smoother version of RSI using Laguerre filter
+ * @param candles - Historical candle data
+ * @param alpha - Smoothing factor (0-1), default: 0.2. Lower = smoother
+ */
+export function calculateLaguerreRSI(
+  candles: Candle[],
+  alpha: number = 0.2
+): number[] {
+  const close = candles.map(c => c.close);
+  const laRSI: number[] = [];
+
+  // Laguerre filter variables
+  let L0 = 0, L1 = 0, L2 = 0, L3 = 0;
+
+  for (let i = 0; i < close.length; i++) {
+    // Laguerre filter calculation
+    const L0_prev = L0;
+    const L1_prev = L1;
+    const L2_prev = L2;
+    const L3_prev = L3;
+
+    L0 = (1 - alpha) * close[i] + alpha * L0_prev;
+    L1 = -alpha * L0 + L0_prev + alpha * L1_prev;
+    L2 = -alpha * L1 + L1_prev + alpha * L2_prev;
+    L3 = -alpha * L2 + L2_prev + alpha * L3_prev;
+
+    // Calculate CU (Close Up) and CD (Close Down)
+    let CU = 0;
+    let CD = 0;
+
+    if (L0 >= L1) CU = L0 - L1; else CD = L1 - L0;
+    if (L1 >= L2) CU += L1 - L2; else CD += L2 - L1;
+    if (L2 >= L3) CU += L2 - L3; else CD += L3 - L2;
+
+    // Calculate Laguerre RSI
+    let rsi = 50; // Default neutral value
+    if (CU + CD !== 0) {
+      rsi = (CU / (CU + CD)) * 100;
+    }
+
+    laRSI.push(rsi);
+  }
+
+  return laRSI;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                    LORENTZIAN CLASSIFICATION INDICATOR                     */
+/* -------------------------------------------------------------------------- */
+
+export interface LorentzianClassificationResult {
+  signal: "BULLISH" | "BEARISH" | "NEUTRAL";
+  confidence: number;
+  prediction: number;
+}
+
+/**
+ * Helper function to extract price values based on source type
+ */
+function extractPriceSource(
+  candles: Candle[],
+  source: "close" | "open" | "high" | "low" | "hl2" | "hlc3" | "ohlc4"
+): number[] {
+  switch (source) {
+    case "close":
+      return candles.map(c => c.close);
+    case "open":
+      return candles.map(c => c.open);
+    case "high":
+      return candles.map(c => c.high);
+    case "low":
+      return candles.map(c => c.low);
+    case "hl2":
+      return candles.map(c => (c.high + c.low) / 2);
+    case "hlc3":
+      return candles.map(c => (c.high + c.low + c.close) / 3);
+    case "ohlc4":
+      return candles.map(c => (c.open + c.high + c.low + c.close) / 4);
+    default:
+      return candles.map(c => c.close);
+  }
+}
+
+/**
+ * Calculate Lorentzian Classification
+ * Machine learning-based market structure classification using Lorentzian distance
+ * 
+ * This is a simplified implementation based on the TradingView indicator
+ * Uses feature engineering with RSI, CCI, and price momentum
+ * 
+ * @param candles - Historical candle data
+ * @param source - Price source for calculations
+ */
+export function calculateLorentzianClassification(
+  candles: Candle[],
+  source: "close" | "open" | "high" | "low" | "hl2" | "hlc3" | "ohlc4" = "close"
+): LorentzianClassificationResult[] {
+  const results: LorentzianClassificationResult[] = [];
+
+  // Minimum data requirement
+  const minCandles = 50;
+  if (candles.length < minCandles) {
+    return new Array(candles.length).fill({
+      signal: "NEUTRAL",
+      confidence: 0,
+      prediction: 0
+    });
+  }
+
+  // Extract price source
+  const prices = extractPriceSource(candles, source);
+
+  // Calculate features for classification
+  const rsiValues = calculateRSI(candles, 14);
+  const closes = candles.map(c => c.close);
+
+  // Feature 1: RSI
+  // Feature 2: Price momentum (rate of change)
+  // Feature 3: Price position relative to recent range
+
+  for (let i = 0; i < candles.length; i++) {
+    if (i < minCandles) {
+      results.push({
+        signal: "NEUTRAL",
+        confidence: 0,
+        prediction: 0
+      });
+      continue;
+    }
+
+    // Calculate features
+    const currentRSI = rsiValues[i];
+
+    // Price momentum (5-period rate of change)
+    const momentum = i >= 5
+      ? ((prices[i] - prices[i - 5]) / prices[i - 5]) * 100
+      : 0;
+
+    // Price position in recent range (14 periods)
+    const recentPrices = prices.slice(Math.max(0, i - 14), i + 1);
+    const maxPrice = Math.max(...recentPrices);
+    const minPrice = Math.min(...recentPrices);
+    const pricePosition = maxPrice !== minPrice
+      ? ((prices[i] - minPrice) / (maxPrice - minPrice)) * 100
+      : 50;
+
+    // Simplified Lorentzian distance-based classification
+    // Compare current features with recent bullish/bearish patterns
+
+    let bullishScore = 0;
+    let bearishScore = 0;
+    const lookback = 20;
+
+    for (let j = 1; j <= lookback && i - j >= 0; j++) {
+      const pastRSI = rsiValues[i - j];
+      const pastMomentum = i - j >= 5
+        ? ((prices[i - j] - prices[i - j - 5]) / prices[i - j - 5]) * 100
+        : 0;
+
+      // Calculate Lorentzian distance (simplified)
+      const distance =
+        Math.log(1 + Math.abs(currentRSI - pastRSI)) +
+        Math.log(1 + Math.abs(momentum - pastMomentum));
+
+      // Determine if past pattern was bullish or bearish
+      const wasBullish = i - j + 1 < candles.length &&
+        candles[i - j + 1].close > candles[i - j].close;
+
+      // Weight by inverse distance (closer patterns have more influence)
+      const weight = 1 / (1 + distance);
+
+      if (wasBullish) {
+        bullishScore += weight;
+      } else {
+        bearishScore += weight;
+      }
+    }
+
+    // Normalize scores
+    const totalScore = bullishScore + bearishScore;
+    const bullishProbability = totalScore > 0 ? bullishScore / totalScore : 0.5;
+
+    // Determine signal
+    let signal: "BULLISH" | "BEARISH" | "NEUTRAL" = "NEUTRAL";
+    let confidence = Math.abs(bullishProbability - 0.5) * 2; // 0-1 scale
+
+    if (bullishProbability > 0.6) {
+      signal = "BULLISH";
+    } else if (bullishProbability < 0.4) {
+      signal = "BEARISH";
+    }
+
+    // Additional confirmation from RSI
+    if (signal === "BULLISH" && currentRSI < 30) {
+      confidence *= 1.2; // Oversold + bullish pattern = stronger signal
+    } else if (signal === "BEARISH" && currentRSI > 70) {
+      confidence *= 1.2; // Overbought + bearish pattern = stronger signal
+    }
+
+    // Cap confidence at 1.0
+    confidence = Math.min(confidence, 1.0);
+
+    results.push({
+      signal,
+      confidence,
+      prediction: bullishProbability
+    });
   }
 
   return results;

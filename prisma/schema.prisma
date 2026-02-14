@@ -26,6 +26,7 @@ model Role {
   features RoleFeature[]
 }
 
+
 model RoleFeature {
   id        String   @id @default(uuid())
   roleId    String
@@ -367,6 +368,22 @@ model PaperTradePosition {
   closedAt   DateTime?
 }
 
+model PaperBalance {
+  id            String   @id @default(uuid())
+  userId        String
+  exchange      String
+  assetType     String   // CRYPTO | STOCK
+  asset         String   // USDT, BTC, INR, etc.
+  
+  balance       Float    @default(10000)  // Starting balance
+  lockedBalance Float    @default(0)      // In open positions
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([userId, exchange, assetType, asset])
+}
+
 
 // Marketplace
 model StrategyPurchase {
@@ -422,6 +439,7 @@ model Notification {
 
 enum StrategyExecutionMode {
   LIVE
+  PAPER
   BACKTEST
   PUBLISHED
 }

@@ -11,6 +11,8 @@ import { evaluateUTC } from "./evaluators/utcEvaluator";
 import { UTCState } from "../../types/strategies/utc.types";
 import { evaluateIndyTrend } from "./evaluators/indyTrendEvaluator";
 import { IndyTrendState } from "../../types/strategies/indyTrend.types";
+import { evaluateLESI } from "./evaluators/lesiEvaluator";
+import { LESIState } from "../../types/strategies/lesi.types";
 import { Candle } from "../../utils/strategies/historicalDataFetcher.js";
 
 // Base runtime state
@@ -46,6 +48,7 @@ type StrategyStateMap = {
   HUMAN_GRID: HumanGridState;
   UTC: UTCState;
   INDY_TREND: IndyTrendState;
+  LESI: LESIState;
   SCALPING: BaseStrategyRuntimeState;
   GRID: BaseStrategyRuntimeState;
   // Add future strategies here
@@ -130,6 +133,21 @@ export class StrategyRuntime<
         } as StrategyStateMap[T];
         break;
 
+      case "LESI":
+        this.state = {
+          investedCapital: 0,
+          positionQty: 0,
+          avgEntryPrice: null,
+          lastExecutionAt: null,
+          status: "ACTIVE",
+          currentPosition: "NONE",
+          pendingOrder: false,
+          emaValue: 0,
+          laRSIValue: 50,
+          lcSignal: "NEUTRAL",
+        } as StrategyStateMap[T];
+        break;
+
       default:
         this.state = {
           investedCapital: 0,
@@ -185,6 +203,10 @@ export class StrategyRuntime<
 
     if (this.strategy.type === "INDY_TREND") {
       this.handleIndyTrend(price, timestamp, candles);
+    }
+
+    if (this.strategy.type === "LESI") {
+      this.handleLESI(price, timestamp, candles);
     }
   }
 
@@ -919,6 +941,163 @@ export class StrategyRuntime<
     }
 
     throw new Error(`Unsupported exchange: ${exchange}`);
+  }
+
+  /**
+   * Handles LESI (Lorentzian + EMA + LaRSI) strategy logic
+   */
+  private async handleLESI(price: number, timestamp: number, candles?: Candle[]) {
+    const state = this.state as LESIState;
+    const config = this.strategy.config as any;
+
+    if (state.pendingOrder) return;
+
+    // Use provided candles or fetch if not available
+    let historicalCandles = candles;
+
+    if (!historicalCandles) {
+      const minCandles = Math.max(
+        config.indicators.ema.enabled ? config.indicators.ema.length + 10 : 0,
+        config.indicators.lc.enabled ? 50 : 0,
+        30 // Minimum for LaRSI
+      );
+
+      try {
+        historicalCandles = await this.fetchHistoricalCandles(
+          this.strategy.exchange,
+          this.strategy.segment,
+          this.strategy.symbol,
+          config.timeFrame || "5m",
+          minCandles
+        );
+      } catch (error: any) {
+        console.error("[LESI] Error fetching candles", {
+          strategyId: this.strategy.id,
+          error: error.message,
+        });
+        return;
+      }
+    }
+
+    try {
+      // Evaluate LESI strategy
+      const decision = evaluateLESI(
+        this.strategy,
+        state,
+        price,
+        historicalCandles
+      );
+
+      console.log("[LESI] Decision", {
+        strategyId: this.strategy.id,
+        action: decision.action,
+        reason: decision.reason,
+        price,
+        candleCount: historicalCandles.length,
+      });
+
+      if (decision.action === "BUY") {
+        // Calculate quantity based on leverage (if Futures)
+        const investmentAmount = config.investment;
+        const leverage = config.leverage || 1;
+        const rawQty = config.leverage
+          ? (investmentAmount * leverage) / price
+          : investmentAmount / price;
+
+        const qty = await formatQuantity({
+          exchange: this.strategy.exchange,
+          tradeType: this.strategy.segment,
+          symbol: this.strategy.symbol,
+          rawQty,
+        });
+
+        state.pendingOrder = true;
+        state.lastExecutionAt = timestamp;
+
+        console.log("[LESI] Placing BUY order (LONG)", {
+          strategyId: this.strategy.id,
+          price,
+          qty,
+          investmentAmount,
+          leverage,
+          stopLoss: decision.stopLoss,
+        });
+
+        tradeDispatcher.dispatch({
+          userId: this.strategy.userId,
+          exchange: this.strategy.exchange,
+          segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: this.strategy.segment as any,
+          symbol: this.strategy.symbol,
+          side: "BUY",
+          quantity: qty,
+          price,
+          orderType: "MARKET",
+          strategyId: this.strategy.id,
+          onComplete: () => {
+            // Update state after successful buy
+            const totalCost = qty * price;
+            const newTotalQty = state.positionQty + qty;
+            const newTotalCost = (state.avgEntryPrice || 0) * state.positionQty + totalCost;
+
+            state.avgEntryPrice = newTotalCost / newTotalQty;
+            state.positionQty = newTotalQty;
+            state.investedCapital += investmentAmount;
+            state.currentPosition = "LONG";
+            state.pendingOrder = false;
+
+            console.log("[LESI] BUY completed", {
+              strategyId: this.strategy.id,
+              avgEntryPrice: state.avgEntryPrice,
+              positionQty: state.positionQty,
+              investedCapital: state.investedCapital,
+            });
+          },
+        });
+      } else if (decision.action === "SELL" && decision.quantity) {
+        state.pendingOrder = true;
+
+        console.log("[LESI] Placing SELL order", {
+          strategyId: this.strategy.id,
+          price,
+          qty: decision.quantity,
+          reason: decision.reason,
+        });
+
+        tradeDispatcher.dispatch({
+          userId: this.strategy.userId,
+          exchange: this.strategy.exchange,
+          segment: this.strategy.assetType as "CRYPTO" | "STOCK",
+          tradeType: this.strategy.segment as any,
+          symbol: this.strategy.symbol,
+          side: "SELL",
+          quantity: decision.quantity,
+          price,
+          orderType: "MARKET",
+          strategyId: this.strategy.id,
+          onComplete: () => {
+            // Update state after successful sell
+            const soldValue = decision.quantity! * price;
+            state.investedCapital -= soldValue;
+            state.positionQty = 0;
+            state.avgEntryPrice = null;
+            state.currentPosition = "NONE";
+            state.pendingOrder = false;
+
+            console.log("[LESI] SELL completed", {
+              strategyId: this.strategy.id,
+              soldValue,
+              investedCapital: state.investedCapital,
+            });
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error("[LESI] Error", {
+        strategyId: this.strategy.id,
+        error: error.message,
+      });
+    }
   }
 
   /**
