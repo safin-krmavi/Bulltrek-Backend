@@ -35,7 +35,7 @@ export async function registerStrategy(strategyId: string) {
 
     // ✅ CRITICAL: Also register with StrategyRuntimeRegistry for UTC and INDY_TREND
     // This ensures the runtime is available when candle-close events trigger
-    if (strategy.type === "UTC" || strategy.type === "INDY_TREND") {
+    if (strategy.type === "UTC" || strategy.type === "INDY_TREND" || strategy.type === "LESI") {
       const { strategyRuntimeRegistry } = await import("../services/strategies/strategyRuntimeRegistry.js");
       await strategyRuntimeRegistry.register(strategy);
       console.log(`[STRATEGY_RUNTIME_REGISTERED] ${strategy.type} runtime registered`, {

@@ -54,6 +54,19 @@ export const createStrategy = async (data: any) => {
     timeFrame,
     utcUpperLimit,
     utcLowerLimit,
+    // LESI
+    mode,
+    lcEnabled,
+    lcSource,
+    emaEnabled,
+    emaLength,
+    emaSource,
+    laRSIEnabled,
+    laRSIAlpha,
+    laRSISource,
+    stopLossByPercent,
+    priceTriggerStart,
+    priceTriggerStop,
   } = data;
 
   let config: any;
@@ -301,6 +314,44 @@ export const createStrategy = async (data: any) => {
       investment: config.investment,
       investmentCap: config.investmentCap,
       mode: config.mode,
+    });
+  } else if (strategyType === "LESI") {
+    // ✅ LESI Strategy Configuration
+    config = {
+      timeFrame: timeFrame || "5m",
+      leverage: segment === "FUTURES" ? leverage : undefined,
+      investment: investment || investmentPerRun,
+      investmentCap: investmentCap || (investment || investmentPerRun) * 5,
+      lowerLimit,
+      upperLimit,
+      priceTriggerStart,
+      priceTriggerStop,
+      stopLossByPercent: stopLossByPercent || stopLossPct || 2,
+      indicators: {
+        lc: {
+          enabled: lcEnabled !== undefined ? lcEnabled : true,
+          source: lcSource || "close",
+        },
+        ema: {
+          enabled: emaEnabled !== undefined ? emaEnabled : true,
+          length: emaLength || 200,
+          source: emaSource || "close",
+        },
+        laRSI: {
+          enabled: laRSIEnabled !== undefined ? laRSIEnabled : true,
+          alpha: laRSIAlpha || 0.2,
+          source: laRSISource || "close",
+        },
+      },
+    };
+
+    nextRunAt = null;
+
+    console.log("[LESI_CONFIG_COMPLETE]", {
+      strategyId: data.id,
+      timeFrame: config.timeFrame,
+      investment: config.investment,
+      investmentCap: config.investmentCap,
     });
   } else {
     // Existing Growth DCA logic

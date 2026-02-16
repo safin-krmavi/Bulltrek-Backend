@@ -301,6 +301,15 @@ export const createStrategyController = async (req: any, res: Response) => {
     adxThreshold,
     partialExit,
     trailingStop,
+    // LESI - NEW FIELDS
+    lcEnabled,
+    lcSource,
+    emaEnabled,
+    emaLength,
+    emaSource,
+    laRSIEnabled,
+    laRSIAlpha,
+    laRSISource,
   } = req.body;
 
 
@@ -497,8 +506,26 @@ export const createStrategyController = async (req: any, res: Response) => {
         `Missing required fields for INDY_TREND strategy: ${missingIndyFields.join(", ")}`
       );
     }
+  } else if (strategyType === "LESI") {
+    // ✅ LESI Strategy Validation
+    const lesiRequiredFields = {
+      ...baseRequiredFields,
+      investment: userInvestment,
+      timeFrame,
+    };
 
-    // ✅ Validate leverage for FUTURES
+    const missingLesiFields = Object.entries(lesiRequiredFields)
+      .filter(([_, value]) => value === undefined || value === null || value === "")
+      .map(([key]) => key);
+
+    if (missingLesiFields.length > 0) {
+      return sendBadRequest(
+        res,
+        `Missing required fields for LESI strategy: ${missingLesiFields.join(", ")}`
+      );
+    }
+
+    // Validate leverage for FUTURES
     if (segment === "FUTURES" && assetType === "CRYPTO") {
       if (!leverage || leverage < 1 || leverage > 20) {
         return sendBadRequest(
@@ -586,6 +613,15 @@ export const createStrategyController = async (req: any, res: Response) => {
       adxThreshold,
       partialExit,
       trailingStop,
+      // LESI
+      lcEnabled,
+      lcSource,
+      emaEnabled,
+      emaLength,
+      emaSource,
+      laRSIEnabled,
+      laRSIAlpha,
+      laRSISource,
     });
 
     if (

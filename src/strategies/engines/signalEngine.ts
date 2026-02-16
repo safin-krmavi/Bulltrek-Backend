@@ -20,6 +20,7 @@ import prisma from "../../config/db.config";
 import { BinanceKlineHandler } from "../../sockets/crypto/marketData/binanceKlineHandler";
 import { bootstrapCandles } from "../../sockets/crypto/marketData/candleBootstrap";
 import { CandleBuffer } from "../../sockets/crypto/marketData/candleBuffer";
+import { LESIState } from "../../types/strategies/lesi.types.js";
 
 /* -------------------------------------------------------------------------- */
 /*                            STRATEGY STATE MAP                              */
@@ -45,6 +46,7 @@ type StrategyStateMap = {
   SMART_GRID: SmartGridState;
   UTC: UTCState;
   INDY_TREND: IndyTrendState;
+  LESI: LESIState;
 };
 const bootstrapedStrategies = new Set<string>();
 
@@ -375,6 +377,110 @@ export const signalEngine = {
           });
         }
       }
+    } else if (strategy.type === "LESI") {
+      // LESI strategy is handled by StrategyRuntime, not SignalEngine
+      // But we need to initialize state for tracking
+      state = {
+        investedCapital: 0,
+        positionQty: 0,
+        avgEntryPrice: null,
+        lastExecutionAt: null,
+        status: "ACTIVE",
+        currentPosition: "NONE",
+        pendingOrder: false,
+        emaValue: 0,
+        laRSIValue: 50,
+        lcSignal: "NEUTRAL",
+      } as LESIState;
+      console.log("[LESI_INIT_STATE]", {
+        strategyId: strategy.id,
+        symbol: strategy.symbol,
+        segment: strategy.segment,
+        exchange: strategy.exchange,
+      });
+
+      // ✅ Bootstrap candles and subscribe to kline stream for LESI
+      if (
+        strategy.exchange === "BINANCE" &&
+        !bootstrapedStrategies.has(strategy.id)
+      ) {
+        try {
+          const config = strategy.config as any;
+          const timeframe = config.timeFrame || "5m";
+
+          console.log("[LESI_BOOTSTRAP] Starting", {
+            strategyId: strategy.id,
+            symbol: strategy.symbol,
+            timeframe,
+          });
+
+          // Bootstrap historical candles
+          await bootstrapCandles({
+            exchange: strategy.exchange,
+            segment: strategy.segment as any,
+            symbol: strategy.symbol,
+            timeframe,
+            limit: 500,
+          });
+
+          // Subscribe to kline stream
+          await BinanceKlineHandler.connect(
+            strategy.segment as any,
+            strategy.symbol,
+            timeframe
+          );
+
+          // Listen for candle close events
+          const candleCloseHandler = (data: any) => {
+            if (
+              data.exchange === strategy.exchange &&
+              data.segment === strategy.segment &&
+              data.symbol === strategy.symbol
+            ) {
+              console.log("[LESI_CANDLE_CLOSE] Triggering evaluation", {
+                strategyId: strategy.id,
+                symbol: data.symbol,
+                time: new Date(data.candle.time).toISOString(),
+                close: data.candle.close,
+              });
+
+              // Get all candles from buffer
+              const candles = CandleBuffer.getCandles(
+                data.exchange,
+                data.segment,
+                data.symbol
+              );
+
+              // Trigger LESI evaluation with candle data
+              signalEngine.onCandleClose(
+                strategy.id,
+                data.candle.close,
+                Date.now(),
+                candles
+              );
+            }
+          };
+
+          BinanceKlineHandler.on("candleClose", candleCloseHandler);
+
+          bootstrapedStrategies.add(strategy.id);
+
+          console.log("[LESI_BOOTSTRAP] Complete", {
+            strategyId: strategy.id,
+            candleCount: CandleBuffer.getCandleCount(
+              strategy.exchange,
+              strategy.segment,
+              strategy.symbol
+            ),
+          });
+        } catch (error: any) {
+          console.error("[LESI_BOOTSTRAP] Error", {
+            strategyId: strategy.id,
+            error: error.message,
+            stack: error.stack,
+          });
+        }
+      }
     } else {
       throw new Error(`Unsupported strategy type: ${strategy.type}`);
     }
@@ -485,7 +591,7 @@ export const signalEngine = {
     const { strategy, state } = entry;
 
     try {
-      if (strategy.type === "UTC" || strategy.type === "INDY_TREND") {
+      if (strategy.type === "UTC" || strategy.type === "INDY_TREND" || strategy.type === "LESI") {
         console.log(`[${strategy.type}_CANDLE_CLOSE_HANDLER] Triggering StrategyRuntime`, {
           strategyId,
           type: strategy.type,
