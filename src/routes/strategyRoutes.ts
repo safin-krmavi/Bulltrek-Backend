@@ -6,7 +6,7 @@ import {
   updateStrategyController,
   deleteStrategyController,
   updateStrategyStatusController,
-    calculateSmartGridLimits,
+  calculateSmartGridLimits,
   calculateSmartGridLimitsEnhanced,
 } from "../controllers/strategyController";
 import {
@@ -15,6 +15,11 @@ import {
   getUserCopySubscriptions,
   getPublishedStrategies,
 } from "../controllers/copyTadingController";
+import {
+  purchaseStrategyController,
+  getMyPurchasedStrategiesController,
+  getStrategyPurchasesController,
+} from "../controllers/marketplaceController";
 import { verifyUser } from "../middleware/verifyUser";
 import { runStrategyController } from "../controllers/runStrategyController";
 
@@ -35,6 +40,11 @@ router.get("/strategies/published", verifyUser, getPublishedStrategies);
 
 // Get logged-in user's copy subscriptions - MUST BE BEFORE :strategyId
 router.get("/strategies/subscriptions/me", verifyUser, getUserCopySubscriptions);
+
+// ✅ MARKETPLACE ROUTES - PUT SPECIFIC ROUTES FIRST
+
+// Get logged-in user's purchased strategies - MUST BE BEFORE :strategyId
+router.get("/strategies/purchases/me", verifyUser, getMyPurchasedStrategiesController);
 
 // ✅ NOW PUT PARAMETERIZED ROUTES
 
@@ -59,6 +69,20 @@ router.post(
   "/strategies/:strategyId/subscribe",
   verifyUser,
   subscribeToCopyStrategy
+);
+
+// Purchase a published strategy (marketplace)
+router.post(
+  "/strategies/purchase",
+  verifyUser,
+  purchaseStrategyController
+);
+
+// Get purchase history for a strategy (seller view)
+router.get(
+  "/strategies/:strategyId/purchases",
+  verifyUser,
+  getStrategyPurchasesController
 );
 
 // Unsubscribe from a strategy
