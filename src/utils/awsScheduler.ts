@@ -12,7 +12,7 @@ dotenv.config();
 /*                                AWS CLIENT                                  */
 /* -------------------------------------------------------------------------- */
 if (
-  !process.env.REGION ||
+  !process.env.AWS_REGION ||
   !process.env.ACCESS_KEY ||
   !process.env.SECRET_KEY ||
   !process.env.AWS_LAMBDA_ROLE_ARN
